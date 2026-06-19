@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ลิงก์เชิญ — ปฏิทินหลวงพ่อ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#f4f0e8;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:#fff;border-radius:16px;border:0.5px solid #c9b896;padding:40px 36px;width:400px;max-width:95vw;text-align:center}
+.logo-badge{width:56px;height:56px;background:#c9973a;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
+.app-name{font-size:20px;font-weight:700;color:#3d3222;margin-bottom:4px}
+.status-box{border-radius:10px;padding:16px;margin:20px 0;font-size:14px;line-height:1.7}
+.status-checking{background:#faf7f0;border:1px solid #c9b896;color:#6b5a3e}
+.status-ok{background:#eaf3de;border:1px solid #97c459;color:#27500a}
+.status-err{background:#faeee5;border:1px solid #f0997b;color:#712b13}
+.google-btn{width:100%;padding:12px;background:#3d3222;color:#f4f0e8;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s;display:none}
+.google-btn:hover{background:#4d3f2a}
+.google-btn img{width:20px;height:20px}
+.go-btn{width:100%;padding:12px;background:#4a6741;color:#d4e8cc;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:10px;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-badge">🗓️</div>
+  <div class="app-name">ปฏิทินหลวงพ่อ</div>
+
+  <div class="status-box status-checking" id="status-box">
+    ⏳ กำลังตรวจสอบลิงก์เชิญ...
+  </div>
+
+  <button class="google-btn" id="google-btn" onclick="loginGoogle()">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    เข้าสู่ระบบด้วย Google เพื่อยืนยัน
+  </button>
+
+  <button class="go-btn" id="go-btn" onclick="window.location.href='index.html'">
+    เข้าใช้งานปฏิทิน →
+  </button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAZeMTn0aihwl_LaKJ7UHTDepEWtHkRauo",
+  authDomain: "luangpor-calendar.firebaseapp.com",
+  projectId: "luangpor-calendar",
+  storageBucket: "luangpor-calendar.firebasestorage.app",
+  messagingSenderId: "575348458305",
+  appId: "1:575348458305:web:d7e43e154df855d54357c0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+const role = params.get('role') || 'editor';
+
+let inviteData = null;
+
+const statusBox = document.getElementById('status-box');
+const googleBtn = document.getElementById('google-btn');
+const goBtn = document.getElementById('go-btn');
+
+async function init() {
+  if (!token) {
+    showError('ลิงก์เชิญไม่ถูกต้องหรือหมดอายุแล้ว');
+    return;
+  }
+  try {
+    const inviteRef = doc(db, 'invites', token);
+    const inviteSnap = await getDoc(inviteRef);
+    if (!inviteSnap.exists()) {
+      showError('ลิงก์เชิญนี้ถูกใช้งานแล้วหรือไม่ถูกต้อง');
+      return;
+    }
+    inviteData = inviteSnap.data();
+    const now = new Date();
+    const exp = inviteData.expiresAt?.toDate();
+    if (exp && now > exp) {
+      showError('ลิงก์เชิญหมดอายุแล้ว กรุณาติดต่อ Admin เพื่อขอลิงก์ใหม่');
+      return;
+    }
+    statusBox.className = 'status-box status-ok';
+    statusBox.innerHTML = '✅ ลิงก์เชิญถูกต้อง<br><strong>กรุณา Login ด้วย Google เพื่อเข้าระบบ</strong>';
+    googleBtn.style.display = 'flex';
+  } catch(e) {
+    showError('เกิดข้อผิดพลาด: ' + e.message);
+  }
+}
+
+function showError(msg) {
+  statusBox.className = 'status-box status-err';
+  statusBox.innerHTML = '❌ ' + msg;
+}
+
+window.loginGoogle = async function() {
+  googleBtn.disabled = true;
+  googleBtn.textContent = 'กำลังเข้าสู่ระบบ...';
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const email = user.email.toLowerCase();
+    const memberRef = doc(db, 'members', email);
+    await setDoc(memberRef, {
+      name: user.displayName,
+      email: email,
+      role: inviteData.role || role,
+      active: true,
+      addedAt: serverTimestamp(),
+      photoURL: user.photoURL || ''
+    });
+    const inviteRef = doc(db, 'invites', token);
+    await deleteDoc(inviteRef);
+    statusBox.className = 'status-box status-ok';
+    statusBox.innerHTML = '🎉 เข้าร่วมสำเร็จ!<br>ยินดีต้อนรับ <strong>' + user.displayName + '</strong>';
+    googleBtn.style.display = 'none';
+    goBtn.style.display = 'block';
+  } catch(e) {
+    showError('เกิดข้อผิดพลาด: ' + e.message);
+    googleBtn.disabled = false;
+    googleBtn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> เข้าสู่ระบบด้วย Google เพื่อยืนยัน';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

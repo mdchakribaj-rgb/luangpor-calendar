@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เข้าสู่ระบบ — ปฏิทินหลวงพ่อ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#f4f0e8;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:#fff;border-radius:16px;border:0.5px solid #c9b896;padding:40px 36px;width:380px;max-width:95vw;text-align:center}
+.logo-badge{width:56px;height:56px;background:#c9973a;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
+.app-name{font-size:20px;font-weight:700;color:#3d3222;margin-bottom:4px}
+.app-sub{font-size:13px;color:#8c7a52;margin-bottom:32px}
+.google-btn{width:100%;padding:12px;background:#3d3222;color:#f4f0e8;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s}
+.google-btn:hover{background:#4d3f2a}
+.google-btn img{width:20px;height:20px}
+.divider{margin:20px 0;border:none;border-top:0.5px solid #d8d0be}
+.note{font-size:12px;color:#8c7a52;line-height:1.6}
+.error-box{display:none;background:#faeee5;border:1px solid #f0997b;border-radius:8px;padding:12px;margin-top:16px;font-size:13px;color:#712b13;line-height:1.6}
+.loading{display:none;font-size:13px;color:#8c7a52;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-badge">🗓️</div>
+  <div class="app-name">ปฏิทินหลวงพ่อ</div>
+  <div class="app-sub">ระบบจัดการตารางงาน</div>
+
+  <button class="google-btn" onclick="loginGoogle()" id="login-btn">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    เข้าสู่ระบบด้วย Google
+  </button>
+
+  <div class="loading" id="loading">⏳ กำลังตรวจสอบสิทธิ์...</div>
+
+  <div class="error-box" id="error-box">
+    <strong>ไม่ได้รับอนุญาต</strong><br>
+    บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>
+    กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ
+  </div>
+
+  <hr class="divider">
+  <div class="note">ระบบนี้เปิดให้เฉพาะผู้ที่ได้รับเชิญเท่านั้น<br>หากมีลิงก์เชิญ กรุณากดลิงก์นั้นก่อนเข้าสู่ระบบ</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAZeMTn0aihwl_LaKJ7UHTDepEWtHkRauo",
+  authDomain: "luangpor-calendar.firebaseapp.com",
+  projectId: "luangpor-calendar",
+  storageBucket: "luangpor-calendar.firebasestorage.app",
+  messagingSenderId: "575348458305",
+  appId: "1:575348458305:web:d7e43e154df855d54357c0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const allowed = await checkWhitelist(user.email);
+    if (allowed) {
+      window.location.href = 'index.html';
+    }
+  }
+});
+
+async function checkWhitelist(email) {
+  try {
+    const ref = doc(db, 'members', email.toLowerCase());
+    const snap = await getDoc(ref);
+    if (snap.exists() && snap.data().active === true) {
+      return true;
+    }
+    return false;
+  } catch(e) {
+    return false;
+  }
+}
+
+window.loginGoogle = async function() {
+  const btn = document.getElementById('login-btn');
+  const loading = document.getElementById('loading');
+  const errBox = document.getElementById('error-box');
+  btn.disabled = true;
+  loading.style.display = 'block';
+  errBox.style.display = 'none';
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const allowed = await checkWhitelist(user.email);
+    if (allowed) {
+      window.location.href = 'index.html';
+    } else {
+      errBox.style.display = 'block';
+      await auth.signOut();
+      btn.disabled = false;
+      loading.style.display = 'none';
+    }
+  } catch(e) {
+    btn.disabled = false;
+    loading.style.display = 'none';
+    errBox.style.display = 'block';
+    errBox.innerHTML = '<strong>เกิดข้อผิดพลาด</strong><br>' + e.message;
+  }
+}
+</script>
+</body>
+</html>

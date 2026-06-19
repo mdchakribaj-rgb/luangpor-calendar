@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — ปฏิทินหลวงพ่อ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#f4f0e8;color:#2c2a1e;min-height:100vh}
+.topbar{background:#3d3222;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;border-bottom:2px solid #c9973a}
+.logo{font-size:15px;font-weight:600;color:#f4f0e8}
+.logo span{color:#c9973a}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.user-name{font-size:13px;color:#b4a07a}
+.back-btn{padding:6px 14px;background:#4a6741;color:#d4e8cc;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif}
+.logout-btn{padding:6px 14px;background:transparent;color:#8c7a52;border:1px solid #4d3f2a;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif}
+.container{max-width:760px;margin:0 auto;padding:24px 16px}
+.section{background:#fff;border:0.5px solid #c9b896;border-radius:12px;padding:24px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:600;color:#3d3222;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.section-desc{font-size:13px;color:#8c7a52;margin-bottom:18px;line-height:1.6}
+
+/* INVITE FORM */
+.invite-form{display:flex;flex-direction:column;gap:12px}
+.label{font-size:12px;font-weight:500;color:#6b5a3e;margin-bottom:4px;display:block}
+.input{width:100%;padding:9px 12px;background:#faf7f0;border:0.5px solid #c9b896;border-radius:8px;color:#3d3222;font-size:14px;font-family:'Sarabun',sans-serif;outline:none}
+.input:focus{border-color:#c9973a}
+.role-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.role-opt{padding:8px;border-radius:8px;border:0.5px solid #c9b896;cursor:pointer;font-size:13px;text-align:center;background:#faf7f0;color:#6b5a3e;transition:all .15s}
+.role-opt.active{border-color:#c9973a;background:#fdf3e3;color:#854f0b;font-weight:600}
+.gen-btn{padding:10px;background:#c9973a;color:#3d3222;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;transition:background .15s}
+.gen-btn:hover{background:#e8c56a}
+
+/* LINK RESULT */
+.link-box{display:none;margin-top:14px;background:#faf7f0;border:1px solid #c9b896;border-radius:8px;padding:14px}
+.link-label{font-size:12px;color:#6b5a3e;font-weight:500;margin-bottom:8px}
+.link-text{font-size:12px;color:#3d3222;word-break:break-all;background:#fff;border:0.5px solid #d8d0be;border-radius:6px;padding:8px 10px;margin-bottom:8px;font-family:monospace;line-height:1.6}
+.link-actions{display:flex;gap:8px}
+.copy-btn{flex:1;padding:8px;background:#3d3222;color:#f4f0e8;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif}
+.line-btn{flex:1;padding:8px;background:#00b900;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif}
+.link-expire{font-size:11px;color:#8c7a52;margin-top:6px}
+
+/* MEMBERS TABLE */
+.members-list{display:flex;flex-direction:column;gap:8px}
+.member-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#faf7f0;border-radius:8px;border:0.5px solid #d8d0be}
+.member-avatar{width:36px;height:36px;border-radius:50%;background:#c9973a;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#3d3222;flex-shrink:0;overflow:hidden}
+.member-avatar img{width:100%;height:100%;object-fit:cover}
+.member-info{flex:1}
+.member-name{font-size:14px;font-weight:500;color:#3d3222}
+.member-email{font-size:11px;color:#8c7a52;margin-top:1px}
+.role-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.role-admin{background:#fdf3e3;color:#854f0b;border:1px solid #e8c56a}
+.role-editor{background:#eaf3de;color:#27500a;border:1px solid #97c459}
+.role-viewer{background:#e8f2fb;color:#0c447c;border:1px solid #85b7eb}
+.remove-btn{padding:4px 10px;background:#faeee5;color:#712b13;border:1px solid #f0997b;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif}
+.empty-state{text-align:center;padding:24px;color:#8c7a52;font-size:13px}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#4a6741;color:#d4e8cc;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;display:none;z-index:999}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">ปฏิทิน<span>หลวงพ่อ</span> — Admin</div>
+  <div class="topbar-right">
+    <span class="user-name" id="user-name"></span>
+    <button class="back-btn" onclick="window.location.href='index.html'">← กลับปฏิทิน</button>
+    <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- GENERATE INVITE LINK -->
+  <div class="section">
+    <div class="section-title">🔗 สร้างลิงก์เชิญสมาชิก</div>
+    <div class="section-desc">ลิงก์จะใช้ได้เพียงครั้งเดียวเท่านั้น เมื่อสมาชิก Login สำเร็จแล้วลิงก์จะหมดอายุทันที</div>
+
+    <div class="invite-form">
+      <div>
+        <label class="label">ชื่อผู้รับเชิญ (ไม่บังคับ)</label>
+        <input class="input" type="text" id="invite-name" placeholder="เช่น พระอานนท์, โยมสมชาย">
+      </div>
+      <div>
+        <label class="label">สิทธิ์การใช้งาน</label>
+        <div class="role-row">
+          <div class="role-opt" onclick="setRole('viewer',this)">👁 Viewer<br><span style="font-size:10px;font-weight:400">ดูอย่างเดียว</span></div>
+          <div class="role-opt active" onclick="setRole('editor',this)">✏️ Editor<br><span style="font-size:10px;font-weight:400">เพิ่ม/แก้ไขได้</span></div>
+          <div class="role-opt" onclick="setRole('admin',this)">⚙️ Admin<br><span style="font-size:10px;font-weight:400">จัดการทั้งหมด</span></div>
+        </div>
+      </div>
+      <button class="gen-btn" onclick="generateLink()">🔗 สร้างลิงก์เชิญ</button>
+    </div>
+
+    <div class="link-box" id="link-box">
+      <div class="link-label">ลิงก์เชิญ (ใช้ได้ครั้งเดียว)</div>
+      <div class="link-text" id="link-text"></div>
+      <div class="link-actions">
+        <button class="copy-btn" onclick="copyLink()">📋 Copy ลิงก์</button>
+        <button class="line-btn" onclick="shareViaLine()">💬 ส่งผ่าน Line</button>
+      </div>
+      <div class="link-expire" id="link-expire"></div>
+    </div>
+  </div>
+
+  <!-- MEMBERS LIST -->
+  <div class="section">
+    <div class="section-title">👥 สมาชิกทั้งหมด</div>
+    <div class="section-desc">จัดการสมาชิกที่มีสิทธิ์เข้าใช้งานปฏิทิน</div>
+    <div class="members-list" id="members-list">
+      <div class="empty-state">⏳ กำลังโหลดรายชื่อสมาชิก...</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAZeMTn0aihwl_LaKJ7UHTDepEWtHkRauo",
+  authDomain: "luangpor-calendar.firebaseapp.com",
+  projectId: "luangpor-calendar",
+  storageBucket: "luangpor-calendar.firebasestorage.app",
+  messagingSenderId: "575348458305",
+  appId: "1:575348458305:web:d7e43e154df855d54357c0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let selectedRole = 'editor';
+let currentLink = '';
+
+const BASE_URL = window.location.origin + window.location.pathname.replace('admin.html','');
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  const ref = doc(db, 'members', user.email.toLowerCase());
+  const snap = await getDoc(ref);
+  if (!snap.exists() || snap.data().role !== 'admin') {
+    alert('คุณไม่มีสิทธิ์เข้าหน้านี้');
+    window.location.href = 'index.html';
+    return;
+  }
+  currentUser = user;
+  document.getElementById('user-name').textContent = user.displayName;
+  loadMembers();
+});
+
+window.setRole = function(role, el) {
+  selectedRole = role;
+  document.querySelectorAll('.role-opt').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+};
+
+window.generateLink = async function() {
+  const token = crypto.randomUUID();
+  const name = document.getElementById('invite-name').value.trim();
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await setDoc(doc(db, 'invites', token), {
+    role: selectedRole,
+    name: name || 'ไม่ระบุ',
+    createdBy: currentUser.email,
+    createdAt: serverTimestamp(),
+    expiresAt: expiresAt,
+    used: false
+  });
+  currentLink = BASE_URL + 'invite.html?token=' + token + '&role=' + selectedRole;
+  document.getElementById('link-text').textContent = currentLink;
+  document.getElementById('link-expire').textContent = '⏰ หมดอายุ: ' + expiresAt.toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric'}) + ' (7 วัน) · ใช้ได้ครั้งเดียวเท่านั้น';
+  document.getElementById('link-box').style.display = 'block';
+  showToast('✅ สร้างลิงก์เรียบร้อย');
+};
+
+window.copyLink = function() {
+  navigator.clipboard.writeText(currentLink);
+  showToast('📋 Copy ลิงก์แล้ว');
+};
+
+window.shareViaLine = function() {
+  const name = document.getElementById('invite-name').value.trim() || 'ท่าน';
+  const msg = encodeURIComponent('🗓️ ปฏิทินหลวงพ่อ\n\nขอเรียนเชิญ ' + name + ' เข้าร่วมระบบปฏิทินหลวงพ่อ\n\nกดลิงก์นี้เพื่อเข้าร่วม:\n' + currentLink + '\n\n⚠️ ลิงก์นี้ใช้ได้เพียงครั้งเดียว');
+  window.open('https://line.me/R/share?text=' + msg, '_blank');
+};
+
+async function loadMembers() {
+  const list = document.getElementById('members-list');
+  try {
+    const snap = await getDocs(collection(db, 'members'));
+    if (snap.empty) { list.innerHTML = '<div class="empty-state">ยังไม่มีสมาชิก</div>'; return; }
+    list.innerHTML = '';
+    snap.forEach(d => {
+      const m = d.data();
+      const initials = (m.name || m.email).slice(0,2).toUpperCase();
+      const roleCls = m.role === 'admin' ? 'role-admin' : m.role === 'editor' ? 'role-editor' : 'role-viewer';
+      const roleLabel = m.role === 'admin' ? 'Admin' : m.role === 'editor' ? 'Editor' : 'Viewer';
+      const isMe = m.email === currentUser.email.toLowerCase();
+      list.innerHTML += `
+        <div class="member-row">
+          <div class="member-avatar">${m.photoURL ? `<img src="${m.photoURL}">` : initials}</div>
+          <div class="member-info">
+            <div class="member-name">${m.name || '-'}${isMe ? ' <span style="font-size:11px;color:#8c7a52">(คุณ)</span>' : ''}</div>
+            <div class="member-email">${m.email}</div>
+          </div>
+          <span class="role-badge ${roleCls}">${roleLabel}</span>
+          ${!isMe ? `<button class="remove-btn" onclick="removeMember('${m.email}')">ลบ</button>` : ''}
+        </div>`;
+    });
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาด: ' + e.message + '</div>';
+  }
+}
+
+window.removeMember = async function(email) {
+  if (!confirm('ลบ ' + email + ' ออกจากระบบ?')) return;
+  await deleteDoc(doc(db, 'members', email));
+  showToast('🗑️ ลบสมาชิกแล้ว');
+  loadMembers();
+};
+
+window.logout = async function() {
+  await signOut(auth);
+  window.location.href = 'login.html';
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+</script>
+</body>
+</html>
