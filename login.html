@@ -2,51 +2,389 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เข้าสู่ระบบ — ปฏิทินหลวงพ่อ</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ปฏิทินหลวงพ่อ — เข้าสู่ระบบ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',sans-serif;background:#f4f0e8;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.card{background:#fff;border-radius:16px;border:0.5px solid #c9b896;padding:40px 36px;width:380px;max-width:95vw;text-align:center}
-.logo-badge{width:56px;height:56px;background:#c9973a;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
-.app-name{font-size:20px;font-weight:700;color:#3d3222;margin-bottom:4px}
-.app-sub{font-size:13px;color:#8c7a52;margin-bottom:32px}
-.google-btn{width:100%;padding:12px;background:#3d3222;color:#f4f0e8;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s}
-.google-btn:hover{background:#4d3f2a}
-.google-btn img{width:20px;height:20px}
-.divider{margin:20px 0;border:none;border-top:0.5px solid #d8d0be}
-.note{font-size:12px;color:#8c7a52;line-height:1.6}
-.error-box{display:none;background:#faeee5;border:1px solid #f0997b;border-radius:8px;padding:12px;margin-top:16px;font-size:13px;color:#712b13;line-height:1.6}
-.loading{display:none;font-size:13px;color:#8c7a52;margin-top:16px}
+:root {
+  --bg: #0f1a0a;
+  --surface: #1a2d12;
+  --surface2: #222e1a;
+  --border: rgba(201,151,58,.2);
+  --gold: #c9973a;
+  --gold-light: #e8c56a;
+  --gold-dim: rgba(201,151,58,.15);
+  --green: #4a6741;
+  --green-light: #9fe1cb;
+  --text: #f4ead0;
+  --text2: #8c7a52;
+  --text3: #4a3d28;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── AMBIENT BACKGROUND ── */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-glow::before {
+  content: '';
+  position: absolute;
+  top: -80px; left: 50%;
+  transform: translateX(-50%);
+  width: 500px; height: 300px;
+  background: radial-gradient(ellipse, rgba(201,151,58,.12) 0%, transparent 70%);
+}
+.bg-glow::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: radial-gradient(ellipse, rgba(74,103,65,.1) 0%, transparent 70%);
+}
+
+/* ── CARD ── */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  padding: 0 20px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── MONK ILLUSTRATION ── */
+.monk-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.monk-wrap svg {
+  filter: drop-shadow(0 8px 24px rgba(201,151,58,.2));
+}
+
+/* ── TITLE ── */
+.title-wrap {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.title-main {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.5px;
+  line-height: 1.1;
+}
+.title-main em {
+  font-style: normal;
+  color: var(--gold);
+}
+.title-sub {
+  font-size: 14px;
+  color: var(--text2);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+/* ── LOGIN BOX ── */
+.login-box {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  padding: 24px 20px;
+  backdrop-filter: blur(8px);
+}
+
+.google-btn {
+  width: 100%;
+  padding: 16px 20px;
+  background: #3d3222;
+  color: var(--gold-light);
+  border: 1px solid rgba(201,151,58,.35);
+  border-radius: 14px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all .2s;
+  letter-spacing: .1px;
+}
+.google-btn:hover {
+  background: #4d3f2a;
+  border-color: rgba(201,151,58,.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(201,151,58,.2);
+}
+.google-btn:active { transform: translateY(0); }
+.google-btn img { width: 22px; height: 22px; flex-shrink: 0; }
+.google-btn.loading { opacity: .7; pointer-events: none; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+}
+.div-line { flex: 1; height: 0.5px; background: rgba(255,255,255,.07); }
+.div-text { font-size: 12px; color: var(--text3); }
+
+.invite-box {
+  background: rgba(74,103,65,.12);
+  border: 0.5px solid rgba(74,103,65,.3);
+  border-radius: 12px;
+  padding: 14px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.invite-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.invite-text {
+  font-size: 13px;
+  color: #7a9e6e;
+  line-height: 1.7;
+}
+.invite-text strong { color: var(--green-light); font-weight: 600; }
+
+/* ── STATUS MESSAGES ── */
+.status-msg {
+  display: none;
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 14px;
+  text-align: center;
+}
+.status-loading {
+  background: rgba(201,151,58,.1);
+  border: 0.5px solid rgba(201,151,58,.3);
+  color: var(--gold-light);
+}
+.status-error {
+  background: rgba(216,90,48,.12);
+  border: 0.5px solid rgba(216,90,48,.3);
+  color: #f0997b;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* ── DESKTOP LAYOUT ── */
+@media (min-width: 640px) {
+  .card {
+    max-width: 480px;
+    padding: 0 24px 40px;
+  }
+  .title-main { font-size: 36px; }
+  .login-box { padding: 28px 24px; }
+  .google-btn { font-size: 17px; padding: 18px 24px; }
+}
+
+@media (min-width: 900px) {
+  body { background: #080f05; }
+  .card {
+    max-width: 860px;
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+    padding: 40px;
+    background: rgba(255,255,255,.025);
+    border: 0.5px solid var(--border);
+    border-radius: 28px;
+    backdrop-filter: blur(8px);
+  }
+  .monk-wrap { margin-bottom: 0; }
+  .monk-wrap svg { width: 220px; height: 220px; }
+  .right-col {
+    flex: 1;
+  }
+  .title-wrap { text-align: left; margin-bottom: 24px; }
+  .title-main { font-size: 38px; }
+  .footer { text-align: left; }
+}
+
+/* pulse animation on monk */
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.monk-float { animation: float 3.5s ease-in-out infinite; }
+
+@keyframes sparkle {
+  0%,100% { opacity: .4; transform: scale(.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(20deg); }
+}
+.sparkle-1 { animation: sparkle 2s ease-in-out infinite; }
+.sparkle-2 { animation: sparkle 2.4s ease-in-out infinite .4s; }
+.sparkle-3 { animation: sparkle 1.8s ease-in-out infinite .8s; }
 </style>
 </head>
 <body>
+
+<div class="bg-glow"></div>
+
 <div class="card">
-  <div class="logo-badge">🗓️</div>
-  <div class="app-name">ปฏิทินหลวงพ่อ</div>
-  <div class="app-sub">ระบบจัดการตารางงาน</div>
-
-  <button class="google-btn" onclick="loginGoogle()" id="login-btn">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-    เข้าสู่ระบบด้วย Google
-  </button>
-
-  <div class="loading" id="loading">⏳ กำลังตรวจสอบสิทธิ์...</div>
-
-  <div class="error-box" id="error-box">
-    <strong>ไม่ได้รับอนุญาต</strong><br>
-    บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>
-    กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ
+  <!-- MONK SVG -->
+  <div class="monk-wrap">
+    <svg class="monk-float" width="200" height="210" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+      <!-- shadow -->
+      <ellipse cx="100" cy="202" rx="52" ry="7" fill="rgba(0,0,0,.3)"/>
+      <!-- robe body -->
+      <ellipse cx="100" cy="162" rx="46" ry="50" fill="#c9973a"/>
+      <!-- robe shadow fold -->
+      <path d="M58 130 Q68 118 100 114 Q132 118 142 130 Q136 148 100 148 Q64 148 58 130Z" fill="#b8853a"/>
+      <!-- robe lines -->
+      <path d="M76 135 Q82 150 86 172" stroke="#a07220" stroke-width="1.8" fill="none" opacity=".5"/>
+      <path d="M112 133 Q107 150 105 172" stroke="#a07220" stroke-width="1.8" fill="none" opacity=".5"/>
+      <!-- neck -->
+      <rect x="88" y="100" width="24" height="20" rx="10" fill="#e8c98a"/>
+      <!-- head -->
+      <ellipse cx="100" cy="84" rx="34" ry="36" fill="#e8c98a"/>
+      <!-- shaved head highlight -->
+      <ellipse cx="94" cy="62" rx="11" ry="7" fill="rgba(255,255,255,.13)" transform="rotate(-15 94 62)"/>
+      <!-- ear L -->
+      <ellipse cx="66" cy="86" rx="7" ry="9" fill="#dbb870"/>
+      <!-- ear R -->
+      <ellipse cx="134" cy="86" rx="7" ry="9" fill="#dbb870"/>
+      <!-- eyebrow L -->
+      <path d="M80 70 Q90 66 96 69" stroke="#7a5c1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- eyebrow R -->
+      <path d="M104 69 Q110 66 120 70" stroke="#7a5c1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- eye L closed happy -->
+      <path d="M80 78 Q88 73 96 78" stroke="#3d2e10" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- eye R closed happy -->
+      <path d="M104 78 Q112 73 120 78" stroke="#3d2e10" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- cheek L -->
+      <ellipse cx="74" cy="87" rx="9" ry="5" fill="rgba(220,100,70,.22)"/>
+      <!-- cheek R -->
+      <ellipse cx="126" cy="87" rx="9" ry="5" fill="rgba(220,100,70,.22)"/>
+      <!-- smile -->
+      <path d="M84 95 Q100 108 116 95" stroke="#7a5c1e" stroke-width="2.5" fill="rgba(180,90,50,.18)" stroke-linecap="round"/>
+      <!-- teeth hint -->
+      <path d="M88 98 Q100 105 112 98" fill="rgba(255,255,255,.35)" stroke="none"/>
+      <!-- arm L -->
+      <path d="M58 132 Q40 118 34 100" stroke="#c9973a" stroke-width="18" fill="none" stroke-linecap="round"/>
+      <!-- hand L -->
+      <ellipse cx="31" cy="96" rx="13" ry="11" fill="#e8c98a"/>
+      <!-- arm R -->
+      <path d="M142 132 Q160 118 166 100" stroke="#c9973a" stroke-width="18" fill="none" stroke-linecap="round"/>
+      <!-- hand R -->
+      <ellipse cx="169" cy="96" rx="13" ry="11" fill="#e8c98a"/>
+      <!-- prayer fingers L -->
+      <line x1="24" y1="90" x2="24" y2="102" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <line x1="28" y1="88" x2="28" y2="100" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <line x1="32" y1="87" x2="32" y2="99" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <line x1="36" y1="88" x2="36" y2="100" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <!-- prayer fingers R -->
+      <line x1="162" y1="90" x2="162" y2="102" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <line x1="166" y1="88" x2="166" y2="100" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <line x1="170" y1="87" x2="170" y2="99" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <line x1="174" y1="88" x2="174" y2="100" stroke="#dbb870" stroke-width="2" stroke-linecap="round"/>
+      <!-- sparkle 1 -->
+      <g class="sparkle-1" transform-origin="18 58">
+        <g transform="translate(18,58)">
+          <line x1="0" y1="-10" x2="0" y2="10" stroke="#e8c56a" stroke-width="2" stroke-linecap="round"/>
+          <line x1="-10" y1="0" x2="10" y2="0" stroke="#e8c56a" stroke-width="2" stroke-linecap="round"/>
+          <line x1="-6" y1="-6" x2="6" y2="6" stroke="#e8c56a" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="6" y1="-6" x2="-6" y2="6" stroke="#e8c56a" stroke-width="1.2" stroke-linecap="round"/>
+        </g>
+      </g>
+      <!-- sparkle 2 -->
+      <g class="sparkle-2" transform-origin="180 52">
+        <g transform="translate(180,52)">
+          <line x1="0" y1="-8" x2="0" y2="8" stroke="#e8c56a" stroke-width="2" stroke-linecap="round"/>
+          <line x1="-8" y1="0" x2="8" y2="0" stroke="#e8c56a" stroke-width="2" stroke-linecap="round"/>
+          <line x1="-5" y1="-5" x2="5" y2="5" stroke="#e8c56a" stroke-width="1" stroke-linecap="round"/>
+          <line x1="5" y1="-5" x2="-5" y2="5" stroke="#e8c56a" stroke-width="1" stroke-linecap="round"/>
+        </g>
+      </g>
+      <!-- sparkle 3 small top -->
+      <g class="sparkle-3" transform-origin="100 28">
+        <g transform="translate(100,28)">
+          <line x1="0" y1="-6" x2="0" y2="6" stroke="#c9973a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="-6" y1="0" x2="6" y2="0" stroke="#c9973a" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>
   </div>
 
-  <hr class="divider">
-  <div class="note">ระบบนี้เปิดให้เฉพาะผู้ที่ได้รับเชิญเท่านั้น<br>หากมีลิงก์เชิญ กรุณากดลิงก์นั้นก่อนเข้าสู่ระบบ</div>
+  <div class="right-col">
+    <!-- TITLE -->
+    <div class="title-wrap">
+      <div class="title-main">ขอ<em>นมัสการ</em> 🙏</div>
+      <div class="title-sub">ยินดีต้อนรับสู่ระบบจัดการตารางงาน<br>ปฏิทินหลวงพ่อ</div>
+    </div>
+
+    <!-- LOGIN BOX -->
+    <div class="login-box">
+      <button class="google-btn" id="google-btn" onclick="loginGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+        เข้าสู่ระบบด้วย Google
+      </button>
+
+      <div class="status-msg status-loading" id="msg-loading">
+        ⏳ กำลังตรวจสอบสิทธิ์การเข้าใช้งาน...
+      </div>
+      <div class="status-msg status-error" id="msg-error"></div>
+
+      <div class="divider">
+        <div class="div-line"></div>
+        <div class="div-text">ยังไม่ได้รับการเชิญ?</div>
+        <div class="div-line"></div>
+      </div>
+
+      <div class="invite-box">
+        <span class="invite-icon">🔒</span>
+        <div class="invite-text">
+          ระบบนี้เปิดเฉพาะ<strong>ผู้ที่ได้รับลิงก์เชิญจาก Admin</strong> เท่านั้น<br>
+          หากมีลิงก์เชิญ กรุณากดลิงก์นั้นก่อนแล้วค่อย Login ที่นี่
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      ปฏิทินหลวงพ่อ · ระบบปลอดภัย เฉพาะสมาชิก<br>
+      © 2568 สงวนลิขสิทธิ์
+    </div>
+  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -63,54 +401,68 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
+// ── Check if already logged in ──
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const allowed = await checkWhitelist(user.email);
-    if (allowed) {
+    showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
+    const ok = await checkWhitelist(user.email);
+    if (ok) {
       window.location.href = 'index.html';
+    } else {
+      await signOut(auth);
+      hideLoading();
     }
   }
 });
 
 async function checkWhitelist(email) {
   try {
-    const ref = doc(db, 'members', email.toLowerCase());
-    const snap = await getDoc(ref);
-    if (snap.exists() && snap.data().active === true) {
-      return true;
-    }
-    return false;
-  } catch(e) {
-    return false;
-  }
+    const snap = await getDoc(doc(db, 'members', email.toLowerCase()));
+    return snap.exists() && snap.data().active === true;
+  } catch { return false; }
 }
 
-window.loginGoogle = async function() {
-  const btn = document.getElementById('login-btn');
-  const loading = document.getElementById('loading');
-  const errBox = document.getElementById('error-box');
-  btn.disabled = true;
-  loading.style.display = 'block';
-  errBox.style.display = 'none';
+function showLoading(msg) {
+  document.getElementById('google-btn').classList.add('loading');
+  document.getElementById('msg-loading').textContent = msg;
+  document.getElementById('msg-loading').style.display = 'block';
+  document.getElementById('msg-error').style.display = 'none';
+}
+
+function hideLoading() {
+  document.getElementById('google-btn').classList.remove('loading');
+  document.getElementById('msg-loading').style.display = 'none';
+}
+
+function showError(msg) {
+  hideLoading();
+  const el = document.getElementById('msg-error');
+  el.innerHTML = '❌ ' + msg;
+  el.style.display = 'block';
+}
+
+window.loginGoogle = async function () {
+  showLoading('⏳ กำลังเชื่อมต่อ Google...');
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const allowed = await checkWhitelist(user.email);
-    if (allowed) {
+    showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
+    const ok = await checkWhitelist(user.email);
+    if (ok) {
+      showLoading('✅ เข้าสู่ระบบสำเร็จ กำลังโหลด...');
       window.location.href = 'index.html';
     } else {
-      errBox.style.display = 'block';
-      await auth.signOut();
-      btn.disabled = false;
-      loading.style.display = 'none';
+      await signOut(auth);
+      showError('บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ');
     }
-  } catch(e) {
-    btn.disabled = false;
-    loading.style.display = 'none';
-    errBox.style.display = 'block';
-    errBox.innerHTML = '<strong>เกิดข้อผิดพลาด</strong><br>' + e.message;
+  } catch (e) {
+    if (e.code === 'auth/popup-closed-by-user') {
+      hideLoading();
+    } else {
+      showError('เกิดข้อผิดพลาด: ' + (e.message || 'กรุณาลองใหม่อีกครั้ง'));
+    }
   }
-}
+};
 </script>
 </body>
 </html>
