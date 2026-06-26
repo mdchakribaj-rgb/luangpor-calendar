@@ -2,263 +2,874 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewpฟort" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ปฏิทินหลวงพ่อ</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',sans-serif;background:#f4f0e8;color:#2c2a1e;min-height:100vh}
-#auth-loading{position:fixed;inset:0;background:#f4f0e8;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:12px}
-#auth-loading .spinner{width:36px;height:36px;border:3px solid #d8d0be;border-top-color:#c9973a;border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#app{display:none}
+:root {
+  --bg: #0f1a0a;
+  --surface: #162210;
+  --surface2: #1e2e16;
+  --surface3: #253520;
+  --border: rgba(201,151,58,.18);
+  --border2: rgba(255,255,255,.07);
+  --gold: #c9973a;
+  --gold-light: #e8c56a;
+  --gold-dim: rgba(201,151,58,.12);
+  --green: #4a6741;
+  --green-light: #9fe1cb;
+  --red: #d85a30;
+  --text: #f4ead0;
+  --text2: #8c7a52;
+  --text3: #4a3d28;
+  --cat-priv: #c9973a;
+  --cat-temple: #4a9e6e;
+  --cat-abroad: #d85a30;
+  --cat-pati: #c9973a;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --nav-h: 64px;
+}
 
-.topbar{background:#3d3222;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;border-bottom:2px solid #c9973a;position:sticky;top:0;z-index:50}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-badge{width:34px;height:34px;border-radius:8px;background:#c9973a;display:flex;align-items:center;justify-content:center;color:#3d3222;font-size:17px}
-.logo-name{font-size:15px;font-weight:600;color:#f4f0e8}
-.logo-sub{font-size:11px;color:#8c7a52;margin-top:1px}
-.nav-tabs{display:flex;gap:3px}
-.nav-tab{padding:6px 13px;border-radius:6px;border:none;background:transparent;color:#b4a07a;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Sarabun',sans-serif;transition:all .15s}
-.nav-tab:hover{background:#4d3f2a;color:#f4f0e8}
-.nav-tab.active{background:#c9973a;color:#3d3222;font-weight:600}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.user-chip{display:flex;align-items:center;gap:7px;background:#2c2416;padding:5px 10px;border-radius:20px}
-.user-chip img{width:22px;height:22px;border-radius:50%}
-.user-chip span{font-size:12px;color:#b4a07a}
-.admin-btn{padding:5px 12px;background:#4a6741;color:#d4e8cc;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif}
-.logout-btn{padding:5px 12px;background:transparent;color:#8c7a52;border:1px solid #4d3f2a;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif}
-.add-btn{padding:7px 14px;background:#4a6741;color:#d4e8cc;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Sarabun',sans-serif}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
 
-.app-body{display:flex;height:calc(100vh - 54px)}
-.sidebar{width:190px;min-width:190px;background:#3d3222;border-right:1px solid #4d3f2a;padding:14px 10px;display:flex;flex-direction:column;gap:18px;overflow-y:auto}
-.sb-title{font-size:10px;font-weight:600;letter-spacing:1px;color:#8c7a52;text-transform:uppercase;margin-bottom:8px}
-.cat-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:6px;cursor:pointer;font-size:12px;color:#b4a07a;transition:background .15s}
-.cat-item:hover,.cat-item.active{background:#4d3f2a;color:#e8c56a}
-.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.cat-cnt{margin-left:auto;font-size:10px;background:#2c2416;color:#8c7a52;padding:1px 6px;border-radius:20px}
-.cat-item.active .cat-cnt{background:#c9973a;color:#3d3222;font-weight:600}
-.pat-card{background:#2c2416;border-radius:8px;padding:12px;border:1px solid #4d3f2a}
-.pat-date{font-size:11px;color:#e8c56a;font-weight:500}
-.pat-countdown{font-size:10px;color:#c9973a;margin-top:1px}
-.pat-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
-.pat-full{background:#3d3222;color:#e8c56a;border:1px solid #c9973a}
-.pat-new{background:#2a3d22;color:#9fe1cb;border:1px solid #4a6741}
-.notify-btn{width:100%;padding:8px;background:#c9973a;color:#3d3222;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px}
+/* ── AUTH LOADING ── */
+#auth-loading {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 9999; gap: 14px;
+}
+#auth-loading .spinner {
+  width: 40px; height: 40px; border: 3px solid var(--surface2);
+  border-top-color: var(--gold); border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#auth-loading p { font-size: 14px; color: var(--text2); }
+#app { display: none; height: 100%; flex-direction: column; }
+#app.show { display: flex; }
 
-.main{flex:1;overflow-y:auto;padding:16px 18px;background:#f4f0e8}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.cal-title-text{font-size:18px;font-weight:600;color:#3d3222}
-.cal-nav{display:flex;gap:5px}
-.cal-btn{padding:5px 12px;background:#fff;border:0.5px solid #c9b896;color:#6b5a3e;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif}
-.cal-btn.today{background:#c9973a;border-color:#c9973a;color:#3d3222;font-weight:600}
-.legend-row{display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b5a3e}
-.leg-sq{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--gold);
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  position: relative; z-index: 50;
+}
+.topbar-logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold), #7a5c1e);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(201,151,58,.3);
+}
+.logo-name { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -.2px; }
+.logo-sub { font-size: 10px; color: var(--text2); margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.user-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.05); border: 0.5px solid var(--border);
+  padding: 5px 10px 5px 5px; border-radius: 20px;
+}
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #7a5c1e);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  overflow: hidden; flex-shrink: 0;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-name { font-size: 12px; color: var(--text2); font-weight: 500; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.cal-tbl{width:100%;border-collapse:collapse;table-layout:fixed}
-.cal-tbl th{padding:7px 4px;text-align:center;font-size:11px;font-weight:600;color:#8c7a52;text-transform:uppercase;letter-spacing:.4px;border-bottom:1.5px solid #c9973a}
-.cal-tbl td{vertical-align:top;border:0.5px solid #d8d0be;padding:5px 5px 4px;height:98px;cursor:pointer;background:#fff;transition:background .1s}
-.cal-tbl td:hover{background:#faf7f0}
-.td-today{background:#fdf8ee!important;border:1.5px solid #c9973a!important}
-.td-oth{background:#f9f6ef!important}
-.td-patimokkha{background:#fdf3e3!important;border-top:2px solid #c9973a!important}
-.td-patimokkha-new{background:#f0f8f0!important;border-top:2px solid #4a6741!important}
-.day-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px}
-.day-n{font-size:12px;color:#8c7a52;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-variant-numeric:tabular-nums;flex-shrink:0}
-.day-n.today{background:#c9973a;color:#3d3222;font-weight:700}
-.day-n.oth{color:#c9b896}
-.lunar-badge{font-size:9px;color:#8c7a52;text-align:right;line-height:1.3;flex-shrink:0;max-width:48px}
-.lunar-15{color:#854f0b;font-weight:600}
-.lunar-wp{color:#3b6d11;font-weight:600}
-.wan-phra-dot{width:5px;height:5px;border-radius:50%;background:#c9973a;display:inline-block;margin-left:2px;vertical-align:1px}
-.chip{display:block;padding:2px 5px;border-radius:3px;font-size:10px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ch-priv{background:#faeeda;color:#633806}
-.ch-temple{background:#eaf3de;color:#27500a}
-.ch-abroad{background:#faeee5;color:#712b13}
-.ch-pati{background:#fdf3e3;color:#854f0b;border:0.5px solid #e8c56a}
-.ch-pati-new{background:#e3f5ec;color:#085041;border:0.5px solid #4a6741}
-.fly-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;background:#e8f2fb;color:#0c447c;border-radius:3px;padding:1px 5px;margin-top:1px;border:0.5px solid #b5d4f4}
-.recorder-tag{font-size:9px;color:#8c7a52;margin-top:1px;display:block}
+/* ── MAIN AREA ── */
+.main-area {
+  flex: 1; overflow: hidden;
+  position: relative;
+}
 
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(45,38,22,.55);z-index:200;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border:0.5px solid #c9b896;border-radius:12px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:22px;position:relative}
-.modal-hd{font-size:15px;font-weight:600;color:#3d3222;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;color:#8c7a52;font-size:20px}
-.fl{display:block;font-size:11px;font-weight:500;color:#6b5a3e;margin-bottom:4px}
-.fi{width:100%;padding:7px 10px;background:#faf7f0;border:0.5px solid #c9b896;border-radius:6px;color:#3d3222;font-size:13px;font-family:'Sarabun',sans-serif;outline:none}
-.fi:focus{border-color:#c9973a;background:#fff}
-.fg{margin-bottom:11px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cat-sel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
-.co{padding:7px 6px;border-radius:6px;border:0.5px solid #c9b896;cursor:pointer;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px;background:#faf7f0;color:#6b5a3e;transition:all .15s}
-.co.s-priv{background:#faeeda;color:#633806;border-color:#ef9f27}
-.co.s-temple{background:#eaf3de;color:#27500a;border-color:#97c459}
-.co.s-abroad{background:#faeee5;color:#712b13;border-color:#f0997b}
-.fly-section{background:#f0f6fc;border:0.5px solid #b5d4f4;border-radius:8px;padding:12px;margin-bottom:11px}
-.fly-toggle-row{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.fly-toggle-label{font-size:12px;font-weight:500;color:#185fa5}
-.fly-body{margin-top:10px;display:none}
-.fly-body.open{display:block}
-.toggle-sw{width:34px;height:19px;background:#d8d0be;border-radius:20px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-.toggle-sw.on{background:#378add}
-.toggle-sw::after{content:'';width:13px;height:13px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .2s}
-.toggle-sw.on::after{left:18px}
-.remind-row{display:flex;gap:5px;flex-wrap:wrap}
-.rc{padding:4px 11px;border-radius:20px;font-size:11px;border:0.5px solid #c9b896;cursor:pointer;background:#faf7f0;color:#6b5a3e;transition:all .15s}
-.rc.on{background:#c9973a;color:#3d3222;border-color:#c9973a;font-weight:600}
-.btn-row{display:flex;gap:8px;margin-top:16px}
-.btn-save{flex:1;padding:8px;background:#4a6741;color:#d4e8cc;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Sarabun',sans-serif}
-.btn-delete{padding:8px 14px;background:#faeee5;color:#712b13;border:1px solid #f0997b;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif;display:none}
-.btn-cancel{padding:8px 14px;background:#faf7f0;color:#6b5a3e;border:0.5px solid #c9b896;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif}
+/* ── VIEWS ── */
+.view {
+  position: absolute; inset: 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding-bottom: calc(var(--nav-h) + 8px);
+  display: none;
+}
+.view.active { display: block; }
 
-.toast{position:fixed;bottom:24px;right:24px;background:#4a6741;color:#d4e8cc;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;display:none;z-index:999}
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+  display: flex; align-items: flex-end; justify-content: space-around;
+  padding: 6px 4px 10px;
+  z-index: 50;
+  flex-shrink: 0;
+}
+.bottom-nav::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,151,58,.4), transparent);
+}
+.bn-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px; flex: 1;
+  cursor: pointer; padding: 2px 0;
+  border: none; background: none; color: var(--text3);
+  font-family: 'Sarabun', sans-serif;
+  transition: all .2s;
+}
+.bn-item i { font-size: 22px; transition: color .2s; }
+.bn-item span { font-size: 10px; font-weight: 500; letter-spacing: .2px; transition: color .2s; }
+.bn-item.active i, .bn-item.active span { color: var(--gold); }
+.bn-item.active { position: relative; }
+.bn-item.active::after {
+  content: '';
+  position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 2px; background: var(--gold); border-radius: 2px;
+}
+.bn-fab-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px; flex: 1;
+  cursor: pointer; margin-top: -22px;
+}
+.bn-fab {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, #4a6741, #2d4028);
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(74,103,65,.5);
+  box-shadow: 0 4px 16px rgba(74,103,65,.4);
+  transition: transform .2s;
+}
+.bn-fab:hover { transform: scale(1.05); }
+.bn-fab i { font-size: 26px; color: #d4e8cc; }
+.bn-fab-wrap span { font-size: 10px; color: var(--text3); font-weight: 500; }
+
+/* ── CALENDAR VIEW ── */
+.cal-header {
+  padding: 14px 16px 8px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.cal-month-title { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+.cal-month-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.cal-nav { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+.cal-nav-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--surface2); border: 0.5px solid var(--border);
+  color: var(--gold); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; transition: all .15s;
+}
+.cal-nav-btn:hover { background: var(--surface3); }
+.today-btn {
+  padding: 0 12px; width: auto; font-size: 13px; font-weight: 600;
+  font-family: 'Sarabun', sans-serif;
+}
+
+.legend-row {
+  display: flex; gap: 8px; padding: 0 16px 10px; flex-wrap: wrap;
+}
+.leg {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text2);
+  background: var(--surface2); border-radius: 20px;
+  padding: 4px 10px; border: 0.5px solid var(--border2);
+}
+.leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* CATEGORY FILTER */
+.cat-filter {
+  display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto;
+  scrollbar-width: none;
+}
+.cat-filter::-webkit-scrollbar { display: none; }
+.cat-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 20px; white-space: nowrap;
+  background: var(--surface2); border: 0.5px solid var(--border2);
+  font-size: 12px; color: var(--text2); cursor: pointer; flex-shrink: 0;
+  transition: all .15s;
+}
+.cat-pill.active { color: var(--text); border-color: var(--gold); background: var(--gold-dim); }
+.cat-pill i { font-size: 14px; }
+
+/* CALENDAR GRID */
+.cal-grid-wrap { padding: 0 10px; }
+.cal-head {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  margin-bottom: 3px;
+}
+.cal-head span {
+  text-align: center; font-size: 11px; font-weight: 600;
+  color: var(--text3); padding: 3px 0;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-cell {
+  min-height: 68px; border-radius: 8px;
+  padding: 4px 3px 3px; position: relative;
+  background: rgba(255,255,255,.03);
+  border: 0.5px solid rgba(255,255,255,.05);
+  cursor: pointer; transition: background .12s;
+  overflow: hidden;
+}
+.cal-cell:hover { background: rgba(255,255,255,.07); }
+.cal-cell.oth { background: transparent; border-color: transparent; opacity: .35; }
+.cal-cell.today { background: var(--gold-dim); border: 1.5px solid rgba(201,151,58,.5); }
+.cal-cell.pati { background: rgba(180,120,20,.1); border-top: 2px solid var(--gold); border-bottom: 0.5px solid rgba(201,151,58,.15); border-left: 0.5px solid rgba(201,151,58,.15); border-right: 0.5px solid rgba(201,151,58,.15); }
+.cal-cell.pati-new { background: rgba(74,103,65,.12); border-top: 2px solid var(--green); border-bottom: 0.5px solid rgba(74,103,65,.15); border-left: 0.5px solid rgba(74,103,65,.15); border-right: 0.5px solid rgba(74,103,65,.15); }
+.day-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2px; }
+.day-n {
+  font-size: 13px; font-weight: 600; color: var(--text2);
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; flex-shrink: 0;
+}
+.day-n.today {
+  background: linear-gradient(135deg, var(--gold), #a07220);
+  color: #fff; font-weight: 800;
+  box-shadow: 0 2px 6px rgba(201,151,58,.4);
+}
+.day-n.oth { color: var(--text3); }
+.lunar-label {
+  font-size: 8px; color: var(--text3); text-align: right;
+  line-height: 1.2; max-width: 40px;
+}
+.lunar-label.wp { color: var(--green); font-weight: 700; }
+.lunar-label.f15 { color: var(--gold); font-weight: 700; }
+.wp-dot {
+  display: inline-block; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--gold);
+  vertical-align: 1px; margin-right: 1px;
+}
+.ev-chip {
+  display: flex; align-items: center; gap: 2px;
+  font-size: 9px; font-weight: 600; padding: 2px 4px;
+  border-radius: 4px; margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}
+.ev-chip i { font-size: 9px; flex-shrink: 0; }
+.chip-priv { background: rgba(201,151,58,.2); color: var(--gold-light); }
+.chip-temple { background: rgba(74,158,110,.2); color: #9fe1cb; }
+.chip-abroad { background: rgba(216,90,48,.2); color: #f0997b; }
+.chip-pati { background: rgba(201,151,58,.2); color: var(--gold); border: 0.5px solid rgba(201,151,58,.3); }
+.chip-pati-new { background: rgba(74,103,65,.2); color: var(--green-light); border: 0.5px solid rgba(74,103,65,.3); }
+.fly-tag {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: 8px; background: rgba(55,138,221,.15);
+  color: #85b7eb; border-radius: 3px; padding: 1px 4px; margin-top: 1px;
+}
+.recorder-tag { font-size: 8px; color: var(--text3); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── DASHBOARD VIEW ── */
+.dash-wrap { padding: 16px; }
+.dash-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 14px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+}
+.stat-label { font-size: 11px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+.stat-num { font-size: 32px; font-weight: 800; color: var(--text); line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.dash-card {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+}
+.dash-card-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.dash-card-title i { font-size: 18px; color: var(--gold); }
+/* donut */
+.donut-row { display: flex; align-items: center; gap: 20px; }
+.donut-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.leg-item { display: flex; align-items: center; gap: 8px; }
+.leg-item-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.leg-item-name { font-size: 13px; color: var(--text); flex: 1; }
+.leg-item-num { font-size: 13px; color: var(--text2); font-weight: 600; }
+/* patimokkha card */
+.pati-card {
+  background: rgba(201,151,58,.07); border: 0.5px solid rgba(201,151,58,.25);
+  border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
+}
+.pati-card-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.pati-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid rgba(201,151,58,.15); }
+.pati-row:last-of-type { border-bottom: none; }
+.pati-date-text { font-size: 13px; color: var(--gold-light); font-weight: 600; }
+.pati-cd-text { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.pati-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  background: rgba(201,151,58,.2); color: var(--gold); border: 0.5px solid var(--gold);
+}
+.pati-badge.new { background: rgba(74,103,65,.2); color: var(--green-light); border-color: var(--green); }
+/* upcoming */
+.up-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 0.5px solid var(--border2); cursor: pointer;
+}
+.up-item:last-child { border-bottom: none; }
+.up-bar { width: 3px; border-radius: 2px; align-self: stretch; flex-shrink: 0; }
+.up-info { flex: 1; min-width: 0; }
+.up-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.up-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.up-date { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.empty-state { text-align: center; padding: 24px 0; color: var(--text2); font-size: 13px; }
+
+/* ── SETTINGS VIEW ── */
+.settings-wrap { padding: 16px; }
+.settings-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 16px; }
+.settings-section {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 14px;
+}
+.settings-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--text2); padding: 10px 16px;
+  background: var(--surface2); border-bottom: 0.5px solid var(--border);
+}
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 0.5px solid var(--border2);
+  cursor: pointer;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row-left { display: flex; align-items: center; gap: 12px; }
+.settings-row-left i { font-size: 20px; color: var(--gold); }
+.settings-row-label { font-size: 15px; color: var(--text); font-weight: 500; }
+.settings-row-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.settings-chevron { font-size: 18px; color: var(--text3); }
+/* toggle */
+.toggle {
+  width: 44px; height: 24px; background: var(--surface3);
+  border-radius: 12px; position: relative; cursor: pointer;
+  transition: background .2s; flex-shrink: 0; border: 0.5px solid var(--border);
+}
+.toggle.on { background: var(--gold); border-color: var(--gold); }
+.toggle::after {
+  content: ''; width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; position: absolute; top: 3px; left: 3px;
+  transition: left .2s; box-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+.toggle.on::after { left: 23px; }
+/* token box */
+.token-wrap { padding: 16px; }
+.fl { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+.fi {
+  width: 100%; padding: 12px 14px;
+  background: var(--surface2); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'Sarabun', sans-serif; font-size: 14px; outline: none;
+  transition: border-color .2s;
+}
+.fi:focus { border-color: var(--gold); }
+.btn-gold {
+  width: 100%; padding: 14px; background: var(--gold);
+  color: #1a1209; border: none; border-radius: var(--radius-sm);
+  font-family: 'Sarabun', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-top: 10px; transition: background .15s;
+}
+.btn-gold:hover { background: var(--gold-light); }
+.btn-gold i { font-size: 18px; }
+.btn-secondary {
+  width: 100%; padding: 12px; background: var(--surface2);
+  color: var(--text); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); font-family: 'Sarabun', sans-serif;
+  font-size: 14px; cursor: pointer; margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.script-box {
+  background: var(--bg); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px;
+  font-family: monospace; font-size: 11px; color: var(--text2);
+  white-space: pre-wrap; max-height: 160px; overflow-y: auto;
+  line-height: 1.7; margin-top: 10px; word-break: break-all;
+}
+.btn-danger {
+  width: 100%; padding: 14px;
+  background: rgba(216,90,48,.12); color: var(--red);
+  border: 0.5px solid rgba(216,90,48,.3);
+  border-radius: var(--radius-sm); font-family: 'Sarabun', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.65); z-index: 200;
+  align-items: flex-end; justify-content: center;
+  padding: 0;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-top: 1.5px solid var(--gold);
+  border-radius: 20px 20px 0 0;
+  width: 100%; max-height: 92vh; overflow-y: auto;
+  padding: 0 0 32px; position: relative;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-drag {
+  width: 36px; height: 4px; background: var(--surface3);
+  border-radius: 2px; margin: 12px auto 16px; cursor: pointer;
+}
+.modal-hd {
+  font-size: 18px; font-weight: 700; color: var(--text);
+  padding: 0 20px 14px; display: flex; align-items: center; gap: 10px;
+  border-bottom: 0.5px solid var(--border2);
+}
+.modal-hd i { font-size: 22px; color: var(--gold); }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--surface2); border: none; color: var(--text2);
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.modal-body { padding: 16px 20px 0; }
+.fg { margin-bottom: 14px; }
+.cat-sel { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.co {
+  padding: 10px 6px; border-radius: 10px;
+  border: 0.5px solid var(--border2); cursor: pointer;
+  font-size: 12px; font-weight: 600; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: var(--surface2); color: var(--text2);
+  transition: all .15s; line-height: 1.3;
+}
+.co i { font-size: 20px; }
+.co.s-priv { background: rgba(201,151,58,.12); color: var(--gold-light); border-color: rgba(201,151,58,.35); }
+.co.s-temple { background: rgba(74,158,110,.12); color: #9fe1cb; border-color: rgba(74,158,110,.35); }
+.co.s-abroad { background: rgba(216,90,48,.12); color: #f0997b; border-color: rgba(216,90,48,.35); }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fly-section {
+  background: rgba(55,138,221,.07); border: 0.5px solid rgba(55,138,221,.2);
+  border-radius: 10px; padding: 12px; margin-bottom: 14px;
+}
+.fly-toggle-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.fly-label { font-size: 13px; font-weight: 600; color: #85b7eb; display: flex; align-items: center; gap: 6px; }
+.fly-label i { font-size: 16px; }
+.fly-hint { font-size: 11px; color: #4a7aad; }
+.fly-body { margin-top: 12px; display: none; }
+.fly-body.open { display: block; }
+.remind-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.rc {
+  padding: 8px 14px; border-radius: 20px; font-size: 13px;
+  border: 0.5px solid var(--border); cursor: pointer;
+  background: var(--surface2); color: var(--text2); transition: all .15s;
+  font-family: 'Sarabun', sans-serif;
+}
+.rc.on { background: var(--gold); color: #1a1209; border-color: var(--gold); font-weight: 700; }
+.modal-btn-row { display: flex; gap: 10px; margin-top: 18px; padding: 0 20px; }
+.btn-save {
+  flex: 1; padding: 14px; background: var(--green);
+  color: #d4e8cc; border: none; border-radius: 12px;
+  font-family: 'Sarabun', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s;
+}
+.btn-save:hover { background: #3a5232; }
+.btn-del {
+  padding: 14px 18px; background: rgba(216,90,48,.12);
+  color: var(--red); border: 0.5px solid rgba(216,90,48,.3);
+  border-radius: 12px; font-family: 'Sarabun', sans-serif;
+  font-size: 15px; cursor: pointer; display: none;
+}
+.btn-cxl {
+  padding: 14px 18px; background: var(--surface2);
+  color: var(--text2); border: 0.5px solid var(--border);
+  border-radius: 12px; font-family: 'Sarabun', sans-serif;
+  font-size: 15px; cursor: pointer;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--green); color: #d4e8cc;
+  padding: 12px 20px; border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  display: none; z-index: 999; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+}
+
+/* ── DESKTOP ── */
+@media (min-width: 768px) {
+  :root { --nav-h: 0px; }
+  #app { flex-direction: column; }
+  .topbar { padding: 12px 24px; }
+  .topbar-nav-tabs { display: flex; gap: 4px; }
+  .topbar-nav-tab {
+    padding: 7px 16px; border-radius: 8px; border: none;
+    background: transparent; color: var(--text2);
+    font-family: 'Sarabun', sans-serif; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: all .15s;
+  }
+  .topbar-nav-tab:hover { background: var(--surface2); color: var(--text); }
+  .topbar-nav-tab.active { background: var(--gold); color: #1a1209; font-weight: 700; }
+  .topbar-nav-tab i { font-size: 16px; }
+  .bottom-nav { display: none; }
+  .view { padding-bottom: 16px; }
+  .modal { border-radius: 16px; max-width: 480px; bottom: auto; top: 50%; transform: translateY(-50%); margin: auto; }
+  .modal-overlay { align-items: center; }
+  .stat-grid { grid-template-columns: repeat(4,1fr); }
+  .cal-grid { }
+  .cal-cell { min-height: 90px; }
+  .ev-chip { font-size: 10px; padding: 2px 6px; }
+}
 </style>
 </head>
 <body>
 
 <div id="auth-loading">
   <div class="spinner"></div>
-  <div style="font-size:14px;color:#8c7a52">กำลังตรวจสอบสิทธิ์...</div>
+  <p>กำลังตรวจสอบสิทธิ์...</p>
 </div>
 
 <div id="app">
-<div class="topbar">
-  <div class="logo">
-    <div class="logo-badge">🗓️</div>
-    <div>
-      <div class="logo-name">ปฏิทินหลวงพ่อ</div>
-      <div class="logo-sub">ระบบจัดการตารางงาน</div>
-    </div>
-  </div>
-  <div class="nav-tabs">
-    <button class="nav-tab active">📅 ปฏิทิน</button>
-    <button class="nav-tab">📊 Dashboard</button>
-    <button class="nav-tab">🔔 Line</button>
-  </div>
-  <div class="topbar-right">
-    <div class="user-chip">
-      <img id="user-photo" src="" alt="">
-      <span id="user-name-top"></span>
-    </div>
-    <button class="admin-btn" id="admin-btn" onclick="window.location.href='admin.html'" style="display:none">⚙️ Admin</button>
-    <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
-    <button class="add-btn" onclick="openAddModal()">+ เพิ่มกิจกรรม</button>
-  </div>
-</div>
-
-<div class="app-body">
-  <div class="sidebar">
-    <div>
-      <div class="sb-title">ประเภทกิจกรรม</div>
-      <div class="cat-item active" onclick="filterCat('all',this)"><div class="cat-dot" style="background:#8c7a52"></div>ทั้งหมด<span class="cat-cnt" id="cnt-all">0</span></div>
-      <div class="cat-item" onclick="filterCat('priv',this)"><div class="cat-dot" style="background:#c9973a"></div>นิมนต์ส่วนองค์<span class="cat-cnt" id="cnt-priv">0</span></div>
-      <div class="cat-item" onclick="filterCat('temple',this)"><div class="cat-dot" style="background:#4a6741"></div>นิมนต์วัด<span class="cat-cnt" id="cnt-temple">0</span></div>
-      <div class="cat-item" onclick="filterCat('abroad',this)"><div class="cat-dot" style="background:#d85a30"></div>นิมนต์ต่างประเทศ<span class="cat-cnt" id="cnt-abroad">0</span></div>
-    </div>
-    <div>
-      <div class="sb-title">ปาฏิโมกข์ เดือนนี้</div>
-      <div class="pat-card">
-        <div style="padding:5px 0;border-bottom:0.5px solid #3d3222;margin-bottom:6px">
-          <div class="pat-date" id="pati1-date">—</div>
-          <div class="pat-countdown" id="pati1-cd">—</div>
-        </div>
-        <div style="padding:5px 0">
-          <div class="pat-date" id="pati2-date">—</div>
-          <div class="pat-countdown" id="pati2-cd">—</div>
-        </div>
-        <button class="notify-btn">🔔 ตั้งแจ้งเตือน Line</button>
-      </div>
-    </div>
-    <div>
-      <div class="sb-title">วันนี้</div>
-      <div id="today-events" style="font-size:12px;color:#8c7a52">ยังไม่มีกิจกรรม</div>
-    </div>
-  </div>
-
-  <div class="main">
-    <div class="cal-header">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-icon">🌙</div>
       <div>
-        <div class="cal-title-text" id="cal-month-title"></div>
-        <div style="font-size:12px;color:#8c7a52;margin-top:2px" id="cal-thai-year"></div>
-      </div>
-      <div class="cal-nav">
-        <button class="cal-btn" onclick="prevMonth()">‹ ก่อนหน้า</button>
-        <button class="cal-btn today" onclick="goToday()">วันนี้</button>
-        <button class="cal-btn" onclick="nextMonth()">ถัดไป ›</button>
+        <div class="logo-name">ปฏิทินหลวงพ่อ</div>
+        <div class="logo-sub">ระบบจัดการตารางงาน</div>
       </div>
     </div>
-    <div class="legend-row">
-      <div class="leg"><div class="leg-sq" style="background:#fdf3e3;border:1px solid #c9973a"></div>ปาฏิโมกข์ ขึ้น 15</div>
-      <div class="leg"><div class="leg-sq" style="background:#f0f8f0;border:1px solid #4a6741"></div>ปาฏิโมกข์ แรม 1</div>
-      <div class="leg"><div class="leg-dot" style="background:#c9973a"></div>วันพระ</div>
+    <!-- Desktop nav tabs -->
+    <div class="topbar-nav-tabs" id="desktop-nav" style="display:none">
+      <button class="topbar-nav-tab active" onclick="switchView('calendar',this)"><i class="ti ti-calendar-month"></i>ปฏิทิน</button>
+      <button class="topbar-nav-tab" onclick="switchView('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
+      <button class="topbar-nav-tab" onclick="switchView('settings',this)"><i class="ti ti-adjustments-horizontal"></i>ตั้งค่า</button>
+      <button class="topbar-nav-tab" id="desktop-admin-btn" onclick="window.location.href='admin.html'" style="display:none"><i class="ti ti-shield-lock"></i>Admin</button>
     </div>
-    <table class="cal-tbl">
-      <thead><tr><th>อา</th><th>จ</th><th>อ</th><th>พ</th><th>พฤ</th><th>ศ</th><th>ส</th></tr></thead>
-      <tbody id="cal-body"></tbody>
-    </table>
+    <div class="topbar-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="user-avatar-el">ม</div>
+        <span class="user-name" id="user-name-el">...</span>
+      </div>
+    </div>
   </div>
-</div>
-</div>
 
-<!-- ADD/EDIT MODAL -->
+  <!-- MAIN -->
+  <div class="main-area">
+
+    <!-- ══ CALENDAR VIEW ══ -->
+    <div class="view active" id="view-calendar">
+      <div class="cal-header">
+        <div>
+          <div class="cal-month-title" id="cal-month-title">—</div>
+          <div class="cal-month-sub" id="cal-month-sub">—</div>
+        </div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="prevMonth()"><i class="ti ti-chevron-left"></i></button>
+          <button class="cal-nav-btn today-btn" onclick="goToday()">วันนี้</button>
+          <button class="cal-nav-btn" onclick="nextMonth()"><i class="ti ti-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div class="legend-row">
+        <div class="leg"><div class="leg-sq" style="background:rgba(201,151,58,.4);border:1px solid #c9973a"></div>ปาฏิโมกข์ ขึ้น 15</div>
+        <div class="leg"><div class="leg-sq" style="background:rgba(74,103,65,.4);border:1px solid #4a6741"></div>แรม 1</div>
+        <div class="leg"><div class="leg-dot" style="background:#c9973a"></div>วันพระ</div>
+      </div>
+
+      <div class="cat-filter" id="cat-filter">
+        <div class="cat-pill active" onclick="filterCat('all',this)"><i class="ti ti-layout-grid"></i>ทั้งหมด</div>
+        <div class="cat-pill" onclick="filterCat('priv',this)"><i class="ti ti-user-heart" style="color:#c9973a"></i>ส่วนองค์</div>
+        <div class="cat-pill" onclick="filterCat('temple',this)"><i class="ti ti-building-arch" style="color:#4a9e6e"></i>วัด</div>
+        <div class="cat-pill" onclick="filterCat('abroad',this)"><i class="ti ti-world" style="color:#d85a30"></i>ต่างประเทศ</div>
+      </div>
+
+      <div class="cal-grid-wrap">
+        <div class="cal-head">
+          <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <!-- ══ DASHBOARD VIEW ══ -->
+    <div class="view" id="view-dashboard">
+      <div class="dash-wrap">
+        <div class="dash-title">ภาพรวม</div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">ทั้งหมด</div>
+            <div class="stat-num" id="d-total">0</div>
+            <div class="stat-sub">กิจกรรม</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">เดือนนี้</div>
+            <div class="stat-num" id="d-month">0</div>
+            <div class="stat-sub">กิจกรรม</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">สัปดาห์นี้</div>
+            <div class="stat-num" id="d-week">0</div>
+            <div class="stat-sub">กิจกรรม</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">วันนี้</div>
+            <div class="stat-num" id="d-today-count">0</div>
+            <div class="stat-sub">กิจกรรม</div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title"><i class="ti ti-chart-donut"></i>สัดส่วนตามประเภท</div>
+          <div class="donut-row">
+            <canvas id="donut-canvas" width="110" height="110"></canvas>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+
+        <div class="pati-card">
+          <div class="pati-card-title"><i class="ti ti-moon-stars"></i>ปาฏิโมกข์เดือนนี้</div>
+          <div class="pati-row">
+            <div>
+              <div class="pati-date-text" id="pati1-date">—</div>
+              <div class="pati-cd-text" id="pati1-cd">—</div>
+            </div>
+            <span class="pati-badge">ขึ้น 15</span>
+          </div>
+          <div class="pati-row">
+            <div>
+              <div class="pati-date-text" id="pati2-date">—</div>
+              <div class="pati-cd-text" id="pati2-cd">—</div>
+            </div>
+            <span class="pati-badge new">แรม 1</span>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title"><i class="ti ti-clock-hour-4"></i>กิจกรรมที่กำลังจะมาถึง</div>
+          <div id="upcoming-list"><div class="empty-state">ยังไม่มีกิจกรรม</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS VIEW ══ -->
+    <div class="view" id="view-settings">
+      <div class="settings-wrap">
+        <div class="settings-title">ตั้งค่าระบบ</div>
+
+        <!-- Line Notify Token -->
+        <div class="settings-section">
+          <div class="settings-section-title"><i class="ti ti-key" style="font-size:13px;margin-right:4px"></i>Line Notify Token</div>
+          <div class="token-wrap">
+            <label class="fl">วาง Token ที่นี่</label>
+            <input type="password" class="fi" id="line-token-input" placeholder="เช่น abc123xyz...">
+            <button class="btn-gold" onclick="saveLineToken()">
+              <i class="ti ti-device-floppy"></i> บันทึก Token
+            </button>
+            <button class="btn-secondary" onclick="testLineNotify()">
+              <i class="ti ti-send"></i> ทดสอบส่งข้อความ Line
+            </button>
+          </div>
+          <div style="padding:0 16px 4px;font-size:11px;color:var(--text2);line-height:1.7">
+            วิธีสร้าง Token: ไปที่ <strong style="color:var(--gold-light)">notify-bot.line.me</strong> → Login → สร้าง Token → เลือกกลุ่ม → Copy Token มาวางที่นี่
+          </div>
+        </div>
+
+        <!-- แจ้งเตือนปาฏิโมกข์ -->
+        <div class="settings-section">
+          <div class="settings-section-title">🌕 แจ้งเตือนวันปาฏิโมกข์</div>
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <i class="ti ti-bell"></i>
+              <div>
+                <div class="settings-row-label">แจ้งเตือนก่อน 7 วัน</div>
+                <div class="settings-row-sub">ส่งล่วงหน้า 1 สัปดาห์</div>
+              </div>
+            </div>
+            <div class="toggle" id="t-7d" onclick="toggleSetting('notify7d',this)"></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <i class="ti ti-bell"></i>
+              <div>
+                <div class="settings-row-label">แจ้งเตือนก่อน 3 วัน</div>
+                <div class="settings-row-sub">เตรียมความพร้อม</div>
+              </div>
+            </div>
+            <div class="toggle on" id="t-3d" onclick="toggleSetting('notify3d',this)"></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <i class="ti ti-bell"></i>
+              <div>
+                <div class="settings-row-label">แจ้งเตือนก่อน 1 วัน</div>
+                <div class="settings-row-sub">ส่ง 08:00 น.</div>
+              </div>
+            </div>
+            <div class="toggle on" id="t-1d" onclick="toggleSetting('notify1d',this)"></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <i class="ti ti-bell"></i>
+              <div>
+                <div class="settings-row-label">เช้าวันปาฏิโมกข์</div>
+                <div class="settings-row-sub">ส่ง 05:00 น. พร้อมรายละเอียด</div>
+              </div>
+            </div>
+            <div class="toggle on" id="t-0d" onclick="toggleSetting('notify0d',this)"></div>
+          </div>
+        </div>
+
+        <!-- Google Apps Script -->
+        <div class="settings-section">
+          <div class="settings-section-title"><i class="ti ti-code" style="font-size:13px;margin-right:4px"></i>Google Apps Script</div>
+          <div class="token-wrap">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6">
+              Copy โค้ดนี้ไปวางใน <strong style="color:var(--gold-light)">script.google.com</strong> เพื่อให้แจ้งเตือน Line อัตโนมัติ
+            </div>
+            <div class="script-box" id="script-box">กำลังโหลด...</div>
+            <button class="btn-secondary" onclick="copyScript()">
+              <i class="ti ti-copy"></i> Copy โค้ด
+            </button>
+          </div>
+        </div>
+
+        <!-- บัญชี -->
+        <div class="settings-section">
+          <div class="settings-section-title"><i class="ti ti-user" style="font-size:13px;margin-right:4px"></i>บัญชีผู้ใช้</div>
+          <div class="settings-row" style="cursor:default">
+            <div class="settings-row-left">
+              <i class="ti ti-user-circle"></i>
+              <div>
+                <div class="settings-row-label" id="settings-user-name">—</div>
+                <div class="settings-row-sub" id="settings-user-email">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-row" id="admin-panel-btn" onclick="window.location.href='admin.html'" style="display:none">
+            <div class="settings-row-left">
+              <i class="ti ti-shield-lock" style="color:var(--gold)"></i>
+              <div>
+                <div class="settings-row-label">จัดการสมาชิก</div>
+                <div class="settings-row-sub">เพิ่ม/ลบสมาชิก สร้างลิงก์เชิญ</div>
+              </div>
+            </div>
+            <i class="ti ti-chevron-right settings-chevron"></i>
+          </div>
+        </div>
+
+        <button class="btn-danger" onclick="doLogout()">
+          <i class="ti ti-logout"></i> ออกจากระบบ
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+      <button class="bn-item active" id="bn-calendar" onclick="switchView('calendar',this)">
+        <i class="ti ti-calendar-month"></i>
+        <span>ปฏิทิน</span>
+      </button>
+      <button class="bn-item" id="bn-dashboard" onclick="switchView('dashboard',this)">
+        <i class="ti ti-layout-dashboard"></i>
+        <span>Dashboard</span>
+      </button>
+      <div class="bn-fab-wrap" onclick="openAddModal()">
+        <div class="bn-fab"><i class="ti ti-plus"></i></div>
+        <span>เพิ่ม</span>
+      </div>
+      <button class="bn-item" id="bn-settings" onclick="switchView('settings',this)">
+        <i class="ti ti-adjustments-horizontal"></i>
+        <span>ตั้งค่า</span>
+      </button>
+      <button class="bn-item" id="bn-admin" onclick="window.location.href='admin.html'" style="display:none">
+        <i class="ti ti-shield-lock"></i>
+        <span>Admin</span>
+      </button>
+    </div>
+
+  </div><!-- main-area -->
+</div><!-- app -->
+
+<!-- ══ ADD/EDIT MODAL ══ -->
 <div class="modal-overlay" id="event-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-hd" id="modal-title">🗓️ เพิ่มกิจกรรม</div>
-    <input type="hidden" id="ev-id">
-    <div class="fg"><label class="fl">ชื่อกิจกรรม *</label><input class="fi" type="text" id="ev-title" placeholder="เช่น นิมนต์วัดป่าสัก, เดินทางสิงคโปร์"></div>
-    <div class="fg">
-      <label class="fl">ประเภท</label>
-      <div class="cat-sel">
-        <div class="co s-priv" id="co-priv" onclick="selCat('priv')">🙏 นิมนต์ส่วนองค์</div>
-        <div class="co" id="co-temple" onclick="selCat('temple')">🏛 นิมนต์วัด</div>
-        <div class="co" id="co-abroad" onclick="selCat('abroad')">🌏 นิมนต์ต่างประเทศ</div>
+    <div class="modal-drag" onclick="closeModal()"></div>
+    <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    <div class="modal-hd">
+      <i class="ti ti-calendar-plus"></i>
+      <span id="modal-title-text">เพิ่มกิจกรรม</span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ev-id">
+      <div class="fg">
+        <label class="fl">ชื่อกิจกรรม *</label>
+        <input type="text" class="fi" id="ev-title" placeholder="เช่น นิมนต์วัดป่าสัก, เดินทางสิงคโปร์">
       </div>
-    </div>
-    <div class="g2">
-      <div class="fg"><label class="fl">วันที่เริ่ม *</label><input class="fi" type="date" id="ev-start"></div>
-      <div class="fg"><label class="fl">วันที่สิ้นสุด</label><input class="fi" type="date" id="ev-end"></div>
-      <div class="fg"><label class="fl">เวลาเริ่ม</label><input class="fi" type="time" id="ev-time-s"></div>
-      <div class="fg"><label class="fl">เวลาสิ้นสุด</label><input class="fi" type="time" id="ev-time-e"></div>
-    </div>
-    <div class="fg"><label class="fl">สถานที่</label><input class="fi" type="text" id="ev-location" placeholder="เช่น วัดป่าสัก จ.เชียงราย"></div>
-    <div class="fg"><label class="fl">ผู้ติดตาม / ผู้ประสานงาน</label><input class="fi" type="text" id="ev-guests" placeholder="เช่น พระอานนท์, โยมสมชาย"></div>
-    <div class="fg"><label class="fl">รายละเอียด / หมายเหตุ</label><textarea class="fi" id="ev-desc" rows="2" style="resize:vertical"></textarea></div>
-    <div class="fly-section">
-      <div class="fly-toggle-row" onclick="toggleFly()">
-        <div class="fly-toggle-label">✈️ มีข้อมูลไฟล์บิน</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:10px;color:#378add" id="fly-hint">กดเพื่อเพิ่ม</span>
-          <div class="toggle-sw" id="fly-sw"></div>
+      <div class="fg">
+        <label class="fl">ประเภท</label>
+        <div class="cat-sel">
+          <div class="co s-priv" id="co-priv" onclick="selCat('priv')">
+            <i class="ti ti-user-heart"></i>นิมนต์ส่วนองค์
+          </div>
+          <div class="co" id="co-temple" onclick="selCat('temple')">
+            <i class="ti ti-building-arch"></i>นิมนต์วัด
+          </div>
+          <div class="co" id="co-abroad" onclick="selCat('abroad')">
+            <i class="ti ti-world"></i>นิมนต์ต่างประเทศ
+          </div>
         </div>
       </div>
-      <div class="fly-body" id="fly-body">
-        <div class="g2" style="margin-top:10px">
-          <div class="fg"><label class="fl">เที่ยวบิน</label><input class="fi" type="text" id="fly-no" placeholder="TG202"></div>
-          <div class="fg"><label class="fl">เวลาออก</label><input class="fi" type="time" id="fly-time"></div>
-          <div class="fg"><label class="fl">ต้นทาง</label><input class="fi" type="text" id="fly-from" placeholder="BKK"></div>
-          <div class="fg"><label class="fl">ปลายทาง</label><input class="fi" type="text" id="fly-to" placeholder="CNX"></div>
+      <div class="g2">
+        <div class="fg"><label class="fl">วันที่เริ่ม *</label><input type="date" class="fi" id="ev-start"></div>
+        <div class="fg"><label class="fl">วันที่สิ้นสุด</label><input type="date" class="fi" id="ev-end"></div>
+        <div class="fg"><label class="fl">เวลาเริ่ม</label><input type="time" class="fi" id="ev-time-s"></div>
+        <div class="fg"><label class="fl">เวลาสิ้นสุด</label><input type="time" class="fi" id="ev-time-e"></div>
+      </div>
+      <div class="fg"><label class="fl">สถานที่</label><input type="text" class="fi" id="ev-location" placeholder="เช่น วัดป่าสัก จ.เชียงราย"></div>
+      <div class="fg"><label class="fl">ผู้ติดตาม / ผู้ประสานงาน</label><input type="text" class="fi" id="ev-guests" placeholder="เช่น พระอานนท์, โยมสมชาย"></div>
+      <div class="fg"><label class="fl">รายละเอียด</label><textarea class="fi" id="ev-desc" rows="2" style="resize:vertical" placeholder="เลขเที่ยวบิน ข้อมูลพิเศษ หรือสิ่งที่ต้องเตรียม"></textarea></div>
+      <!-- FLY SECTION -->
+      <div class="fly-section">
+        <div class="fly-toggle-row" onclick="toggleFly()">
+          <div class="fly-label"><i class="ti ti-plane"></i>มีข้อมูลไฟล์บิน</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="fly-hint" id="fly-hint">กดเพื่อเพิ่ม</span>
+            <div class="toggle" id="fly-toggle-sw"></div>
+          </div>
         </div>
-        <div class="fg"><label class="fl">ที่นั่ง / Class</label><input class="fi" type="text" id="fly-seat" placeholder="12A"></div>
-        <div class="fg"><label class="fl">หมายเหตุไฟล์บิน</label><input class="fi" type="text" id="fly-note" placeholder="ต้องนำบัตรประชาชน"></div>
+        <div class="fly-body" id="fly-body">
+          <div class="g2" style="margin-top:10px">
+            <div class="fg"><label class="fl">เที่ยวบิน</label><input type="text" class="fi" id="fly-no" placeholder="TG202"></div>
+            <div class="fg"><label class="fl">เวลาออก</label><input type="time" class="fi" id="fly-time"></div>
+            <div class="fg"><label class="fl">ต้นทาง</label><input type="text" class="fi" id="fly-from" placeholder="BKK"></div>
+            <div class="fg"><label class="fl">ปลายทาง</label><input type="text" class="fi" id="fly-to" placeholder="CNX"></div>
+          </div>
+          <div class="fg"><label class="fl">ที่นั่ง / Class</label><input type="text" class="fi" id="fly-seat" placeholder="12A หรือ Business Class"></div>
+          <div class="fg"><label class="fl">หมายเหตุไฟล์บิน</label><input type="text" class="fi" id="fly-note" placeholder="ต้องนำบัตรประชาชน, น้ำหนักไม่เกิน 20 กก."></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">แจ้งเตือนล่วงหน้า</label>
+        <div class="remind-row">
+          <span class="rc" onclick="setRemind(this,'60')">1 ชม.</span>
+          <span class="rc on" onclick="setRemind(this,'1440')">1 วัน</span>
+          <span class="rc" onclick="setRemind(this,'4320')">3 วัน</span>
+          <span class="rc" onclick="setRemind(this,'10080')">1 สัปดาห์</span>
+        </div>
       </div>
     </div>
-    <div class="fg"><label class="fl">แจ้งเตือนล่วงหน้า</label>
-      <div class="remind-row">
-        <span class="rc" onclick="setRemind(this,'60')">1 ชม.</span>
-        <span class="rc on" onclick="setRemind(this,'1440')">1 วัน</span>
-        <span class="rc" onclick="setRemind(this,'4320')">3 วัน</span>
-        <span class="rc" onclick="setRemind(this,'10080')">1 สัปดาห์</span>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn-save" onclick="saveEvent()">✓ บันทึก</button>
-      <button class="btn-delete" id="btn-delete" onclick="deleteEvent()">🗑 ลบ</button>
-      <button class="btn-cancel" onclick="closeModal()">ยกเลิก</button>
+    <div class="modal-btn-row">
+      <button class="btn-save" onclick="saveEvent()"><i class="ti ti-check"></i>บันทึก</button>
+      <button class="btn-del" id="btn-delete" onclick="deleteEvent()"><i class="ti ti-trash"></i></button>
+      <button class="btn-cxl" onclick="closeModal()">ยกเลิก</button>
     </div>
   </div>
 </div>
@@ -268,7 +879,10 @@ body{font-family:'Sarabun',sans-serif;background:#f4f0e8;color:#2c2a1e;min-heigh
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getFirestore, doc, getDoc, collection, getDocs,
+  addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZeMTn0aihwl_LaKJ7UHTDepEWtHkRauo",
@@ -283,59 +897,94 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUser = null;
-let userRole = 'viewer';
+// ── STATE ──
+let currentUser = null, userRole = 'viewer';
 let events = [];
 let activeFilter = 'all';
-let selectedCat = 'priv';
-let selectedRemind = '1440';
-let flyOpen = false;
+let selectedCat = 'priv', selectedRemind = '1440', flyOpen = false;
 let editingId = null;
 let currentYear, currentMonth;
+let settings = JSON.parse(localStorage.getItem('lpSettings') || '{"token":"","notify7d":false,"notify3d":true,"notify1d":true,"notify0d":true}');
 
 const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const catColor = { priv:'#c9973a', temple:'#4a9e6e', abroad:'#d85a30' };
+const catName = { priv:'นิมนต์ส่วนองค์', temple:'นิมนต์วัด', abroad:'นิมนต์ต่างประเทศ' };
+const catIcon = { priv:'ti-user-heart', temple:'ti-building-arch', abroad:'ti-world' };
 
-onAuthStateChanged(auth, async (user) => {
+// Lunar data June 2025 offset (approximate — day offset from 1st)
+const lunarOffset = 6; // 1 June = ขึ้น 7
+
+function getLunar(day) {
+  const idx = ((day + lunarOffset - 2) % 30) + 1;
+  const half = idx <= 15 ? 'ขึ้น' : 'แรม';
+  const num = idx <= 15 ? idx : idx - 15;
+  const isWp = [8,15,23,30].includes(idx);
+  const isPati15 = idx === 15;
+  const isPatiNew = idx === 1 && half === 'แรม';
+  return { label: `${half} ${num}`, isWp, isPati15, isPatiNew };
+}
+
+function toDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function formatThai(str) {
+  if (!str) return '';
+  const [y,m,d] = str.split('-');
+  const mn = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${parseInt(d)} ${mn[parseInt(m)]} ${parseInt(y)+543}`;
+}
+
+// ── AUTH ──
+onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = 'login.html'; return; }
-  const ref = doc(db, 'members', user.email.toLowerCase());
-  const snap = await getDoc(ref);
+  const snap = await getDoc(doc(db, 'members', user.email.toLowerCase()));
   if (!snap.exists() || !snap.data().active) {
-    await signOut(auth);
-    window.location.href = 'login.html';
-    return;
+    await signOut(auth); window.location.href = 'login.html'; return;
   }
   currentUser = user;
   userRole = snap.data().role || 'viewer';
-  document.getElementById('user-name-top').textContent = user.displayName?.split(' ')[0] || user.email;
-  const photo = document.getElementById('user-photo');
-  if (user.photoURL) photo.src = user.photoURL;
-  else { photo.style.display='none'; }
-  if (userRole === 'admin') document.getElementById('admin-btn').style.display = 'block';
-  document.getElementById('auth-loading').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
+  setupUI();
   const now = new Date();
-  currentYear = now.getFullYear();
-  currentMonth = now.getMonth();
+  currentYear = now.getFullYear(); currentMonth = now.getMonth();
   await loadEvents();
-  renderCal();
-  updatePatimokkha();
+  renderCalendar();
+  renderDashboard();
+  updateSettings();
+  generateScript();
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  if (window.innerWidth >= 768) {
+    document.getElementById('desktop-nav').style.display = 'flex';
+  }
 });
 
+function setupUI() {
+  const u = currentUser;
+  const nameEl = document.getElementById('user-name-el');
+  const avatarEl = document.getElementById('user-avatar-el');
+  nameEl.textContent = u.displayName?.split(' ')[0] || u.email;
+  if (u.photoURL) {
+    avatarEl.innerHTML = `<img src="${u.photoURL}" alt="">`;
+  } else {
+    avatarEl.textContent = (u.displayName || u.email)[0].toUpperCase();
+  }
+  document.getElementById('settings-user-name').textContent = u.displayName || u.email;
+  document.getElementById('settings-user-email').textContent = `${u.email} · ${userRole === 'admin' ? 'Admin' : userRole === 'editor' ? 'Editor' : 'Viewer'}`;
+  if (userRole === 'admin') {
+    document.getElementById('bn-admin').style.display = 'flex';
+    document.getElementById('admin-panel-btn').style.display = 'flex';
+    document.getElementById('desktop-admin-btn').style.display = 'flex';
+  }
+}
+
+// ── EVENTS ──
 async function loadEvents() {
   events = [];
   try {
-    const q = query(collection(db, 'events'), orderBy('start'));
+    const q = query(collection(db,'events'), orderBy('start'));
     const snap = await getDocs(q);
     snap.forEach(d => events.push({ id: d.id, ...d.data() }));
-    updateCounts();
   } catch(e) { console.error(e); }
-}
-
-function updateCounts() {
-  document.getElementById('cnt-all').textContent = events.length;
-  ['priv','temple','abroad'].forEach(c => {
-    document.getElementById('cnt-'+c).textContent = events.filter(e=>e.cat===c).length;
-  });
 }
 
 function getEventsForDate(dateStr) {
@@ -346,110 +995,160 @@ function getEventsForDate(dateStr) {
   });
 }
 
-const lunarMap = {1:{l:'ขึ้น 8',wp:true},2:{l:'ขึ้น 9'},3:{l:'ขึ้น 10'},4:{l:'ขึ้น 11'},5:{l:'ขึ้น 12'},6:{l:'ขึ้น 13'},7:{l:'ขึ้น 14'},8:{l:'ขึ้น 15',wp:true,pati:'full'},9:{l:'แรม 1'},10:{l:'แรม 2'},11:{l:'แรม 3'},12:{l:'แรม 4'},13:{l:'แรม 5'},14:{l:'แรม 6'},15:{l:'แรม 7'},16:{l:'แรม 8',wp:true},17:{l:'แรม 9'},18:{l:'แรม 10'},19:{l:'แรม 11'},20:{l:'แรม 12'},21:{l:'แรม 13'},22:{l:'แรม 14'},23:{l:'แรม 15',wp:true},24:{l:'ขึ้น 1',pati:'new'},25:{l:'ขึ้น 2'},26:{l:'ขึ้น 3'},27:{l:'ขึ้น 4'},28:{l:'ขึ้น 5'},29:{l:'ขึ้น 6'},30:{l:'ขึ้น 7'}};
-
-function toDateStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function formatThai(str) { if(!str)return''; const[y,m,d]=str.split('-'); const mn=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']; return parseInt(d)+' '+mn[parseInt(m)]+' '+(parseInt(y)+543); }
-
-function renderCal() {
+// ── CALENDAR ──
+function renderCalendar() {
   const now = new Date();
-  document.getElementById('cal-month-title').textContent = thMonths[currentMonth] + ' ' + (currentYear + 543);
-  document.getElementById('cal-thai-year').textContent = 'เดือน ' + (currentMonth+7>12?currentMonth-5:currentMonth+7) + ' ปีมะเส็ง';
+  document.getElementById('cal-month-title').textContent = thMonths[currentMonth] + ' ' + (currentYear+543);
+  document.getElementById('cal-month-sub').textContent = 'เดือน ' + ((currentMonth+7)>12?(currentMonth-5):(currentMonth+7)) + ' · ปีมะเส็ง';
   const first = new Date(currentYear, currentMonth, 1).getDay();
   const days = new Date(currentYear, currentMonth+1, 0).getDate();
-  const tbody = document.getElementById('cal-body');
-  tbody.innerHTML = '';
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
   let day = 1 - first;
-  let todayEvs = [];
-  for (let r=0; r<6; r++) {
-    const tr = document.createElement('tr');
-    for (let c=0; c<7; c++, day++) {
-      const td = document.createElement('td');
-      const isThis = day>=1 && day<=days;
+  for (let r = 0; r < 6; r++) {
+    for (let c = 0; c < 7; c++, day++) {
+      const cell = document.createElement('div');
+      const isThis = day >= 1 && day <= days;
       const d = new Date(currentYear, currentMonth, day);
       const isToday = d.toDateString() === now.toDateString();
-      const ld = lunarMap[day] || {};
-      if (!isThis) td.classList.add('td-oth');
-      else if (isToday) td.classList.add('td-today');
-      else if (ld.pati==='full') td.classList.add('td-patimokkha');
-      else if (ld.pati==='new') td.classList.add('td-patimokkha-new');
+      const lunar = isThis ? getLunar(day) : null;
+      if (!isThis) { cell.className = 'cal-cell oth'; }
+      else if (isToday) { cell.className = 'cal-cell today'; }
+      else if (lunar?.isPati15) { cell.className = 'cal-cell pati'; }
+      else if (lunar?.isPatiNew) { cell.className = 'cal-cell pati-new'; }
+      else { cell.className = 'cal-cell'; }
+      // Day top row
       const top = document.createElement('div');
       top.className = 'day-top';
       const dn = document.createElement('span');
       dn.className = 'day-n' + (isToday?' today':(!isThis?' oth':''));
       dn.textContent = isThis ? day : new Date(currentYear, currentMonth, day).getDate();
       top.appendChild(dn);
-      if (isThis && ld.l) {
+      if (isThis && lunar) {
         const lb = document.createElement('div');
-        lb.className = 'lunar-badge' + (ld.l==='ขึ้น 15'?' lunar-15':(ld.wp?' lunar-wp':''));
-        lb.innerHTML = ld.wp ? `<span class="wan-phra-dot"></span>${ld.l}` : ld.l;
+        lb.className = 'lunar-label' + (lunar.isPati15?' f15':lunar.isWp?' wp':'');
+        lb.innerHTML = lunar.isWp ? `<span class="wp-dot"></span>${lunar.label}` : lunar.label;
         top.appendChild(lb);
       }
-      td.appendChild(top);
+      cell.appendChild(top);
+      // Events
       if (isThis) {
         const dateStr = toDateStr(d);
         const dayEvs = getEventsForDate(dateStr);
-        if (isToday) todayEvs = dayEvs;
-        dayEvs.slice(0,3).forEach(ev => {
-          const chip = document.createElement('span');
-          chip.className = 'chip ch-'+ev.cat;
-          chip.textContent = (ev.timeStart?ev.timeStart+' ':'')+ev.title;
-          chip.onclick = (e) => { e.stopPropagation(); openEditModal(ev); };
-          td.appendChild(chip);
+        dayEvs.slice(0,2).forEach(ev => {
+          const chip = document.createElement('div');
+          chip.className = 'ev-chip chip-'+ev.cat;
+          chip.innerHTML = `<i class="ti ${catIcon[ev.cat]}"></i><span style="overflow:hidden;text-overflow:ellipsis">${ev.timeStart?ev.timeStart+' ':''  }${ev.title}</span>`;
+          chip.onclick = e => { e.stopPropagation(); openEditModal(ev); };
+          cell.appendChild(chip);
           if (ev.flyNo) {
-            const fb = document.createElement('span');
-            fb.className = 'fly-badge';
-            fb.textContent = '✈ ' + ev.flyNo + (ev.flyTime?' · '+ev.flyTime:'');
-            td.appendChild(fb);
+            const ft = document.createElement('div');
+            ft.className = 'fly-tag';
+            ft.innerHTML = `<i class="ti ti-plane"></i>${ev.flyNo}`;
+            cell.appendChild(ft);
           }
           if (ev.recordedBy) {
-            const rt = document.createElement('span');
+            const rt = document.createElement('div');
             rt.className = 'recorder-tag';
             rt.textContent = '👤 ' + ev.recordedBy;
-            td.appendChild(rt);
+            cell.appendChild(rt);
           }
         });
-        if (dayEvs.length > 3) {
-          const more = document.createElement('span');
-          more.style.cssText='font-size:10px;color:#8c7a52;padding:1px 5px;display:block';
-          more.textContent = '+' + (dayEvs.length-3) + ' เพิ่มเติม';
-          td.appendChild(more);
+        if (dayEvs.length > 2) {
+          const m = document.createElement('div');
+          m.style.cssText = 'font-size:9px;color:var(--text2);padding:1px 4px';
+          m.textContent = `+${dayEvs.length-2} อื่นๆ`;
+          cell.appendChild(m);
         }
-        td.onclick = () => openAddModal(dateStr);
+        cell.onclick = () => openAddModal(dateStr);
       }
-      tr.appendChild(td);
+      grid.appendChild(cell);
     }
-    tbody.appendChild(tr);
-    if (day>days && r>=4) break;
+    if (day > days && r >= 4) break;
   }
-  updateTodayEvents(todayEvs);
 }
 
-function updateTodayEvents(evs) {
-  const el = document.getElementById('today-events');
-  if (!evs.length) { el.innerHTML = '<span style="color:#6b5a3e">ไม่มีกิจกรรม</span>'; return; }
-  el.innerHTML = evs.map(ev=>`<div style="margin-bottom:6px"><div style="font-size:12px;color:#e8c56a">${ev.title}</div>${ev.timeStart?'<div style="font-size:10px;color:#6b5a3e">'+ev.timeStart+' น.</div>':''}</div>`).join('');
-}
+window.prevMonth = () => { currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderCalendar(); };
+window.nextMonth = () => { currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderCalendar(); };
+window.goToday = () => { const n=new Date(); currentYear=n.getFullYear(); currentMonth=n.getMonth(); renderCalendar(); };
 
-function updatePatimokkha() {
+window.filterCat = (cat, el) => {
+  activeFilter = cat;
+  document.querySelectorAll('.cat-pill').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  renderCalendar();
+};
+
+// ── DASHBOARD ──
+function renderDashboard() {
   const now = new Date();
-  const y = now.getFullYear(), m = now.getMonth();
-  const d1 = new Date(y,m,8), d2 = new Date(y,m,24);
-  const diff = d => Math.max(0, Math.ceil((d-now)/864e5));
-  document.getElementById('pati1-date').innerHTML = '🌕 ' + d1.getDate() + ' ' + thMonths[m].slice(0,3) + '. (ขึ้น 15)';
-  document.getElementById('pati1-cd').textContent = diff(d1)===0?'วันนี้!':'อีก '+diff(d1)+' วัน';
-  document.getElementById('pati2-date').innerHTML = '🌑 ' + d2.getDate() + ' ' + thMonths[m].slice(0,3) + '. (แรม 1)';
-  document.getElementById('pati2-cd').textContent = diff(d2)===0?'วันนี้!':'อีก '+diff(d2)+' วัน';
+  const todayStr = toDateStr(now);
+  const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
+  const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const mEnd = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  const inRange = (ev,s,e) => ev.start >= toDateStr(s) && ev.start <= toDateStr(e);
+  document.getElementById('d-total').textContent = events.length;
+  document.getElementById('d-month').textContent = events.filter(ev=>inRange(ev,mStart,mEnd)).length;
+  document.getElementById('d-week').textContent = events.filter(ev=>inRange(ev,weekStart,weekEnd)).length;
+  document.getElementById('d-today-count').textContent = events.filter(ev=>ev.start===todayStr).length;
+  // Donut
+  const cats = ['priv','temple','abroad'];
+  const counts = cats.map(c=>events.filter(e=>e.cat===c).length);
+  const total = counts.reduce((a,b)=>a+b,0)||1;
+  const canvas = document.getElementById('donut-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,110,110);
+  let angle = -Math.PI/2;
+  const colors = ['#c9973a','#4a9e6e','#d85a30'];
+  cats.forEach((c,i)=>{
+    const slice = (counts[i]/total)*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(55,55);
+    ctx.arc(55,55,50,angle,angle+slice);
+    ctx.closePath(); ctx.fillStyle = colors[i]; ctx.fill();
+    angle += slice;
+  });
+  ctx.beginPath(); ctx.arc(55,55,28,0,Math.PI*2);
+  ctx.fillStyle = '#162210'; ctx.fill();
+  const legend = document.getElementById('donut-legend');
+  legend.innerHTML = cats.map((c,i)=>`
+    <div class="leg-item">
+      <div class="leg-item-dot" style="background:${colors[i]}"></div>
+      <span class="leg-item-name">${catName[c]}</span>
+      <span class="leg-item-num">${counts[i]}</span>
+    </div>`).join('');
+  // Patimokkha
+  const m = now.getMonth(), y = now.getFullYear();
+  const d15 = new Date(y,m,8), d1 = new Date(y,m,24);
+  const diff = d => Math.max(0,Math.ceil((d-now)/864e5));
+  document.getElementById('pati1-date').textContent = `🌕 ${d15.getDate()} ${thMonths[m].slice(0,3)}. (ขึ้น 15)`;
+  document.getElementById('pati1-cd').textContent = diff(d15)===0?'วันนี้!':'อีก '+diff(d15)+' วัน';
+  document.getElementById('pati2-date').textContent = `🌑 ${d1.getDate()} ${thMonths[m].slice(0,3)}. (แรม 1)`;
+  document.getElementById('pati2-cd').textContent = diff(d1)===0?'วันนี้!':'อีก '+diff(d1)+' วัน';
+  // Upcoming
+  const upcoming = events.filter(ev=>ev.start>=todayStr).sort((a,b)=>a.start.localeCompare(b.start)).slice(0,6);
+  const list = document.getElementById('upcoming-list');
+  if (!upcoming.length) { list.innerHTML = '<div class="empty-state">ยังไม่มีกิจกรรมที่กำลังจะมาถึง</div>'; return; }
+  list.innerHTML = upcoming.map(ev=>`
+    <div class="up-item" onclick="openEditModal_id('${ev.id}')">
+      <div class="up-bar" style="background:${catColor[ev.cat]||'#888'}"></div>
+      <div class="up-info">
+        <div class="up-name">${ev.title}</div>
+        <div class="up-meta">${catName[ev.cat]||''}${ev.location?' · '+ev.location:''}</div>
+      </div>
+      <div class="up-date">${formatThai(ev.start)}${ev.timeStart?' '+ev.timeStart:''}</div>
+    </div>`).join('');
 }
 
-window.prevMonth = ()=>{ currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderCal(); };
-window.nextMonth = ()=>{ currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderCal(); };
-window.goToday = ()=>{ const n=new Date(); currentYear=n.getFullYear(); currentMonth=n.getMonth(); renderCal(); };
-window.filterCat = (cat,el)=>{ activeFilter=cat; document.querySelectorAll('.cat-item').forEach(x=>x.classList.remove('active')); el.classList.add('active'); renderCal(); };
+window.openEditModal_id = function(id) {
+  const ev = events.find(e=>e.id===id);
+  if (ev) openEditModal(ev);
+};
 
+// ── MODAL ──
 window.openAddModal = function(dateStr) {
   editingId = null;
-  document.getElementById('modal-title').textContent = '🗓️ เพิ่มกิจกรรม';
+  document.getElementById('modal-title-text').textContent = 'เพิ่มกิจกรรม';
   document.getElementById('ev-id').value = '';
   document.getElementById('ev-title').value = '';
   document.getElementById('ev-start').value = dateStr || toDateStr(new Date());
@@ -459,22 +1158,15 @@ window.openAddModal = function(dateStr) {
   document.getElementById('ev-location').value = '';
   document.getElementById('ev-guests').value = '';
   document.getElementById('ev-desc').value = '';
-  document.getElementById('fly-no').value = '';
-  document.getElementById('fly-time').value = '';
-  document.getElementById('fly-from').value = '';
-  document.getElementById('fly-to').value = '';
-  document.getElementById('fly-seat').value = '';
-  document.getElementById('fly-note').value = '';
-  selCat('priv');
-  setRemindVal('1440');
-  closeFly();
+  ['fly-no','fly-time','fly-from','fly-to','fly-seat','fly-note'].forEach(id=>document.getElementById(id).value='');
+  selCat('priv'); setRemindVal('1440'); closeFly();
   document.getElementById('btn-delete').style.display = 'none';
   document.getElementById('event-modal').classList.add('open');
 };
 
 function openEditModal(ev) {
   editingId = ev.id;
-  document.getElementById('modal-title').textContent = '✏️ แก้ไขกิจกรรม';
+  document.getElementById('modal-title-text').textContent = 'แก้ไขกิจกรรม';
   document.getElementById('ev-title').value = ev.title||'';
   document.getElementById('ev-start').value = ev.start||'';
   document.getElementById('ev-end').value = ev.end||'';
@@ -489,19 +1181,19 @@ function openEditModal(ev) {
   document.getElementById('fly-to').value = ev.flyTo||'';
   document.getElementById('fly-seat').value = ev.flySeat||'';
   document.getElementById('fly-note').value = ev.flyNote||'';
-  selCat(ev.cat||'priv');
-  setRemindVal(ev.remind||'1440');
-  if (ev.flyNo) openFly(); else closeFly();
-  document.getElementById('btn-delete').style.display = userRole==='admin'||ev.recordedByEmail===currentUser?.email ? 'block' : 'none';
+  selCat(ev.cat||'priv'); setRemindVal(ev.remind||'1440');
+  ev.flyNo ? openFly() : closeFly();
+  const canDelete = userRole==='admin' || ev.recordedByEmail===currentUser?.email;
+  document.getElementById('btn-delete').style.display = canDelete ? 'block' : 'none';
   document.getElementById('event-modal').classList.add('open');
 }
 
-window.closeModal = ()=> document.getElementById('event-modal').classList.remove('open');
+window.closeModal = () => document.getElementById('event-modal').classList.remove('open');
 
 window.saveEvent = async function() {
   const title = document.getElementById('ev-title').value.trim();
   const start = document.getElementById('ev-start').value;
-  if (!title||!start) { showToast('กรุณากรอกชื่อและวันที่'); return; }
+  if (!title||!start) { showToast('กรุณากรอกชื่อและวันที่','error'); return; }
   const ev = {
     title, start,
     end: document.getElementById('ev-end').value || start,
@@ -531,21 +1223,18 @@ window.saveEvent = async function() {
       await addDoc(collection(db,'events'), ev);
       showToast('✅ บันทึกกิจกรรมแล้ว');
     }
-    closeModal();
-    await loadEvents();
-    renderCal();
-  } catch(e) { showToast('เกิดข้อผิดพลาด: '+e.message); }
+    closeModal(); await loadEvents(); renderCalendar(); renderDashboard();
+  } catch(e) { showToast('เกิดข้อผิดพลาด: '+e.message,'error'); }
 };
 
 window.deleteEvent = async function() {
-  if (!editingId || !confirm('ลบกิจกรรมนี้?')) return;
+  if (!editingId||!confirm('ลบกิจกรรมนี้?')) return;
   await deleteDoc(doc(db,'events',editingId));
   showToast('🗑️ ลบกิจกรรมแล้ว');
-  closeModal();
-  await loadEvents();
-  renderCal();
+  closeModal(); await loadEvents(); renderCalendar(); renderDashboard();
 };
 
+// ── CAT / REMIND ──
 window.selCat = function(cat) {
   selectedCat = cat;
   ['priv','temple','abroad'].forEach(c => {
@@ -554,13 +1243,11 @@ window.selCat = function(cat) {
     if (c===cat) el.classList.add('s-'+cat);
   });
 };
-
 window.setRemind = function(el, val) {
   selectedRemind = val;
   document.querySelectorAll('.rc').forEach(x=>x.classList.remove('on'));
   el.classList.add('on');
 };
-
 function setRemindVal(val) {
   selectedRemind = val;
   document.querySelectorAll('.rc').forEach(x => {
@@ -568,19 +1255,161 @@ function setRemindVal(val) {
   });
 }
 
-window.toggleFly = function() { flyOpen ? closeFly() : openFly(); };
-function openFly() { flyOpen=true; document.getElementById('fly-sw').classList.add('on'); document.getElementById('fly-body').classList.add('open'); document.getElementById('fly-hint').textContent='เปิดอยู่'; }
-function closeFly() { flyOpen=false; document.getElementById('fly-sw').classList.remove('on'); document.getElementById('fly-body').classList.remove('open'); document.getElementById('fly-hint').textContent='กดเพื่อเพิ่ม'; }
-
-window.doLogout = async function() { await signOut(auth); window.location.href='login.html'; };
-
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none',2500);
+// ── FLY ──
+window.toggleFly = () => flyOpen ? closeFly() : openFly();
+function openFly() {
+  flyOpen=true;
+  document.getElementById('fly-toggle-sw').classList.add('on');
+  document.getElementById('fly-body').classList.add('open');
+  document.getElementById('fly-hint').textContent='เปิดอยู่';
+}
+function closeFly() {
+  flyOpen=false;
+  document.getElementById('fly-toggle-sw').classList.remove('on');
+  document.getElementById('fly-body').classList.remove('open');
+  document.getElementById('fly-hint').textContent='กดเพื่อเพิ่ม';
 }
 
-document.getElementById('event-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+// ── VIEW SWITCHING ──
+window.switchView = function(view, el) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const bnMap = {calendar:'bn-calendar',dashboard:'bn-dashboard',settings:'bn-settings'};
+  if (bnMap[view]) document.getElementById(bnMap[view])?.classList.add('active');
+  if (view==='dashboard') renderDashboard();
+  // desktop tabs
+  document.querySelectorAll('.topbar-nav-tab').forEach(t=>t.classList.remove('active'));
+  const tabMap = {calendar:0,dashboard:1,settings:2};
+  const tabs = document.querySelectorAll('.topbar-nav-tab');
+  if (tabMap[view]!==undefined) tabs[tabMap[view]]?.classList.add('active');
+};
+
+// ── SETTINGS ──
+function updateSettings() {
+  const s = settings;
+  document.getElementById('line-token-input').value = s.token||'';
+  ['7d','3d','1d','0d'].forEach(k=>{
+    const key = 'notify'+k;
+    const el = document.getElementById('t-'+k);
+    if (el) el.classList.toggle('on', !!s[key]);
+  });
+}
+
+window.toggleSetting = function(key, el) {
+  settings[key] = !settings[key];
+  el.classList.toggle('on', settings[key]);
+  localStorage.setItem('lpSettings', JSON.stringify(settings));
+  generateScript();
+};
+
+window.saveLineToken = function() {
+  settings.token = document.getElementById('line-token-input').value.trim();
+  localStorage.setItem('lpSettings', JSON.stringify(settings));
+  generateScript();
+  showToast('✅ บันทึก Token แล้ว');
+};
+
+window.testLineNotify = function() {
+  const token = document.getElementById('line-token-input').value.trim() || settings.token;
+  if (!token) { showToast('กรุณาใส่ Token ก่อน','error'); return; }
+  fetch('https://notify-api.line.me/api/notify', {
+    method:'POST',
+    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/x-www-form-urlencoded'},
+    body:'message='+encodeURIComponent('\n🔔 ทดสอบระบบแจ้งเตือน\nปฏิทินหลวงพ่อ ✓')
+  }).then(r=>{
+    if(r.ok) showToast('✅ ส่ง Line สำเร็จ');
+    else showToast('Token ไม่ถูกต้อง','error');
+  }).catch(()=>showToast('ไม่สามารถเชื่อมต่อได้','error'));
+};
+
+function generateScript() {
+  const token = settings.token || 'YOUR_LINE_NOTIFY_TOKEN';
+  const script = `// ปฏิทินหลวงพ่อ — Google Apps Script
+const LINE_TOKEN = '${token}';
+
+function checkAndNotify() {
+  const now = new Date();
+  const soon = new Date(now.getTime() + 24*60*60*1000);
+  CalendarApp.getAllCalendars().forEach(cal => {
+    cal.getEvents(now, soon).forEach(ev => {
+      const tag = ev.getId() + '_notified';
+      const props = PropertiesService.getScriptProperties();
+      if (props.getProperty(tag)) return;
+      const time = Utilities.formatDate(ev.getStartTime(), 'Asia/Bangkok', 'dd/MM/yyyy HH:mm');
+      const msg = '\\n📅 แจ้งเตือนกิจกรรม\\n' +
+        '━━━━━━━━━━━━━━\\n' +
+        '📌 ' + ev.getTitle() + '\\n' +
+        '🗂 ' + cal.getName() + '\\n' +
+        '⏰ ' + time + '\\n' +
+        '📍 ' + (ev.getLocation()||'-') + '\\n' +
+        '📝 ' + (ev.getDescription()||'-') + '\\n' +
+        '━━━━━━━━━━━━━━';
+      sendLine(msg);
+      props.setProperty(tag, 'true');
+    });
+  });
+}
+
+function weeklySummary() {
+  const now = new Date();
+  const end = new Date(now.getTime() + 7*24*60*60*1000);
+  let msg = '\\n📊 สรุปสัปดาห์นี้\\n━━━━━━━━━━━━━━\\n';
+  CalendarApp.getAllCalendars().forEach(cal => {
+    const evs = cal.getEvents(now, end);
+    if (!evs.length) return;
+    msg += '\\n🗂 ' + cal.getName() + '\\n';
+    evs.forEach(ev => {
+      const t = Utilities.formatDate(ev.getStartTime(), 'Asia/Bangkok', 'dd/MM HH:mm');
+      msg += '  • ' + t + ' — ' + ev.getTitle() + '\\n';
+    });
+  });
+  sendLine(msg);
+}
+
+function sendLine(message) {
+  UrlFetchApp.fetch('https://notify-api.line.me/api/notify', {
+    method: 'post',
+    headers: { 'Authorization': 'Bearer ' + LINE_TOKEN },
+    payload: { message: message }
+  });
+}`;
+  document.getElementById('script-box').textContent = script;
+}
+
+window.copyScript = function() {
+  navigator.clipboard.writeText(document.getElementById('script-box').textContent);
+  showToast('✅ Copy โค้ดแล้ว');
+};
+
+// ── LOGOUT ──
+window.doLogout = async function() {
+  if (!confirm('ออกจากระบบ?')) return;
+  await signOut(auth);
+  window.location.href = 'login.html';
+};
+
+// ── TOAST ──
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error' ? '#d85a30' : '#4a6741';
+  t.style.display = 'block';
+  setTimeout(()=>t.style.display='none', 2500);
+}
+window.showToast = showToast;
+
+// Close modal on overlay click
+document.getElementById('event-modal').addEventListener('click', function(e){
+  if (e.target===this) closeModal();
+});
+
+// Desktop layout check
+window.addEventListener('resize', () => {
+  const isDesktop = window.innerWidth >= 768;
+  document.getElementById('desktop-nav').style.display = isDesktop ? 'flex' : 'none';
+});
 </script>
 </body>
 </html>
