@@ -737,20 +737,39 @@ function renderCalendar(){
       dn.className='day-n'+(isToday?' today':(!isThis?' oth':''));
       dn.textContent=isThis?day:new Date(currentYear,currentMonth,day).getDate();
       top.appendChild(dn);
-      // lunar label — แสดงทุกวัน
-      if(isThis&&ld){
+      // lunar label — แสดงทุกวัน รูปแบบ 2 บรรทัดกะทัดรัด
+      if(isThis){
         const lb=document.createElement('div');
-        const cls=ld.pati15?'lunar-label pati15':ld.patiNew?'lunar-label pati-new':ld.wp?'lunar-label wp':'lunar-label normal';
-        lb.className=cls;
-        // วันพระใส่ dot นำหน้า
-        if(ld.wp){
-          const dot=document.createElement('span');
-          dot.className='wp-indicator';
-          lb.appendChild(dot);
+        lb.style.cssText='text-align:right;line-height:1.35;flex-shrink:0;max-width:54px';
+        if(ld){
+          const isCls=ld.pati15?'pati15':ld.patiNew?'pati-new':ld.wp?'wp':'normal';
+          lb.className='lunar-label '+isCls;
+          // parse ขึ้น/แรม X เดือน Y
+          const mM=ld.l.match(/^(ขึ้น|แรม)\s+(\d+)/);
+          const dM=ld.l.match(/เดือน\s*(\S+)/);
+          if(mM){
+            const half=mM[1], num=mM[2];
+            const mon=dM?dM[1]:'';
+            // แปลงชื่อเดือนให้สั้น
+            const monShort=mon.replace('อ้าย','อ้าย').replace('ยี่','ยี่');
+            const prefix=ld.wp?'● ':'';
+            const l1=document.createElement('div');
+            l1.textContent=prefix+half+' '+num;
+            lb.appendChild(l1);
+            if(mon){
+              const l2=document.createElement('div');
+              l2.style.opacity='0.75';
+              l2.style.fontSize='8px';
+              l2.textContent='เดือน'+monShort;
+              lb.appendChild(l2);
+            }
+          } else {
+            lb.textContent=ld.l.slice(0,8);
+          }
+        } else {
+          // วันที่ไม่มีข้อมูล — ซ่อน
+          lb.style.opacity='0';
         }
-        // แสดงชื่อวันจันทรคติแบบสั้น
-        const shortL=ld.l.replace('เดือน','ด.').replace(' หลัง','ห.').replace('เดือนอ้าย','ด.อ้าย').replace('เดือนยี่','ด.ยี่');
-        lb.appendChild(document.createTextNode(shortL));
         top.appendChild(lb);
       }
       cell.appendChild(top);
