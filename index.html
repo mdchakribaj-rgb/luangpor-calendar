@@ -219,6 +219,36 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
   .stat-grid{grid-template-columns:repeat(4,1fr)}
   .cal-cell{min-height:90px}
 }
+
+.bp-upload-area{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--surface2);transition:border-color .2s}
+.bp-upload-area:hover{border-color:var(--gold2);background:#fdf8ee}
+/* DAY MODAL */
+.day-modal-overlay{display:none;position:fixed;inset:0;background:rgba(61,46,16,.45);z-index:200;align-items:flex-end;justify-content:center}
+.day-modal-overlay.open{display:flex}
+.day-modal{background:var(--surface);border-top:3px solid var(--gold2);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:0 0 32px;animation:slideUp .25s ease;box-shadow:0 -8px 32px rgba(61,46,16,.15)}
+.day-modal-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border2)}
+.day-modal-title{font-size:17px;font-weight:700;color:var(--brown)}
+.day-modal-date{font-size:12px;color:var(--text3);margin-top:2px}
+.day-modal-close{background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px}
+.day-modal-add{padding:10px 16px;background:var(--green2);color:#fff;border:none;border-radius:10px;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.day-modal-add i{font-size:16px}
+.day-ev-item{display:flex;align-items:flex-start;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
+.day-ev-item:hover{background:var(--surface2)}
+.day-ev-item:last-child{border-bottom:none}
+.day-ev-bar{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0;margin-top:2px}
+.day-ev-info{flex:1}
+.day-ev-name{font-size:15px;font-weight:600;color:var(--brown)}
+.day-ev-meta{font-size:12px;color:var(--text3);margin-top:3px;display:flex;flex-wrap:wrap;gap:6px}
+.day-ev-meta span{display:flex;align-items:center;gap:3px}
+.day-ev-meta i{font-size:12px}
+.day-ev-bp{margin-top:6px}
+.day-ev-bp img{width:100%;max-height:120px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:#fff}
+.day-empty{text-align:center;padding:32px 20px;color:var(--text3);font-size:14px}
+@media(min-width:768px){
+  .day-modal{border-radius:16px;max-width:500px;bottom:auto;top:50%;transform:translateY(-50%);margin:auto;max-height:85vh}
+  .day-modal-overlay{align-items:center}
+  .bp-upload-area{padding:20px}
+}
 </style>
 </head>
 <body>
@@ -396,6 +426,26 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
           </div>
           <div class="fg"><label class="fl">ที่นั่ง</label><input type="text" class="fi" id="fly-seat" placeholder="12A"></div>
           <div class="fg"><label class="fl">หมายเหตุ</label><input type="text" class="fi" id="fly-note" placeholder="ต้องนำบัตรประชาชน"></div>
+          <div class="fg">
+            <label class="fl">📎 Boarding Pass / ตั๋ว</label>
+            <div class="bp-upload-area" id="bp-upload-area" onclick="document.getElementById('bp-file-input').click()">
+              <i class="ti ti-ticket" style="font-size:28px;color:var(--text3);display:block;margin-bottom:6px"></i>
+              <div style="font-size:13px;color:var(--text2);font-weight:500">กดเพื่อเลือกรูป Boarding Pass หรือตั๋ว</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px">รองรับ JPG, PNG ไม่เกิน 5 MB</div>
+            </div>
+            <input type="file" id="bp-file-input" accept="image/*" style="display:none" onchange="handleBPUpload(this)">
+            <div id="bp-preview-wrap" style="display:none;margin-top:10px">
+              <img id="bp-preview-img" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:180px;object-fit:contain;background:#fff" alt="Boarding Pass">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+                <span id="bp-file-name" style="font-size:11px;color:var(--text3)"></span>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <div id="bp-upload-progress" style="font-size:11px;color:var(--gold2);display:none">⏳ กำลังอัพโหลด...</div>
+                  <button onclick="removeBP()" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer">✕ ลบ</button>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="bp-url" value="">
+          </div>
         </div>
       </div>
       <div class="fg"><label class="fl">แจ้งเตือนล่วงหน้า</label>
@@ -414,12 +464,29 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
     </div>
   </div>
 </div>
+<!-- DAY EVENTS MODAL -->
+<div class="day-modal-overlay" id="day-modal">
+  <div class="day-modal">
+    <div class="day-modal-hd">
+      <div>
+        <div class="day-modal-title" id="day-modal-title">กิจกรรมวันนี้</div>
+        <div class="day-modal-date" id="day-modal-date"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="day-modal-add" onclick="addFromDayModal()"><i class="ti ti-plus"></i>เพิ่ม</button>
+        <button class="day-modal-close" onclick="closeDayModal()"><i class="ti ti-x"></i></button>
+      </div>
+    </div>
+    <div id="day-modal-list"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyAZeMTn0aihwl_LaKJ7UHTDepEWtHkRauo",
@@ -433,6 +500,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // ── ปฏิทินจันทรคติ 2569 ครบทุกวัน (ข้อมูลจาก Thai PBS + ปฏิทินหลวง) ──
 // wp=วันพระ, pati15=ปาฏิโมกข์ขึ้น15, patiNew=ปาฏิโมกข์แรม15/14
@@ -786,7 +854,7 @@ function renderCalendar(){
           if(ev.recordedBy){const rt=document.createElement('div');rt.className='recorder-tag';rt.textContent='👤 '+ev.recordedBy;cell.appendChild(rt);}
         });
         if(dayEvs.length>2){const m=document.createElement('div');m.style.cssText='font-size:9px;color:var(--text3);padding:1px 4px';m.textContent=`+${dayEvs.length-2} อื่นๆ`;cell.appendChild(m);}
-        cell.onclick=()=>openAddModal(dateStr);
+        cell.onclick=()=>openDayModal(dateStr);
       }
       grid.appendChild(cell);
     }
@@ -873,7 +941,7 @@ window.openAddModal=function(dateStr){
   document.getElementById('modal-title-text').textContent='เพิ่มกิจกรรม';
   ['ev-title','ev-end','ev-time-s','ev-time-e','ev-location','ev-guests','ev-desc','fly-no','fly-time','fly-from','fly-to','fly-seat','fly-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ev-start').value=dateStr||toDateStr(new Date());
-  selCat('priv');setRemindVal('1440');closeFly();
+  selCat('priv');setRemindVal('1440');closeFly();resetBPUI();
   document.getElementById('btn-delete').style.display='none';
   document.getElementById('event-modal').classList.add('open');
 };
@@ -896,6 +964,7 @@ function openEditModal(ev){
   document.getElementById('fly-note').value=ev.flyNote||'';
   selCat(ev.cat||'priv');setRemindVal(ev.remind||'1440');
   ev.flyNo?openFly():closeFly();
+  loadBPPreview(ev.bpUrl||'');
   const canDel=userRole==='admin'||ev.recordedByEmail===currentUser?.email;
   document.getElementById('btn-delete').style.display=canDel?'block':'none';
   document.getElementById('event-modal').classList.add('open');
@@ -925,8 +994,20 @@ window.saveEvent=async function(){
     updatedAt:serverTimestamp()
   };
   try{
-    if(editingId){await updateDoc(doc(db,'events',editingId),ev);showToast('✅ แก้ไขกิจกรรมแล้ว');}
-    else{ev.createdAt=serverTimestamp();await addDoc(collection(db,'events'),ev);showToast('✅ บันทึกกิจกรรมแล้ว');}
+    if(editingId){
+      // อัพโหลด Boarding Pass ถ้ามีไฟล์ใหม่
+      const bpUrl = await uploadBoardingPass(editingId);
+      if(bpUrl) ev.bpUrl = bpUrl;
+      else if(!document.getElementById('bp-url').value) ev.bpUrl = '';
+      await updateDoc(doc(db,'events',editingId),ev);showToast('✅ แก้ไขกิจกรรมแล้ว');
+    } else {
+      ev.createdAt=serverTimestamp();
+      const docRef = await addDoc(collection(db,'events'),ev);
+      // อัพโหลด Boarding Pass หลังสร้าง event แล้ว
+      const bpUrl = await uploadBoardingPass(docRef.id);
+      if(bpUrl){ await updateDoc(doc(db,'events',docRef.id),{bpUrl}); }
+      showToast('✅ บันทึกกิจกรรมแล้ว');
+    }
     closeModal();await loadEvents();renderCalendar();renderCalEventList();renderDashboard();
   }catch(e){showToast('เกิดข้อผิดพลาด: '+e.message,'error');}
 };
@@ -962,6 +1043,126 @@ function generateScript(){
   document.getElementById('script-box').textContent=`const LINE_TOKEN = '${token}';\n\nfunction checkAndNotify() {\n  const now = new Date();\n  const soon = new Date(now.getTime() + 24*60*60*1000);\n  CalendarApp.getAllCalendars().forEach(cal => {\n    cal.getEvents(now, soon).forEach(ev => {\n      const tag = ev.getId() + '_notified';\n      const props = PropertiesService.getScriptProperties();\n      if (props.getProperty(tag)) return;\n      const time = Utilities.formatDate(ev.getStartTime(), 'Asia/Bangkok', 'dd/MM/yyyy HH:mm');\n      const msg = '\\n📅 ' + ev.getTitle() + '\\n⏰ ' + time + '\\n📍 ' + (ev.getLocation()||'-');\n      sendLine(msg); props.setProperty(tag, 'true');\n    });\n  });\n}\nfunction sendLine(msg) {\n  UrlFetchApp.fetch('https://notify-api.line.me/api/notify',{\n    method:'post', headers:{'Authorization':'Bearer '+LINE_TOKEN}, payload:{message:msg}\n  });\n}`;
 }
 window.copyScript=()=>{navigator.clipboard.writeText(document.getElementById('script-box').textContent);showToast('✅ Copy โค้ดแล้ว');};
+
+// ── BOARDING PASS UPLOAD ──
+let currentBPFile = null;
+window.handleBPUpload = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('ไฟล์ใหญ่เกิน 5 MB','error'); return; }
+  currentBPFile = file;
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('bp-preview-img').src = e.target.result;
+    document.getElementById('bp-preview-wrap').style.display = 'block';
+    document.getElementById('bp-upload-area').style.display = 'none';
+    document.getElementById('bp-file-name').textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.removeBP = function() {
+  currentBPFile = null;
+  document.getElementById('bp-url').value = '';
+  document.getElementById('bp-preview-wrap').style.display = 'none';
+  document.getElementById('bp-upload-area').style.display = 'block';
+  document.getElementById('bp-preview-img').src = '';
+  document.getElementById('bp-file-input').value = '';
+};
+
+async function uploadBoardingPass(eventId) {
+  if (!currentBPFile) return document.getElementById('bp-url').value || '';
+  const prog = document.getElementById('bp-upload-progress');
+  prog.style.display = 'block';
+  try {
+    const storageRef = ref(storage, `boarding-pass/${eventId}/${Date.now()}_${currentBPFile.name}`);
+    const snap = await uploadBytes(storageRef, currentBPFile);
+    const url = await getDownloadURL(snap.ref);
+    document.getElementById('bp-url').value = url;
+    prog.style.display = 'none';
+    return url;
+  } catch(e) {
+    prog.style.display = 'none';
+    showToast('อัพโหลดรูปไม่สำเร็จ: ' + e.message, 'error');
+    return '';
+  }
+}
+
+function resetBPUI() {
+  currentBPFile = null;
+  document.getElementById('bp-url').value = '';
+  document.getElementById('bp-preview-wrap').style.display = 'none';
+  document.getElementById('bp-upload-area').style.display = 'block';
+  document.getElementById('bp-preview-img').src = '';
+  document.getElementById('bp-file-input').value = '';
+}
+
+function loadBPPreview(url) {
+  if (!url) { resetBPUI(); return; }
+  document.getElementById('bp-url').value = url;
+  document.getElementById('bp-preview-img').src = url;
+  document.getElementById('bp-preview-wrap').style.display = 'block';
+  document.getElementById('bp-upload-area').style.display = 'none';
+  document.getElementById('bp-file-name').textContent = 'รูปที่บันทึกไว้';
+}
+
+// ── DAY MODAL ──
+let currentDayStr = '';
+
+window.openDayModal = function(dateStr) {
+  const dayEvs = events.filter(ev => {
+    if (activeFilter !== 'all' && ev.cat !== activeFilter) return false;
+    return dateStr >= ev.start && dateStr <= (ev.end || ev.start);
+  });
+
+  if (dayEvs.length === 0) {
+    // ไม่มีกิจกรรม → เปิดฟอร์มเพิ่มทันที
+    openAddModal(dateStr);
+    return;
+  }
+
+  currentDayStr = dateStr;
+  const [y,m,d] = dateStr.split('-');
+  const mn = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const ld = LUNAR_2569[dateStr];
+  document.getElementById('day-modal-title').textContent = `${parseInt(d)} ${mn[parseInt(m)]} ${parseInt(y)+543}`;
+  document.getElementById('day-modal-date').textContent = ld ? ld.l : '';
+
+  const list = document.getElementById('day-modal-list');
+  list.innerHTML = dayEvs.map(ev => `
+    <div class="day-ev-item" onclick="editFromDay('${ev.id}')">
+      <div class="day-ev-bar" style="background:${catColor[ev.cat]}"></div>
+      <div class="day-ev-info">
+        <div class="day-ev-name">${ev.title}</div>
+        <div class="day-ev-meta">
+          ${ev.timeStart ? `<span><i class="ti ti-clock"></i>${ev.timeStart}${ev.timeEnd?' — '+ev.timeEnd:''}</span>` : ''}
+          ${ev.location ? `<span><i class="ti ti-map-pin"></i>${ev.location}</span>` : ''}
+          ${ev.guests ? `<span><i class="ti ti-users"></i>${ev.guests}</span>` : ''}
+          ${ev.flyNo ? `<span><i class="ti ti-plane"></i>${ev.flyNo}${ev.flyTime?' '+ev.flyTime:''}</span>` : ''}
+          <span style="color:var(--text3)"><i class="ti ti-user"></i>${ev.recordedBy||''}</span>
+        </div>
+        ${ev.bpUrl ? `<div class="day-ev-bp"><img src="${ev.bpUrl}" alt="Boarding Pass" loading="lazy"></div>` : ''}
+        ${ev.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${ev.desc}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('day-modal').classList.add('open');
+};
+
+window.closeDayModal = () => document.getElementById('day-modal').classList.remove('open');
+
+window.addFromDayModal = function() {
+  closeDayModal();
+  openAddModal(currentDayStr);
+};
+
+window.editFromDay = function(id) {
+  closeDayModal();
+  const ev = events.find(e => e.id === id);
+  if (ev) openEditModal(ev);
+};
+
 window.doLogout=async()=>{if(!confirm('ออกจากระบบ?'))return;await signOut(auth);window.location.href='login.html';};
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
@@ -970,6 +1171,7 @@ function showToast(msg,type='success'){
 }
 window.showToast=showToast;
 document.getElementById('event-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('day-modal').addEventListener('click',function(e){if(e.target===this)closeDayModal();});
 window.addEventListener('resize',()=>{document.getElementById('desktop-tabs').style.display=window.innerWidth>=768?'flex':'none';});
 </script>
 </body>
