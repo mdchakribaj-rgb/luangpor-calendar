@@ -249,6 +249,17 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
   .day-modal-overlay{align-items:center}
   .bp-upload-area{padding:20px}
 }
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:16px}
+.lightbox.open{display:flex}
+.lightbox-img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:8px;box-shadow:0 0 40px rgba(0,0,0,.5)}
+.lightbox-actions{display:flex;gap:12px;align-items:center}
+.lb-btn{padding:10px 20px;border-radius:10px;border:none;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px}
+.lb-download{background:#3d6b35;color:#fff}
+.lb-close{background:rgba(255,255,255,.15);color:#fff}
+.lb-btn i{font-size:16px}
+.lightbox-caption{font-size:12px;color:rgba(255,255,255,.5)}
 </style>
 </head>
 <body>
@@ -435,7 +446,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
             </div>
             <input type="file" id="bp-file-input" accept="image/*" style="display:none" onchange="handleBPUpload(this)">
             <div id="bp-preview-wrap" style="display:none;margin-top:10px">
-              <img id="bp-preview-img" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:180px;object-fit:contain;background:#fff" alt="Boarding Pass">
+              <img id="bp-preview-img" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:180px;object-fit:contain;background:#fff;cursor:zoom-in" alt="Boarding Pass" onclick="openLightbox(this.src,'Boarding Pass')">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
                 <span id="bp-file-name" style="font-size:11px;color:var(--text3)"></span>
                 <div style="display:flex;gap:6px;align-items:center">
@@ -463,6 +474,19 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
       <button class="btn-cxl" onclick="closeModal()">ยกเลิก</button>
     </div>
   </div>
+</div>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img class="lightbox-img" id="lightbox-img" src="" alt="Boarding Pass">
+  <div class="lightbox-actions" onclick="event.stopPropagation()">
+    <a id="lb-download-btn" href="" download="boarding-pass.jpg" class="lb-btn lb-download">
+      <i class="ti ti-download"></i> บันทึกรูป
+    </a>
+    <button class="lb-btn lb-close" onclick="closeLightbox()">
+      <i class="ti ti-x"></i> ปิด
+    </button>
+  </div>
+  <div class="lightbox-caption">กดที่อื่นเพื่อปิด</div>
 </div>
 <!-- DAY EVENTS MODAL -->
 <div class="day-modal-overlay" id="day-modal">
@@ -1142,7 +1166,7 @@ window.openDayModal = function(dateStr) {
           ${ev.flyNo ? `<span><i class="ti ti-plane"></i>${ev.flyNo}${ev.flyTime?' '+ev.flyTime:''}</span>` : ''}
           <span style="color:var(--text3)"><i class="ti ti-user"></i>${ev.recordedBy||''}</span>
         </div>
-        ${ev.bpUrl ? `<div class="day-ev-bp"><img src="${ev.bpUrl}" alt="Boarding Pass" loading="lazy"></div>` : ''}
+        ${ev.bpUrl ? `<div class="day-ev-bp"><img src="${ev.bpUrl}" alt="Boarding Pass" loading="lazy" style="cursor:zoom-in" onclick="event.stopPropagation();openLightbox('${ev.bpUrl}','Boarding Pass — ${ev.title}')"></div>` : ''}
         ${ev.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${ev.desc}</div>` : ''}
       </div>
     </div>`).join('');
@@ -1162,6 +1186,22 @@ window.editFromDay = function(id) {
   const ev = events.find(e => e.id === id);
   if (ev) openEditModal(ev);
 };
+
+
+// ── LIGHTBOX ──
+window.openLightbox = function(src, caption) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lb-download-btn').href = src;
+  document.getElementById('lightbox-caption') && (document.querySelector('.lightbox-caption').textContent = caption || 'กดที่อื่นเพื่อปิด');
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeLightbox = function() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+};
+// ปิดด้วย ESC
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
 
 window.doLogout=async()=>{if(!confirm('ออกจากระบบ?'))return;await signOut(auth);window.location.href='login.html';};
 function showToast(msg,type='success'){
