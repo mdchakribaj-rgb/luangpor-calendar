@@ -42,7 +42,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .user-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),#8b6914);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0}
 .user-avatar img{width:100%;height:100%;object-fit:cover}
 .user-name{font-size:12px;color:var(--text2);font-weight:600;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.main-area{flex:1;overflow:hidden;position:relative}
+.main-area{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column}
 .view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav-h)+8px);display:none}
 .view.active{display:block}
 .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-around;padding:6px 4px 12px;z-index:50;box-shadow:0 -2px 12px rgba(61,46,16,.08)}
@@ -72,11 +72,14 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .cat-pill{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;white-space:nowrap;background:var(--surface);border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;flex-shrink:0;transition:all .15s}
 .cat-pill.active{color:var(--brown);border-color:var(--gold2);background:var(--gold-dim);font-weight:700}
 .cat-pill i{font-size:14px}
-.cal-grid-wrap{padding:0 10px}
-.cal-head{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px}
+.cal-grid-wrap{padding:0 8px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.cal-grid-wrap::-webkit-scrollbar{width:3px}
+.cal-grid-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px;position:sticky;top:0;background:var(--bg);z-index:5;padding:0 2px}
 .cal-head span{text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:3px 0}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-cell{min-height:70px;border-radius:8px;padding:4px 3px 3px;position:relative;background:var(--surface);border:1px solid var(--border2);cursor:pointer;transition:all .12s;overflow:hidden}
+.week-row{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
+.cal-grid{display:flex;flex-direction:column;gap:0}
+.cal-cell{min-height:80px;border-radius:8px;padding:4px 3px 3px;position:relative;background:var(--surface);border:1px solid var(--border2);cursor:pointer;transition:all .12s;overflow:hidden}
 .cal-cell:hover{background:var(--surface2);border-color:var(--border)}
 .cal-cell.oth{background:transparent;border-color:transparent;opacity:.4}
 .cal-cell.today{background:#fdf8ee;border:2px solid var(--gold2)}
@@ -260,6 +263,26 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .lb-close{background:rgba(255,255,255,.15);color:#fff}
 .lb-btn i{font-size:16px}
 .lightbox-caption{font-size:12px;color:rgba(255,255,255,.5)}
+
+/* MULTI-DAY EVENT BAR */
+.multiday-bar{
+  position:absolute;
+  height:20px;
+  border-radius:4px;
+  display:flex;align-items:center;
+  padding:0 6px;
+  font-size:9.5px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  z-index:10;cursor:pointer;gap:4px;
+  color:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+.multiday-bar i{font-size:9px;flex-shrink:0}
+.mb-priv{background:var(--cat-priv)}
+.mb-temple{background:var(--cat-temple)}
+.mb-abroad{background:var(--cat-abroad)}
+/* ev-chip margin-top เพื่อเว้นที่ให้ multiday bar */
+.has-multiday .day-n{position:relative;z-index:1}
 </style>
 </head>
 <body>
@@ -290,7 +313,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
   </div>
   <div class="main-area">
     <!-- CALENDAR VIEW -->
-    <div class="view active" id="view-calendar">
+    <div class="view active" id="view-calendar" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0">
       <div class="cal-header">
         <div>
           <div class="cal-month-title" id="cal-month-title">—</div>
@@ -315,7 +338,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
       </div>
       <div class="cal-grid-wrap">
         <div class="cal-head"><span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span></div>
-        <div class="cal-grid" id="cal-grid"></div>
+        <div id="cal-grid" class="cal-grid"></div>
       </div>
       <div class="event-list-section">
         <div class="event-list-title"><i class="ti ti-clock-hour-4"></i>กิจกรรมที่กำลังจะมาถึง</div>
@@ -799,6 +822,27 @@ function getEventsForDate(dateStr){
   });
 }
 
+function getMultidayEvents(){
+  // หากิจกรรมที่ start != end (หลายวัน)
+  return events.filter(ev=>ev.end && ev.end > ev.start && activeFilter==='all'||
+    (ev.end && ev.end > ev.start && ev.cat===activeFilter));
+}
+
+function computeBarStyle(ev,rowStartDate,rowEndDate){
+  // คำนวณ left% และ width% ของ multiday bar ใน week row
+  const evStart=ev.start>toDateStr(rowStartDate)?ev.start:toDateStr(rowStartDate);
+  const evEnd=ev.end<toDateStr(rowEndDate)?ev.end:toDateStr(rowEndDate);
+  const startD=new Date(evStart+'T00:00:00');
+  const endD=new Date(evEnd+'T00:00:00');
+  const rowStart=rowStartDate;
+  const colStart=Math.round((startD-rowStart)/864e5);
+  const colSpan=Math.round((endD-startD)/864e5)+1;
+  const gap=2;
+  const leftPct=colStart*(100/7);
+  const widthPct=colSpan*(100/7)-((gap*(colSpan-1))/(3.28*7));
+  return {left:leftPct.toFixed(2)+'%',width:widthPct.toFixed(2)+'%'};
+}
+
 function renderCalendar(){
   const now=new Date();
   document.getElementById('cal-month-title').textContent=thMonths[currentMonth]+' '+(currentYear+543);
@@ -807,8 +851,20 @@ function renderCalendar(){
   const days=new Date(currentYear,currentMonth+1,0).getDate();
   const grid=document.getElementById('cal-grid');
   grid.innerHTML='';
+  const multidayEvs=events.filter(ev=>{
+    if(!ev.end||ev.end<=ev.start)return false;
+    if(activeFilter!=='all'&&ev.cat!==activeFilter)return false;
+    return true;
+  });
   let day=1-first;
   for(let r=0;r<6;r++){
+    // สร้าง week-row wrapper
+    const weekRow=document.createElement('div');
+    weekRow.className='week-row';
+    // หาวันแรกและสุดท้ายของ row นี้
+    const rowFirstDay=day;
+    const rowFirstDate=new Date(currentYear,currentMonth,day);
+    const rowLastDate=new Date(currentYear,currentMonth,day+6);
     for(let c=0;c<7;c++,day++){
       const cell=document.createElement('div');
       const isThis=day>=1&&day<=days;
@@ -880,8 +936,35 @@ function renderCalendar(){
         if(dayEvs.length>2){const m=document.createElement('div');m.style.cssText='font-size:9px;color:var(--text3);padding:1px 4px';m.textContent=`+${dayEvs.length-2} อื่นๆ`;cell.appendChild(m);}
         cell.onclick=()=>openDayModal(dateStr);
       }
-      grid.appendChild(cell);
+      weekRow.appendChild(cell);
     }
+    // เพิ่ม multiday bars ใน week row
+    const rowStart=new Date(currentYear,currentMonth,rowFirstDay);
+    const rowEnd=new Date(currentYear,currentMonth,rowFirstDay+6);
+    const rowStartStr=toDateStr(rowStart);
+    const rowEndStr=toDateStr(rowEnd);
+    multidayEvs.forEach(ev=>{
+      // ตรวจว่า event อยู่ใน row นี้ไหม
+      if(ev.end<rowStartStr||ev.start>rowEndStr)return;
+      const bar=document.createElement('div');
+      const catCls={priv:'mb-priv',temple:'mb-temple',abroad:'mb-abroad'};
+      bar.className='multiday-bar '+(catCls[ev.cat]||'mb-priv');
+      // คำนวณตำแหน่ง
+      const evStartDate=ev.start<rowStartStr?rowStart:new Date(ev.start+'T00:00:00');
+      const evEndDate=ev.end>rowEndStr?rowEnd:new Date(ev.end+'T00:00:00');
+      const colStart=Math.round((evStartDate-rowStart)/864e5);
+      const colSpan=Math.round((evEndDate-evStartDate)/864e5)+1;
+      const leftPct=(colStart/7*100).toFixed(1);
+      const widthPct=((colSpan/7*100)-0.5).toFixed(1);
+      bar.style.cssText=`top:26px;left:${leftPct}%;width:${widthPct}%;`;
+      const iconMap={priv:'ti-user-heart',temple:'ti-building-arch',abroad:'ti-world'};
+      const isStart=ev.start>=rowStartStr;
+      bar.innerHTML=`<i class="ti ${iconMap[ev.cat]||'ti-calendar'}"></i>${isStart?ev.title:'↳ '+ev.title}`;
+      bar.onclick=(e)=>{e.stopPropagation();openEditModal(ev);};
+      bar.title=`${ev.title} (${formatThai(ev.start)} – ${formatThai(ev.end)})`;
+      weekRow.appendChild(bar);
+    });
+    grid.appendChild(weekRow);
     if(day>days&&r>=4)break;
   }
 }
