@@ -931,7 +931,7 @@ function renderCalendar(){
           chip.onclick=e=>{e.stopPropagation();openEditModal(ev);};
           cell.appendChild(chip);
           if(ev.flyNo){const ft=document.createElement('div');ft.className='fly-tag';ft.innerHTML=`<i class="ti ti-plane"></i>${ev.flyNo}`;cell.appendChild(ft);}
-          if(ev.recordedBy){const rt=document.createElement('div');rt.className='recorder-tag';rt.textContent='👤 '+ev.recordedBy;cell.appendChild(rt);}
+          // ชื่อผู้บันทึกแสดงเฉพาะตอนกดเข้าดูรายละเอียด ไม่แสดงในช่องปฏิทิน
         });
         if(dayEvs.length>2){const m=document.createElement('div');m.style.cssText='font-size:9px;color:var(--text3);padding:1px 4px';m.textContent=`+${dayEvs.length-2} อื่นๆ`;cell.appendChild(m);}
         cell.onclick=()=>openDayModal(dateStr);
