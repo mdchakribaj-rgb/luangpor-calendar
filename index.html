@@ -1509,8 +1509,11 @@ window.addEventListener('resize',()=>{document.getElementById('desktop-tabs').st
 // ── ลงทะเบียน Service Worker ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
+    navigator.serviceWorker.register('sw.js', {updateViaCache:'none'})
+      .then(reg => {
+        reg.update();
+        console.log('SW registered:', reg.scope);
+      })
       .catch(err => console.warn('SW failed:', err));
   });
 }

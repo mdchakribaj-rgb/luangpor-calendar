@@ -209,39 +209,67 @@ function isMobile(){
 }
 
 let isProcessing = false;
+let authChecked = false;
+
+// Safety timeout — ถ้าค้างเกิน 10 วิ ปลดล็อกปุ่มให้กดได้
+const safetyTimer = setTimeout(() => {
+  if (!authChecked) {
+    console.warn('Auth timeout — ปลดล็อกปุ่ม');
+    isProcessing = false;
+    hideLoading();
+    authChecked = true;
+  }
+}, 10000);
+
+function unlock(){
+  clearTimeout(safetyTimer);
+  authChecked = true;
+  isProcessing = false;
+  hideLoading();
+}
 
 // ตรวจผลลัพธ์จาก Redirect (มือถือ) เมื่อกลับมาจาก Google
 (async function initAuth(){
-  await persistenceReady;
+  try {
+    await persistenceReady;
+  } catch(e) { console.warn('persistence:', e); }
+
   try {
     const result = await getRedirectResult(auth);
     if (result && result.user) {
-      isProcessing = true;
+      clearTimeout(safetyTimer);
+      authChecked = true;
       showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
       const ok = await checkWhitelist(result.user.email);
       if (ok) { window.location.replace('index.html'); return; }
       await signOut(auth);
-      isProcessing = false;
+      unlock();
       showError('บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ');
       return;
     }
   } catch(e) {
     console.warn('Redirect result:', e);
+    unlock();
   }
 
-  // ตรวจ session เดิม
+  // ตรวจ session เดิม — ทำงานครั้งเดียว
+  let firstCheck = true;
   onAuthStateChanged(auth, async user => {
-    if (isProcessing) return;
+    if (!firstCheck) return;
+    firstCheck = false;
+    clearTimeout(safetyTimer);
+    authChecked = true;
+
     if (user) {
-      isProcessing = true;
       showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
-      const ok = await checkWhitelist(user.email);
-      if (ok) { window.location.replace('index.html'); return; }
-      await signOut(auth);
-      isProcessing = false;
-      hideLoading();
+      try {
+        const ok = await checkWhitelist(user.email);
+        if (ok) { window.location.replace('index.html'); return; }
+        await signOut(auth);
+      } catch(e) { console.warn('whitelist:', e); }
+      unlock();
     } else {
-      hideLoading();
+      unlock();
     }
   });
 })();
@@ -271,6 +299,8 @@ window.loginGoogle = async function() {
   if (isProcessing) return;
   isProcessing = true;
   showLoading('⏳ กำลังเชื่อมต่อ Google...');
+  // กันค้าง — ถ้าไม่ redirect ใน 5 วิ ปลดล็อก
+  const loginTimer = setTimeout(() => { isProcessing = false; hideLoading(); }, 5000);
   try {
     await persistenceReady;
     if (isMobile()) {
@@ -278,6 +308,7 @@ window.loginGoogle = async function() {
       await signInWithRedirect(auth, provider);
       // หน้าจะย้ายไป Google แล้วกลับมา
     } else {
+      clearTimeout(loginTimer);
       // คอม — ใช้ Popup
       const result = await signInWithPopup(auth, provider);
       showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
@@ -288,6 +319,7 @@ window.loginGoogle = async function() {
       showError('บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ');
     }
   } catch(e) {
+    clearTimeout(loginTimer);
     isProcessing = false;
     hideLoading();
     if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
@@ -302,12 +334,15 @@ window.loginGoogle = async function() {
 
 <script>
 // ── ลงทะเบียน Service Worker ──
+// หน้า Login ไม่ลงทะเบียน Service Worker
+// เพื่อป้องกันการแคชรบกวน Firebase Auth
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.warn('SW failed:', err));
-  });
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => {
+      // ลบ SW เก่าที่อาจแคชหน้า login ไว้
+      if (r.active) r.unregister();
+    });
+  }).catch(()=>{});
 }
 
 // ── ปุ่มติดตั้งแอพ (Android/Chrome) ──
