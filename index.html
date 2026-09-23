@@ -357,6 +357,29 @@ input,select,textarea{font-size:16px !important}
   border:none;border-radius:8px;font-family:'Sarabun',sans-serif;
   font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;
 }
+
+/* ── FIX: view ซ้อนกัน ── */
+.view{display:none !important}
+.view.active{display:block !important}
+.view.view-flex.active{
+  display:flex !important;
+  flex-direction:column;
+  overflow:hidden;
+  padding-bottom:0;
+}
+/* ปฏิทินเลื่อนได้ภายใน view */
+.view-flex.active .cal-grid-wrap{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + var(--sab) + 12px);
+}
+/* view อื่นๆ (dashboard/settings) เลื่อนปกติ */
+#view-dashboard.active,#view-settings.active{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + var(--sab) + 16px);
+}
 </style>
 </head>
 <body>
@@ -387,7 +410,7 @@ input,select,textarea{font-size:16px !important}
   </div>
   <div class="main-area">
     <!-- CALENDAR VIEW -->
-    <div class="view active" id="view-calendar" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0">
+    <div class="view view-flex active" id="view-calendar">
       <div class="cal-header">
         <div>
           <div class="cal-month-title" id="cal-month-title">—</div>
