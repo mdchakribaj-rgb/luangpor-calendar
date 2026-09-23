@@ -781,21 +781,29 @@ function formatThai(str){
 }
 
 // ป้องกัน redirect loop — รอ 8 วินาทีก่อน redirect
-let authResolved=false;
-const authTimeout=setTimeout(()=>{
-  if(!authResolved){
-    console.warn('Auth timeout — ไม่ redirect เพื่อป้องกัน loop');
-    document.getElementById('auth-loading').style.display='none';
-    document.getElementById('app').classList.add('show');
-  }
-},8000);
+let appInitialized=false;
+let redirectGuard=false;
 
+// รอ persistence พร้อมก่อนเช็ค auth
+const persistenceReady = setPersistence(auth, browserLocalPersistence)
+  .catch(e => console.warn('Persistence:', e));
+
+function goLogin(){
+  if(redirectGuard) return;
+  redirectGuard = true;
+  window.location.replace('login.html');
+}
+
+persistenceReady.then(()=>{
 onAuthStateChanged(auth,async user=>{
-  authResolved=true;
-  clearTimeout(authTimeout);
-  if(!user){window.location.href='login.html';return;}
+  // ถ้าแอพเริ่มทำงานแล้ว และ user หายไปชั่วคราว ไม่ต้อง redirect
+  if(appInitialized && !user){
+    console.warn('Auth state null หลังเริ่มแอพ — ไม่ redirect');
+    return;
+  }
+  if(!user){goLogin();return;}
   const snap=await getDoc(doc(db,'members',user.email.toLowerCase()));
-  if(!snap.exists()||!snap.data().active){await signOut(auth);window.location.href='login.html';return;}
+  if(!snap.exists()||!snap.data().active){await signOut(auth);goLogin();return;}
   currentUser=user;userRole=snap.data().role||'viewer';
   // ดึงชื่อเล่นจาก Firestore field "name" ก่อน ถ้าไม่มีใช้ชื่อ Google
   currentUser._displayName = snap.data().name || user.displayName?.split(' ')[0] || user.email.split('@')[0];
@@ -805,7 +813,9 @@ onAuthStateChanged(auth,async user=>{
   renderCalendar();renderCalEventList();renderDashboard();loadSettingsUI();generateScript();
   document.getElementById('auth-loading').style.display='none';
   document.getElementById('app').classList.add('show');
+  appInitialized = true;
   if(window.innerWidth>=768)document.getElementById('desktop-tabs').style.display='flex';
+});
 });
 
 function setupUI(){
@@ -1314,7 +1324,7 @@ window.closeLightbox = function() {
 // ปิดด้วย ESC
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
 
-window.doLogout=async()=>{if(!confirm('ออกจากระบบ?'))return;await signOut(auth);window.location.href='login.html';};
+window.doLogout=async()=>{if(!confirm('ออกจากระบบ?'))return;redirectGuard=true;await signOut(auth);window.location.replace('login.html');};
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.background=type==='error'?'#c0392b':'#3d6b35';
