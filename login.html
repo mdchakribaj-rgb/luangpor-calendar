@@ -228,46 +228,45 @@ function unlock(){
   hideLoading();
 }
 
-// ตรวจผลลัพธ์จาก Redirect (มือถือ) เมื่อกลับมาจาก Google
-(async function initAuth(){
-  try {
-    await persistenceReady;
-  } catch(e) { console.warn('persistence:', e); }
+async function proceedTo(user){
+  showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
+  const ok = await checkWhitelist(user.email);
+  if (ok) {
+    // รอให้ Firebase เขียน session ลง IndexedDB ให้เสร็จก่อน (สำคัญมากบนมือถือ)
+    await new Promise(r => setTimeout(r, 400));
+    window.location.replace('index.html');
+    return true;
+  }
+  await signOut(auth);
+  unlock();
+  showError('บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ');
+  return false;
+}
 
+(async function initAuth(){
+  try { await persistenceReady; } catch(e) { console.warn('persistence:', e); }
+
+  // เช็คผล redirect (เผื่อ fallback ไปใช้ redirect)
   try {
     const result = await getRedirectResult(auth);
     if (result && result.user) {
       clearTimeout(safetyTimer);
       authChecked = true;
-      showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
-      const ok = await checkWhitelist(result.user.email);
-      if (ok) { window.location.replace('index.html'); return; }
-      await signOut(auth);
-      unlock();
-      showError('บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ');
+      await proceedTo(result.user);
       return;
     }
-  } catch(e) {
-    console.warn('Redirect result:', e);
-    unlock();
-  }
+  } catch(e) { console.warn('Redirect result:', e); }
 
-  // ตรวจ session เดิม — ทำงานครั้งเดียว
+  // เช็ค session เดิม
   let firstCheck = true;
   onAuthStateChanged(auth, async user => {
     if (!firstCheck) return;
     firstCheck = false;
     clearTimeout(safetyTimer);
     authChecked = true;
-
     if (user) {
-      showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
-      try {
-        const ok = await checkWhitelist(user.email);
-        if (ok) { window.location.replace('index.html'); return; }
-        await signOut(auth);
-      } catch(e) { console.warn('whitelist:', e); }
-      unlock();
+      try { if (await proceedTo(user)) return; }
+      catch(e){ console.warn('whitelist:', e); unlock(); }
     } else {
       unlock();
     }
@@ -299,34 +298,33 @@ window.loginGoogle = async function() {
   if (isProcessing) return;
   isProcessing = true;
   showLoading('⏳ กำลังเชื่อมต่อ Google...');
-  // กันค้าง — ถ้าไม่ redirect ใน 5 วิ ปลดล็อก
-  const loginTimer = setTimeout(() => { isProcessing = false; hideLoading(); }, 5000);
   try {
     await persistenceReady;
-    if (isMobile()) {
-      // มือถือ — ใช้ Redirect ไม่ใช้ Popup
-      await signInWithRedirect(auth, provider);
-      // หน้าจะย้ายไป Google แล้วกลับมา
-    } else {
-      clearTimeout(loginTimer);
-      // คอม — ใช้ Popup
-      const result = await signInWithPopup(auth, provider);
-      showLoading('⏳ กำลังตรวจสอบสิทธิ์...');
-      const ok = await checkWhitelist(result.user.email);
-      if (ok) { window.location.replace('index.html'); return; }
-      await signOut(auth);
-      isProcessing = false;
-      showError('บัญชีนี้ไม่มีสิทธิ์เข้าใช้งาน<br>กรุณาติดต่อ Admin เพื่อขอลิงก์เชิญ');
-    }
+    // ใช้ Popup ทุกอุปกรณ์ — มือถือรุ่นใหม่รองรับแล้ว
+    // และ Redirect มีปัญหากับ third-party cookie ที่ Chrome/Safari บล็อก
+    const result = await signInWithPopup(auth, provider);
+    await proceedTo(result.user);
   } catch(e) {
-    clearTimeout(loginTimer);
+    console.warn('Popup login:', e.code, e.message);
+    // ผู้ใช้ปิด popup เอง
+    if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+      isProcessing = false;
+      hideLoading();
+      return;
+    }
+    // Popup ถูกบล็อก → fallback ไป Redirect
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+      showLoading('⏳ กำลังเปลี่ยนไปหน้า Google...');
+      try {
+        await signInWithRedirect(auth, provider);
+        return;
+      } catch(e2) {
+        console.error('Redirect fallback:', e2);
+      }
+    }
     isProcessing = false;
     hideLoading();
-    if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
-      // ผู้ใช้ปิดเอง ไม่ต้องแสดง error
-    } else {
-      showError('เกิดข้อผิดพลาด: ' + (e.message || 'กรุณาลองใหม่'));
-    }
+    showError('เข้าสู่ระบบไม่สำเร็จ<br><span style="font-size:11px;opacity:.8">' + (e.code||e.message||'') + '</span>');
   }
 };
 

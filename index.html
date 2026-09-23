@@ -894,11 +894,27 @@ const bootTimeout=setTimeout(()=>{
 
 setPersistence(auth, browserLocalPersistence).catch(e=>console.warn('Persistence:',e));
 
+let nullCount=0;
 onAuthStateChanged(auth, async user=>{
   authFired=true;
   if(appInitialized && !user){ console.warn('Auth null หลังเริ่มแอพ — ข้าม'); return; }
   if(appInitialized) return;
-  if(!user){ clearTimeout(bootTimeout); goLogin('ไม่มี user'); return; }
+
+  if(!user){
+    // มือถืออาจยิง null ครั้งแรกก่อน restore session เสร็จ — รอก่อน
+    nullCount++;
+    if(nullCount === 1){
+      console.warn('Auth null ครั้งแรก — รอ 2.5 วิ ก่อนตัดสินใจ');
+      setTimeout(()=>{
+        if(!appInitialized && !auth.currentUser){
+          clearTimeout(bootTimeout);
+          goLogin('ไม่มี user หลังรอ');
+        }
+      }, 2500);
+      return;
+    }
+    return;
+  }
 
   try{
     const snap=await getDoc(doc(db,'members',user.email.toLowerCase()));
