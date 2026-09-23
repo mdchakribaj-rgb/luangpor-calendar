@@ -862,42 +862,72 @@ function formatThai(str){
   return`${parseInt(d)} ${mn[parseInt(m)]} ${parseInt(y)+543}`;
 }
 
-// ป้องกัน redirect loop — รอ 8 วินาทีก่อน redirect
 let appInitialized=false;
 let redirectGuard=false;
+let authFired=false;
 
-// รอ persistence พร้อมก่อนเช็ค auth
-const persistenceReady = setPersistence(auth, browserLocalPersistence)
-  .catch(e => console.warn('Persistence:', e));
-
-function goLogin(){
+function goLogin(reason){
   if(redirectGuard) return;
-  redirectGuard = true;
+  redirectGuard=true;
+  console.warn('→ login.html:', reason||'');
   window.location.replace('login.html');
 }
 
-persistenceReady.then(()=>{
-onAuthStateChanged(auth,async user=>{
-  // ถ้าแอพเริ่มทำงานแล้ว และ user หายไปชั่วคราว ไม่ต้อง redirect
-  if(appInitialized && !user){
-    console.warn('Auth state null หลังเริ่มแอพ — ไม่ redirect');
-    return;
+function showAuthError(msg){
+  const el=document.getElementById('auth-loading');
+  if(!el) return;
+  el.innerHTML=`<div style="text-align:center;padding:24px;max-width:330px">
+    <div style="font-size:42px;margin-bottom:12px">⚠️</div>
+    <div style="font-size:15px;font-weight:700;color:var(--brown);margin-bottom:8px">เกิดข้อผิดพลาด</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">${msg}</div>
+    <button onclick="location.reload()" style="padding:11px 22px;background:#3d3222;color:#e8c56a;border:none;border-radius:10px;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-right:8px">ลองใหม่</button>
+    <button onclick="location.replace('login.html')" style="padding:11px 22px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:10px;font-family:'Sarabun',sans-serif;font-size:14px;cursor:pointer">กลับ Login</button>
+  </div>`;
+}
+
+const bootTimeout=setTimeout(()=>{
+  if(!appInitialized){
+    if(!authFired) goLogin('Firebase ไม่ตอบสนอง');
+    else showAuthError('โหลดข้อมูลไม่สำเร็จ<br>กรุณาตรวจสอบอินเทอร์เน็ต');
   }
-  if(!user){goLogin();return;}
-  const snap=await getDoc(doc(db,'members',user.email.toLowerCase()));
-  if(!snap.exists()||!snap.data().active){await signOut(auth);goLogin();return;}
-  currentUser=user;userRole=snap.data().role||'viewer';
-  // ดึงชื่อเล่นจาก Firestore field "name" ก่อน ถ้าไม่มีใช้ชื่อ Google
-  currentUser._displayName = snap.data().name || user.displayName?.split(' ')[0] || user.email.split('@')[0];
-  setupUI();
-  const now=new Date();currentYear=now.getFullYear();currentMonth=now.getMonth();
-  await loadEvents();
-  renderCalendar();renderCalEventList();renderDashboard();loadSettingsUI();generateScript();
-  document.getElementById('auth-loading').style.display='none';
-  document.getElementById('app').classList.add('show');
-  appInitialized = true;
-  if(window.innerWidth>=768)document.getElementById('desktop-tabs').style.display='flex';
-});
+},12000);
+
+setPersistence(auth, browserLocalPersistence).catch(e=>console.warn('Persistence:',e));
+
+onAuthStateChanged(auth, async user=>{
+  authFired=true;
+  if(appInitialized && !user){ console.warn('Auth null หลังเริ่มแอพ — ข้าม'); return; }
+  if(appInitialized) return;
+  if(!user){ clearTimeout(bootTimeout); goLogin('ไม่มี user'); return; }
+
+  try{
+    const snap=await getDoc(doc(db,'members',user.email.toLowerCase()));
+    if(!snap.exists()||!snap.data().active){
+      clearTimeout(bootTimeout);
+      await signOut(auth);
+      goLogin('ไม่มีสิทธิ์');
+      return;
+    }
+    currentUser=user;
+    userRole=snap.data().role||'viewer';
+    currentUser._displayName=snap.data().name||user.displayName?.split(' ')[0]||user.email.split('@')[0];
+    setupUI();
+    const now=new Date();currentYear=now.getFullYear();currentMonth=now.getMonth();
+    try{ await loadEvents(); }catch(e){ console.warn('loadEvents:',e); }
+    renderCalendar();renderCalEventList();renderDashboard();loadSettingsUI();generateScript();
+    clearTimeout(bootTimeout);
+    document.getElementById('auth-loading').style.display='none';
+    document.getElementById('app').classList.add('show');
+    appInitialized=true;
+    if(window.innerWidth>=768) document.getElementById('desktop-tabs').style.display='flex';
+  }catch(err){
+    clearTimeout(bootTimeout);
+    console.error('Auth error:',err);
+    const m=String(err.message||err);
+    if(m.includes('permission')||m.includes('PERMISSION')) showAuthError('ไม่มีสิทธิ์เข้าถึงข้อมูล<br>กรุณาติดต่อ Admin');
+    else if(m.includes('offline')||m.includes('network')||m.includes('unavailable')) showAuthError('เชื่อมต่อฐานข้อมูลไม่ได้<br>กรุณาตรวจสอบอินเทอร์เน็ต');
+    else showAuthError('เกิดข้อผิดพลาด<br><span style="font-size:11px;opacity:.7">'+m.slice(0,90)+'</span>');
+  }
 });
 
 function setupUI(){
@@ -1423,7 +1453,6 @@ window.openDayModal = function(dateStr) {
   currentDayStr = dateStr;
   const [y,m,d] = dateStr.split('-');
   const mn = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  const ld = LUNAR_2569[dateStr];
   document.getElementById('day-modal-title').textContent = `${parseInt(d)} ${mn[parseInt(m)]} ${parseInt(y)+543}`;
   document.getElementById('day-modal-date').textContent = ld ? ld.l : '';
 
