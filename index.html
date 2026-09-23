@@ -106,7 +106,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .chip-pati-new{background:rgba(61,107,53,.15);color:#2a5024;border:1px solid rgba(61,107,53,.3)}
 .fly-tag{display:inline-flex;align-items:center;gap:2px;font-size:8px;background:#e8f0fa;color:#1a4a8a;border-radius:3px;padding:1px 4px;margin-top:1px}
 .recorder-tag{font-size:8px;color:var(--text3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.event-list-section{padding:16px}
+.event-list-section{padding:16px 8px 20px}
 .event-list-title{font-size:14px;font-weight:700;color:var(--brown);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .event-list-title i{font-size:16px;color:var(--gold2)}
 .event-list-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all .15s}
@@ -339,10 +339,10 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
       <div class="cal-grid-wrap">
         <div class="cal-head"><span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span></div>
         <div id="cal-grid" class="cal-grid"></div>
-      </div>
-      <div class="event-list-section">
-        <div class="event-list-title"><i class="ti ti-clock-hour-4"></i>กิจกรรมที่กำลังจะมาถึง</div>
-        <div id="cal-event-list"><div class="empty-state">ยังไม่มีกิจกรรม</div></div>
+        <div class="event-list-section">
+          <div class="event-list-title"><i class="ti ti-clock-hour-4"></i>กิจกรรมที่กำลังจะมาถึง</div>
+          <div id="cal-event-list"><div class="empty-state">ยังไม่มีกิจกรรม</div></div>
+        </div>
       </div>
     </div>
     <!-- DASHBOARD VIEW -->
@@ -1007,18 +1007,86 @@ function renderCalendar(){
   }
 }
 
+let showAllUpcoming=false;
+
 function renderCalEventList(){
   const todayStr=toDateStr(new Date());
-  const upcoming=events.filter(ev=>ev.start>=todayStr).sort((a,b)=>a.start.localeCompare(b.start)).slice(0,5);
   const list=document.getElementById('cal-event-list');
-  if(!upcoming.length){list.innerHTML='<div class="empty-state">ยังไม่มีกิจกรรมที่กำลังจะมาถึง</div>';return;}
-  list.innerHTML=upcoming.map(ev=>`
-    <div class="event-list-item" onclick="openEditModal_id('${ev.id}')">
-      <div class="ev-bar" style="background:${catColor[ev.cat]}"></div>
-      <div class="ev-info"><div class="ev-name">${ev.title}</div><div class="ev-meta">${catName[ev.cat]}${ev.location?' · '+ev.location:''}</div></div>
-      <div class="ev-time">${formatThai(ev.start)}${ev.timeStart?' '+ev.timeStart:''}</div>
-    </div>`).join('');
+
+  // รวมกิจกรรมปกติ
+  const evItems=events.filter(ev=>(ev.end||ev.start)>=todayStr).map(ev=>({
+    type:'event', date:ev.start, data:ev
+  }));
+
+  // รวมวันปาฏิโมกข์ที่ยังไม่ถึง (6 เดือนข้างหน้า)
+  const patiItems=[];
+  Object.entries(LUNAR_2569).forEach(([dateStr,ld])=>{
+    if(dateStr<todayStr) return;
+    if(ld.pati15){
+      patiItems.push({type:'pati15',date:dateStr,data:{title:'วันปาฏิโมกข์',sub:ld.l}});
+    } else if(ld.patiNew){
+      patiItems.push({type:'patiNew',date:dateStr,data:{title:'วันปาฏิโมกข์',sub:ld.l}});
+    }
+  });
+
+  const all=[...evItems,...patiItems].sort((a,b)=>a.date.localeCompare(b.date));
+  const shown=showAllUpcoming?all:all.slice(0,6);
+
+  if(!all.length){
+    list.innerHTML='<div class="empty-state">ยังไม่มีกิจกรรมที่กำลังจะมาถึง</div>';
+    return;
+  }
+
+  let html=shown.map(item=>{
+    if(item.type==='event'){
+      const ev=item.data;
+      const dateRange=ev.end&&ev.end!==ev.start
+        ? `${formatThai(ev.start)} – ${formatThai(ev.end)}`
+        : `${formatThai(ev.start)}${ev.timeStart?' '+ev.timeStart:''}`;
+      const bpIcon=ev.bpUrl?'<i class="ti ti-ticket" style="font-size:11px;color:#1a4a8a;margin-left:4px"></i>':'';
+      const flyTag=ev.flyNo?`<span style="color:#1a4a8a"><i class="ti ti-plane" style="font-size:11px"></i> ${ev.flyNo}</span>`:'';
+      return `
+      <div class="event-list-item" onclick="openDayModal('${ev.start}')">
+        <div class="ev-bar" style="background:${catColor[ev.cat]}"></div>
+        <div class="ev-info">
+          <div class="ev-name">${ev.title}${bpIcon}</div>
+          <div class="ev-meta">${catName[ev.cat]}${ev.location?' · '+ev.location:''} ${flyTag}</div>
+        </div>
+        <div class="ev-time">${dateRange}</div>
+      </div>`;
+    } else {
+      const isFull=item.type==='pati15';
+      const color=isFull?'var(--gold2)':'var(--green)';
+      const bg=isFull?'#fdf8ee':'#f0f8ee';
+      const border=isFull?'#e8d9a0':'#c0dbb8';
+      const icon=isFull?'🌕':'🌑';
+      return `
+      <div class="event-list-item" style="background:${bg};border-color:${border}" onclick="openDayModal('${item.date}')">
+        <div class="ev-bar" style="background:${color}"></div>
+        <div class="ev-info">
+          <div class="ev-name" style="color:${isFull?'#7a5c00':'#2a5024'}">${icon} ${item.data.title}</div>
+          <div class="ev-meta">${item.data.sub}</div>
+        </div>
+        <div class="ev-time">${formatThai(item.date)}</div>
+      </div>`;
+    }
+  }).join('');
+
+  // ปุ่มดูทั้งหมด
+  if(all.length>6){
+    html+=`<button onclick="toggleShowAll()" style="width:100%;padding:10px;margin-top:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--gold2);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      <i class="ti ti-chevron-${showAllUpcoming?'up':'down'}"></i>
+      ${showAllUpcoming?'ย่อรายการ':`ดูทั้งหมด (${all.length} รายการ)`}
+    </button>`;
+  }
+
+  list.innerHTML=html;
 }
+
+window.toggleShowAll=function(){
+  showAllUpcoming=!showAllUpcoming;
+  renderCalEventList();
+};
 
 window.prevMonth=()=>{currentMonth--;if(currentMonth<0){currentMonth=11;currentYear--;}renderCalendar();};
 window.nextMonth=()=>{currentMonth++;if(currentMonth>11){currentMonth=0;currentYear++;}renderCalendar();};
@@ -1261,8 +1329,11 @@ window.openDayModal = function(dateStr) {
     return dateStr >= ev.start && dateStr <= (ev.end || ev.start);
   });
 
-  if (dayEvs.length === 0) {
-    // ไม่มีกิจกรรม → เปิดฟอร์มเพิ่มทันที
+  const ld = LUNAR_2569[dateStr];
+  const isPatiDay = ld && (ld.pati15 || ld.patiNew);
+
+  // ไม่มีกิจกรรม และไม่ใช่วันปาฏิโมกข์ → เปิดฟอร์มเพิ่มทันที
+  if (dayEvs.length === 0 && !isPatiDay) {
     openAddModal(dateStr);
     return;
   }
@@ -1275,7 +1346,22 @@ window.openDayModal = function(dateStr) {
   document.getElementById('day-modal-date').textContent = ld ? ld.l : '';
 
   const list = document.getElementById('day-modal-list');
-  list.innerHTML = dayEvs.map(ev => `
+  let listHtml = '';
+
+  // แสดงวันปาฏิโมกข์ก่อน (ถ้ามี)
+  if (isPatiDay) {
+    const isFull = ld.pati15;
+    listHtml += `
+    <div class="day-ev-item" style="background:${isFull?'#fdf8ee':'#f0f8ee'};cursor:default">
+      <div class="day-ev-bar" style="background:${isFull?'var(--gold2)':'var(--green)'}"></div>
+      <div class="day-ev-info">
+        <div class="day-ev-name" style="color:${isFull?'#7a5c00':'#2a5024'}">${isFull?'🌕':'🌑'} วันปาฏิโมกข์</div>
+        <div class="day-ev-meta"><span><i class="ti ti-moon-stars"></i>${ld.l}</span></div>
+      </div>
+    </div>`;
+  }
+
+  listHtml += dayEvs.map(ev => `
     <div class="day-ev-item" onclick="editFromDay('${ev.id}')">
       <div class="day-ev-bar" style="background:${catColor[ev.cat]}"></div>
       <div class="day-ev-info">
@@ -1292,6 +1378,7 @@ window.openDayModal = function(dateStr) {
       </div>
     </div>`).join('');
 
+  list.innerHTML = listHtml;
   document.getElementById('day-modal').classList.add('open');
 };
 
