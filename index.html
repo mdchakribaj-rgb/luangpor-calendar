@@ -550,7 +550,6 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 // ตั้ง Persistence ให้ Session คงอยู่บนมือถือ
 setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistence error:', e));
-const storage = getStorage(app);
 
 // ── ปฏิทินจันทรคติ 2569 ครบทุกวัน (ข้อมูลจาก Thai PBS + ปฏิทินหลวง) ──
 // wp=วันพระ, pati15=ปาฏิโมกข์ขึ้น15, patiNew=ปาฏิโมกข์แรม15/14
