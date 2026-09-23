@@ -531,7 +531,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
@@ -547,6 +547,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
+// ตั้ง Persistence ให้ Session คงอยู่บนมือถือ
+setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistence error:', e));
 const storage = getStorage(app);
 
 // ── ปฏิทินจันทรคติ 2569 ครบทุกวัน (ข้อมูลจาก Thai PBS + ปฏิทินหลวง) ──
@@ -778,11 +781,25 @@ function formatThai(str){
   return`${parseInt(d)} ${mn[parseInt(m)]} ${parseInt(y)+543}`;
 }
 
+// ป้องกัน redirect loop — รอ 8 วินาทีก่อน redirect
+let authResolved=false;
+const authTimeout=setTimeout(()=>{
+  if(!authResolved){
+    console.warn('Auth timeout — ไม่ redirect เพื่อป้องกัน loop');
+    document.getElementById('auth-loading').style.display='none';
+    document.getElementById('app').classList.add('show');
+  }
+},8000);
+
 onAuthStateChanged(auth,async user=>{
+  authResolved=true;
+  clearTimeout(authTimeout);
   if(!user){window.location.href='login.html';return;}
   const snap=await getDoc(doc(db,'members',user.email.toLowerCase()));
   if(!snap.exists()||!snap.data().active){await signOut(auth);window.location.href='login.html';return;}
   currentUser=user;userRole=snap.data().role||'viewer';
+  // ดึงชื่อเล่นจาก Firestore field "name" ก่อน ถ้าไม่มีใช้ชื่อ Google
+  currentUser._displayName = snap.data().name || user.displayName?.split(' ')[0] || user.email.split('@')[0];
   setupUI();
   const now=new Date();currentYear=now.getFullYear();currentMonth=now.getMonth();
   await loadEvents();
@@ -794,11 +811,11 @@ onAuthStateChanged(auth,async user=>{
 
 function setupUI(){
   const u=currentUser;
-  document.getElementById('user-name-el').textContent=u.displayName?.split(' ')[0]||u.email;
+  document.getElementById('user-name-el').textContent=u._displayName||u.displayName?.split(' ')[0]||u.email;
   const av=document.getElementById('user-avatar-el');
   if(u.photoURL)av.innerHTML=`<img src="${u.photoURL}" alt="">`;
   else av.textContent=(u.displayName||u.email)[0].toUpperCase();
-  document.getElementById('settings-user-name').textContent=u.displayName||u.email;
+  document.getElementById('settings-user-name').textContent=u._displayName||u.displayName||u.email;
   document.getElementById('settings-user-email').textContent=`${u.email} · ${userRole==='admin'?'Admin':userRole==='editor'?'Editor':'Viewer'}`;
   if(userRole==='admin'){
     document.getElementById('bn-admin').style.display='flex';
@@ -921,6 +938,18 @@ function renderCalendar(){
         top.appendChild(lb);
       }
       cell.appendChild(top);
+      // เพิ่ม Chip ปาฏิโมกข์อัตโนมัติ
+      if(isThis&&ld?.pati15){
+        const pc=document.createElement('div');
+        pc.className='ev-chip ch-pati';
+        pc.innerHTML='<i class="ti ti-moon-stars"></i><span>ปาฏิโมกข์</span>';
+        cell.appendChild(pc);
+      } else if(isThis&&ld?.patiNew){
+        const pc=document.createElement('div');
+        pc.className='ev-chip ch-patin';
+        pc.innerHTML='<i class="ti ti-circle-dot"></i><span>ปาฏิโมกข์</span>';
+        cell.appendChild(pc);
+      }
       // events
       if(isThis&&dateStr){
         const dayEvs=getEventsForDate(dateStr);
@@ -1096,7 +1125,7 @@ window.saveEvent=async function(){
     flyTo:flyOpen?document.getElementById('fly-to').value:'',
     flySeat:flyOpen?document.getElementById('fly-seat').value:'',
     flyNote:flyOpen?document.getElementById('fly-note').value:'',
-    recordedBy:currentUser.displayName||currentUser.email,
+    recordedBy:currentUser._displayName||currentUser.displayName||currentUser.email,
     recordedByEmail:currentUser.email,
     updatedAt:serverTimestamp()
   };
