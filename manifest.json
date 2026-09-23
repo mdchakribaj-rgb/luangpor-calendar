@@ -1,0 +1,56 @@
+{
+  "name": "ปฏิทินหลวงพ่อ",
+  "short_name": "ปฏิทินหลวงพ่อ",
+  "description": "ระบบจัดการตารางงานและกิจนิมนต์",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0ebe0",
+  "theme_color": "#c9973a",
+  "lang": "th",
+  "dir": "ltr",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "./logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "เพิ่มกิจกรรม",
+      "short_name": "เพิ่ม",
+      "description": "เพิ่มกิจกรรมใหม่",
+      "url": "./index.html?action=add",
+      "icons": [{ "src": "./logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "ภาพรวม",
+      "short_name": "Dashboard",
+      "description": "ดูสถิติและภาพรวม",
+      "url": "./index.html?view=dashboard",
+      "icons": [{ "src": "./logo.png", "sizes": "96x96" }]
+    }
+  ]
+}

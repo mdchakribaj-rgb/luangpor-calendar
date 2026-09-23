@@ -2,7 +2,16 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c9973a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ปฏิทินหลวงพ่อ">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
+<meta name="format-detection" content="telephone=no">
 <title>ปฏิทินหลวงพ่อ</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
@@ -283,6 +292,71 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .mb-abroad{background:var(--cat-abroad)}
 /* ev-chip margin-top เพื่อเว้นที่ให้ multiday bar */
 .has-multiday .day-n{position:relative;z-index:1}
+
+/* ── SAFE AREA สำหรับ iPhone มีรอยบาก / Home Indicator ── */
+:root{
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+html,body{
+  height:100%;
+  overscroll-behavior-y:none;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  padding-top:var(--sat);
+  padding-left:var(--sal);
+  padding-right:var(--sar);
+}
+/* Topbar ชิดขอบบนไม่ทับรอยบาก */
+.topbar{padding-top:6px}
+/* Bottom nav เว้นที่ให้ Home Indicator */
+.bottom-nav{
+  padding-bottom:calc(12px + var(--sab));
+  height:calc(var(--nav-h) + var(--sab));
+}
+.view{
+  padding-bottom:calc(var(--nav-h) + var(--sab) + 8px);
+}
+/* Modal เว้นขอบล่าง */
+.modal{padding-bottom:calc(32px + var(--sab))}
+.day-modal{padding-bottom:calc(32px + var(--sab))}
+.toast{bottom:calc(var(--nav-h) + var(--sab) + 12px)}
+/* ป้องกันการ zoom ตอนกด input บน iOS */
+input,select,textarea{font-size:16px !important}
+@media(min-width:768px){
+  input,select,textarea{font-size:14px !important}
+}
+/* ปิด pull-to-refresh ที่รบกวน */
+.view,.cal-grid-wrap{overscroll-behavior:contain}
+
+/* ปุ่มติดตั้งแอพ */
+.install-banner{
+  display:none;
+  align-items:center;gap:10px;
+  margin:12px 16px 0;
+  padding:12px 14px;
+  background:linear-gradient(135deg,#fdf8ee,#f5ead0);
+  border:1px solid var(--gold2);
+  border-radius:var(--radius);
+  box-shadow:0 2px 10px rgba(184,134,11,.15);
+}
+.install-banner-icon{
+  width:38px;height:38px;border-radius:9px;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);flex-shrink:0;overflow:hidden;
+}
+.install-banner-icon img{width:34px;height:34px;object-fit:contain}
+.install-banner-text{flex:1;min-width:0}
+.install-banner-title{font-size:13px;font-weight:700;color:var(--brown)}
+.install-banner-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.install-banner-btn{
+  padding:8px 14px;background:#3d3222;color:#e8c56a;
+  border:none;border-radius:8px;font-family:'Sarabun',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;
+}
 </style>
 </head>
 <body>
@@ -378,6 +452,14 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
     <div class="view" id="view-settings">
       <div class="settings-wrap">
         <div class="settings-title">ตั้งค่าระบบ</div>
+        <div class="install-banner" id="install-app-btn">
+          <div class="install-banner-icon"><img src="logo.png" alt=""></div>
+          <div class="install-banner-text">
+            <div class="install-banner-title">ติดตั้งเป็นแอพ</div>
+            <div class="install-banner-sub">เปิดได้เร็วขึ้น ใช้งานเต็มจอ</div>
+          </div>
+          <button class="install-banner-btn" onclick="installApp()">ติดตั้ง</button>
+        </div>
         <div class="settings-section">
           <div class="settings-section-title">Line Notify Token</div>
           <div class="token-wrap">
@@ -1421,6 +1503,41 @@ window.showToast=showToast;
 document.getElementById('event-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('day-modal').addEventListener('click',function(e){if(e.target===this)closeDayModal();});
 window.addEventListener('resize',()=>{document.getElementById('desktop-tabs').style.display=window.innerWidth>=768?'flex':'none';});
+</script>
+
+<script>
+// ── ลงทะเบียน Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.warn('SW failed:', err));
+  });
+}
+
+// ── ปุ่มติดตั้งแอพ (Android/Chrome) ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('install-app-btn');
+  if (btn) btn.style.display = 'flex';
+});
+window.installApp = async function() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    const btn = document.getElementById('install-app-btn');
+    if (btn) btn.style.display = 'none';
+  }
+  deferredPrompt = null;
+};
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('install-app-btn');
+  if (btn) btn.style.display = 'none';
+  deferredPrompt = null;
+});
 </script>
 </body>
 </html>

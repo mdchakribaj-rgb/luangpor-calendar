@@ -2,7 +2,16 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c9973a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ปฏิทินหลวงพ่อ">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
+<meta name="format-detection" content="telephone=no">
 <title>ปฏิทินหลวงพ่อ — เข้าสู่ระบบ</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -127,6 +136,19 @@ body::before {
   .app-sub { text-align: left; }
   .footer { text-align: left; }
 }
+
+:root{
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+body{
+  padding-top:calc(20px + var(--sat));
+  padding-bottom:calc(20px + var(--sab));
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior-y:none;
+}
+input,button{font-size:16px}
+@media(min-width:768px){input,button{font-size:15px}}
 </style>
 </head>
 <body>
@@ -276,6 +298,41 @@ window.loginGoogle = async function() {
   }
 };
 
+</script>
+
+<script>
+// ── ลงทะเบียน Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.warn('SW failed:', err));
+  });
+}
+
+// ── ปุ่มติดตั้งแอพ (Android/Chrome) ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('install-app-btn');
+  if (btn) btn.style.display = 'flex';
+});
+window.installApp = async function() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    const btn = document.getElementById('install-app-btn');
+    if (btn) btn.style.display = 'none';
+  }
+  deferredPrompt = null;
+};
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('install-app-btn');
+  if (btn) btn.style.display = 'none';
+  deferredPrompt = null;
+});
 </script>
 </body>
 </html>
