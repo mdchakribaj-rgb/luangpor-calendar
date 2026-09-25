@@ -505,6 +505,26 @@ input,select,textarea{font-size:16px !important}
   .cal-cell{min-height:108px !important}
   .day-n{font-size:20px !important}
 }
+
+/* ══ ข้อ 5: พื้นหลังครีมเข้มขึ้น ══ */
+:root{--bg:#e7dcc6}
+html,body{background:var(--bg) !important}
+/* ══ ข้อ 1: ล็อกหน้าต่างเพิ่ม/แก้ไข ไม่ให้เลื่อนแนวนอน ══ */
+html,body{overflow-x:hidden;max-width:100%}
+.modal-overlay,.day-modal-overlay{overscroll-behavior:contain}
+.modal,.day-modal{overflow-x:hidden !important;overscroll-behavior:contain;touch-action:pan-y;max-width:100vw;-webkit-overflow-scrolling:touch}
+.modal *,.day-modal *{min-width:0;box-sizing:border-box}
+.modal .fi,.modal input,.modal textarea,.modal select{max-width:100%;width:100%}
+.g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important}
+.modal input[type=date],.modal input[type=time]{-webkit-appearance:none;appearance:none;display:block;min-height:46px;line-height:1.4;text-align:left}
+.modal input[type=date]::-webkit-date-and-time-value,.modal input[type=time]::-webkit-date-and-time-value{text-align:left}
+.modal img{max-width:100%}
+html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
+/* ══ ข้อ 3: ปัดเปลี่ยนเดือน ══ */
+#view-calendar .cal-grid-wrap{touch-action:pan-y}
+#cal-grid{will-change:transform}
+/* ══ ข้อ 4: ช่องเดือนก่อน/ถัดไป แสดงกิจกรรมแบบจาง ══ */
+.cal-cell.oth{opacity:.55 !important;background:rgba(250,247,240,.55) !important;border:1px solid var(--border2) !important;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1342,7 +1362,7 @@ function renderCalendar(){
       const isThis=day>=1&&day<=days;
       const d=new Date(currentYear,currentMonth,day);
       const isToday=d.toDateString()===now.toDateString();
-      const dateStr=isThis?toDateStr(d):null;
+      const dateStr=toDateStr(d);
       const ld=dateStr?LUNAR_ALL[dateStr]:null;
       // กำหนด class
       let cls='cal-cell';
@@ -1357,8 +1377,8 @@ function renderCalendar(){
       dn.className='day-n'+(isToday?' today':(!isThis?' oth':''));
       dn.textContent=isThis?day:new Date(currentYear,currentMonth,day).getDate();
       top.appendChild(dn);
-      // lunar label — แสดงทุกวัน รูปแบบ 2 บรรทัดกะทัดรัด
-      if(isThis){
+      // lunar label — แสดงทุกวัน รวมวันของเดือนก่อน/ถัดไป
+      {
         const lb=document.createElement('div');
         lb.style.cssText='text-align:center;line-height:1.2';
         if(ld){
@@ -1386,19 +1406,19 @@ function renderCalendar(){
       // เว้นที่ให้แถบกิจกรรมหลายวัน
       if(colLanes[c]>0){const sp=document.createElement('div');sp.style.height=(colLanes[c]*BAR_H)+'px';sp.style.flexShrink='0';cell.appendChild(sp);}
       // เพิ่ม Chip ปาฏิโมกข์อัตโนมัติ
-      if(isThis&&ld?.pati15){
+      if(ld?.pati15){
         const pc=document.createElement('div');
         pc.className='ev-chip ch-pati';
         pc.innerHTML='<i class="ti ti-moon-stars"></i><span>ปาฏิโมกข์</span>';
         cell.appendChild(pc);
-      } else if(isThis&&ld?.patiNew){
+      } else if(ld?.patiNew){
         const pc=document.createElement('div');
         pc.className='ev-chip ch-patin';
         pc.innerHTML='<i class="ti ti-circle-dot"></i><span>ปาฏิโมกข์</span>';
         cell.appendChild(pc);
       }
       // events
-      if(isThis&&dateStr){
+      if(dateStr){
         const dayEvs=getEventsForDate(dateStr).filter(ev=>!(ev.end&&ev.end>ev.start));
         dayEvs.slice(0,2).forEach(ev=>{
           const chip=document.createElement('div');
@@ -1648,24 +1668,37 @@ window.saveEvent=async function(){
     recordedByEmail:currentUser.email,
     updatedAt:serverTimestamp()
   };
+  const btn=document.querySelector('.btn-save');
+  if(btn.disabled) return;
+  btn.disabled=true; const btnHtml=btn.innerHTML; btn.innerHTML='⏳ กำลังบันทึก...';
   try{
+    const id = editingId || doc(collection(db,'events')).id;
+    let bpUrl = document.getElementById('bp-url').value || '';
+    if(currentBPFile){
+      btn.innerHTML='⏳ กำลังอัปโหลดรูป...';
+      try{ bpUrl = await uploadBoardingPass(id); }
+      catch(upErr){
+        console.error('upload:',upErr);
+        if(!confirm('อัปโหลดรูปไม่สำเร็จ\n'+bpErrorText(upErr)+'\n\nกด ตกลง เพื่อบันทึกกิจกรรมโดยไม่มีรูปใหม่\nกด ยกเลิก เพื่อกลับไปลองอีกครั้ง')) return;
+      }
+    }
+    ev.bpUrl = bpUrl;
     if(editingId){
-      // อัพโหลด Boarding Pass ถ้ามีไฟล์ใหม่
-      const bpUrl = await uploadBoardingPass(editingId);
-      if(bpUrl) ev.bpUrl = bpUrl;
-      else if(!document.getElementById('bp-url').value) ev.bpUrl = '';
-      await updateDoc(doc(db,'events',editingId),ev);showToast('✅ แก้ไขกิจกรรมแล้ว');
-    } else {
+      await updateDoc(doc(db,'events',editingId),ev);
+      showToast('✅ แก้ไขกิจกรรมแล้ว');
+    }else{
       ev.createdAt=serverTimestamp();
-      const docRef = await addDoc(collection(db,'events'),ev);
-      // อัพโหลด Boarding Pass หลังสร้าง event แล้ว
-      const bpUrl = await uploadBoardingPass(docRef.id);
-      if(bpUrl){ await updateDoc(doc(db,'events',docRef.id),{bpUrl}); }
+      await setDoc(doc(db,'events',id),ev);
       showToast('✅ บันทึกกิจกรรมแล้ว');
     }
     closeModal();await loadEvents();renderCalendar();renderCalEventList();renderDashboard();
-  }catch(e){showToast('เกิดข้อผิดพลาด: '+e.message,'error');}
+  }catch(e){
+    alert('❌ บันทึกไม่สำเร็จ\n'+(e.code||e.message));
+  }finally{
+    btn.disabled=false; btn.innerHTML=btnHtml;
+  }
 };
+
 window.deleteEvent=async function(){
   if(!editingId||!confirm('ลบกิจกรรมนี้?'))return;
   await deleteDoc(doc(db,'events',editingId));
@@ -1712,20 +1745,44 @@ function generateScript(){}
 
 // ── BOARDING PASS UPLOAD ──
 let currentBPFile = null;
+// ย่อ/บีบอัดรูปเป็น JPEG ก่อนอัปโหลด (แก้ปัญหารูปจากกล้องใหญ่เกินและไฟล์ HEIC)
+function compressImage(file, maxSide=1600, quality=0.82){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.naturalWidth,h=img.naturalHeight;
+      const k=Math.min(1,maxSide/Math.max(w,h)); w=Math.round(w*k); h=Math.round(h*k);
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,w,h); cx.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      cv.toBlob(b=>{
+        if(!b) return reject(new Error('แปลงรูปไม่สำเร็จ'));
+        if(b.size>1.5*1024*1024 && quality>0.6){ compressImage(file,1400,0.65).then(resolve,reject); return; }
+        resolve({blob:b,dataUrl:cv.toDataURL('image/jpeg',quality)});
+      },'image/jpeg',quality);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('เปิดไฟล์รูปนี้ไม่ได้ กรุณาใช้ไฟล์ JPG/PNG หรือแคปหน้าจอแทน'));};
+    img.src=url;
+  });
+}
+
 window.handleBPUpload = async function(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { showToast('ไฟล์ใหญ่เกิน 5 MB','error'); return; }
-  currentBPFile = file;
-  // Show preview
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('bp-preview-img').src = e.target.result;
+  if (file.size > 25 * 1024 * 1024) { showToast('ไฟล์ใหญ่เกิน 25 MB','error'); input.value=''; return; }
+  document.getElementById('bp-file-name').textContent = '⏳ กำลังเตรียมรูป...';
+  try{
+    const {blob,dataUrl}=await compressImage(file);
+    currentBPFile = blob;
+    document.getElementById('bp-preview-img').src = dataUrl;
     document.getElementById('bp-preview-wrap').style.display = 'block';
     document.getElementById('bp-upload-area').style.display = 'none';
-    document.getElementById('bp-file-name').textContent = file.name;
-  };
-  reader.readAsDataURL(file);
+    document.getElementById('bp-file-name').textContent = 'รูปใหม่ · '+Math.round(blob.size/1024)+' KB · จะอัปโหลดเมื่อกดบันทึก';
+  }catch(err){
+    currentBPFile=null; input.value='';
+    alert('❌ '+err.message);
+  }
 };
 
 window.removeBP = function() {
@@ -1742,17 +1799,22 @@ async function uploadBoardingPass(eventId) {
   const prog = document.getElementById('bp-upload-progress');
   prog.style.display = 'block';
   try {
-    const storageRef = ref(storage, `boarding-pass/${eventId}/${Date.now()}_${currentBPFile.name}`);
-    const snap = await uploadBytes(storageRef, currentBPFile);
+    const storageRef = ref(storage, `boarding-pass/${eventId}/${Date.now()}.jpg`);
+    const snap = await uploadBytes(storageRef, currentBPFile, {contentType:'image/jpeg'});
     const url = await getDownloadURL(snap.ref);
     document.getElementById('bp-url').value = url;
-    prog.style.display = 'none';
+    currentBPFile = null;
     return url;
-  } catch(e) {
+  } finally {
     prog.style.display = 'none';
-    showToast('อัพโหลดรูปไม่สำเร็จ: ' + e.message, 'error');
-    return '';
   }
+}
+function bpErrorText(e){
+  const code=(e&&e.code)||'';
+  if(code==='storage/unauthorized') return 'ไม่มีสิทธิ์อัปโหลด (ตรวจ Storage Rules)';
+  if(code==='storage/retry-limit-exceeded'||code==='storage/canceled') return 'อินเทอร์เน็ตไม่เสถียร กรุณาลองใหม่';
+  if(code==='storage/quota-exceeded') return 'พื้นที่จัดเก็บเต็ม';
+  return code||(e&&e.message)||'ไม่ทราบสาเหตุ';
 }
 
 function resetBPUI() {
@@ -1863,6 +1925,49 @@ window.closeLightbox = function() {
 // ปิดด้วย ESC
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
 
+
+// ── ปัดหน้าจอเปลี่ยนเดือน ──
+(function initSwipe(){
+  const wrap=document.querySelector('#view-calendar .cal-grid-wrap');
+  const grid=document.getElementById('cal-grid');
+  if(!wrap||!grid) return;
+  let x0=null,y0=0,axis=null,busy=false;
+  const reset=()=>{grid.style.transition='transform .2s ease, opacity .2s ease';grid.style.transform='';grid.style.opacity='';};
+  wrap.addEventListener('touchstart',e=>{
+    if(busy||e.touches.length!==1){x0=null;return;}
+    x0=e.touches[0].clientX; y0=e.touches[0].clientY; axis=null; grid.style.transition='none';
+  },{passive:true});
+  wrap.addEventListener('touchmove',e=>{
+    if(x0===null) return;
+    const dx=e.touches[0].clientX-x0, dy=e.touches[0].clientY-y0;
+    if(axis===null && (Math.abs(dx)>12||Math.abs(dy)>12)) axis=Math.abs(dx)>Math.abs(dy)*1.3?'x':'y';
+    if(axis==='x'){ grid.style.transform=`translateX(${dx*0.4}px)`; grid.style.opacity=String(Math.max(.4,1-Math.abs(dx)/500)); }
+  },{passive:true});
+  wrap.addEventListener('touchend',e=>{
+    if(x0===null) return;
+    const dx=e.changedTouches[0].clientX-x0;
+    const go=axis==='x'&&Math.abs(dx)>60 ? (dx<0?'next':'prev') : null;
+    x0=null;
+    if(!go){ reset(); return; }
+    busy=true;
+    grid.style.transition='transform .16s ease, opacity .16s ease';
+    grid.style.transform=`translateX(${go==='next'?-60:60}px)`; grid.style.opacity='0';
+    setTimeout(()=>{
+      go==='next'?window.nextMonth():window.prevMonth();
+      grid.style.transition='none';
+      grid.style.transform=`translateX(${go==='next'?60:-60}px)`;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{reset();busy=false;}));
+      wrap.scrollTop=0;
+    },160);
+  });
+  wrap.addEventListener('touchcancel',()=>{x0=null;reset();});
+})();
+
+// ── ล็อกพื้นหลังเมื่อเปิดหน้าต่าง ──
+(function lockOnModal(){
+  const sync=()=>document.documentElement.classList.toggle('modal-lock',!!document.querySelector('.modal-overlay.open,.day-modal-overlay.open'));
+  document.querySelectorAll('.modal-overlay,.day-modal-overlay').forEach(el=>new MutationObserver(sync).observe(el,{attributes:true,attributeFilter:['class']}));
+})();
 window.doLogout=async()=>{if(!confirm('ออกจากระบบ?'))return;redirectGuard=true;await signOut(auth);window.location.replace('login.html');};
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
