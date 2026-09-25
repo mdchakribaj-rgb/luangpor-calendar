@@ -486,7 +486,7 @@ input,select,textarea{font-size:16px !important}
 .pub-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#2a5024;background:#e3f0de;border:1px solid #c8dfc4;border-radius:20px;padding:1px 8px;margin-left:6px;vertical-align:2px}
 
 /* ══ ปฏิทินแบบใหม่: ตัวเลขใหญ่ ช่องเต็มจอ ══ */
-.cal-grid-wrap{padding:0 3px !important}
+.cal-grid-wrap{padding-left:3px !important;padding-right:3px !important;padding-top:0 !important}
 .view-flex.active .cal-grid-wrap{padding-left:3px !important;padding-right:3px !important}
 .cal-head{padding:0 !important}
 .cal-head span{font-size:12px !important}
@@ -525,6 +525,13 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 #cal-grid{will-change:transform}
 /* ══ ข้อ 4: ช่องเดือนก่อน/ถัดไป แสดงกิจกรรมแบบจาง ══ */
 .cal-cell.oth{opacity:.55 !important;background:rgba(250,247,240,.55) !important;border:1px solid var(--border2) !important;cursor:pointer}
+
+/* ══ เว้นพื้นที่ท้ายรายการ ไม่ให้ถูกแถบเมนูล่างบัง ══ */
+#view-calendar .cal-grid-wrap{padding-bottom:calc(var(--nav-h) + var(--sab, 0px) + 48px) !important;scroll-padding-bottom:calc(var(--nav-h) + 48px)}
+#view-dashboard.active,#view-settings.active{padding-bottom:calc(var(--nav-h) + var(--sab, 0px) + 48px) !important}
+@media(min-width:768px){
+  #view-calendar .cal-grid-wrap{padding-bottom:24px !important}
+}
 </style>
 </head>
 <body>
