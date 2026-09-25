@@ -111,7 +111,7 @@ const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
 let currentUser=null,selectedRole='editor',currentLink='';
-const BASE_URL=window.location.origin+window.location.pathname.replace('admin.html','');
+const BASE_URL=new URL('./', window.location.href).href;
 
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='login.html';return;}
@@ -132,7 +132,8 @@ window.generateLink=async()=>{
   const name=document.getElementById('invite-name').value.trim();
   const expiresAt=new Date(Date.now()+7*24*60*60*1000);
   await setDoc(doc(db,'invites',token),{role:selectedRole,name:name||'ไม่ระบุ',createdBy:currentUser.email,createdAt:serverTimestamp(),expiresAt,used:false});
-  currentLink=BASE_URL+'invite.html?token='+token+'&role='+selectedRole;
+  // openExternalBrowser=1 บังคับให้ LINE เปิดในเบราว์เซอร์ของเครื่อง (Google ไม่อนุญาตให้ล็อกอินในเบราว์เซอร์ของ LINE)
+  currentLink=BASE_URL+'invite.html?token='+token+'&openExternalBrowser=1';
   document.getElementById('link-text').textContent=currentLink;
   document.getElementById('link-expire').textContent='⏰ หมดอายุ: '+expiresAt.toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'})+' · ใช้ได้ครั้งเดียว';
   document.getElementById('link-box').style.display='block';
