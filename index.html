@@ -484,6 +484,27 @@ input,select,textarea{font-size:16px !important}
 .pub-label i{font-size:17px}
 .pub-hint{font-size:12px;color:var(--text3);margin-top:2px}
 .pub-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#2a5024;background:#e3f0de;border:1px solid #c8dfc4;border-radius:20px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+
+/* ══ ปฏิทินแบบใหม่: ตัวเลขใหญ่ ช่องเต็มจอ ══ */
+.cal-grid-wrap{padding:0 3px !important}
+.view-flex.active .cal-grid-wrap{padding-left:3px !important;padding-right:3px !important}
+.cal-head{padding:0 !important}
+.cal-head span{font-size:12px !important}
+.week-row{gap:2px !important;margin-bottom:2px !important}
+.cal-cell{min-height:94px !important;padding:3px 2px !important;display:flex !important;flex-direction:column}
+.day-top{flex-direction:column !important;align-items:center !important;justify-content:flex-start !important;margin-bottom:2px !important;min-height:44px}
+.day-n{font-size:20px !important;width:30px !important;height:30px !important;font-weight:800 !important}
+.day-n.oth{color:var(--text3) !important}
+.lunar-label,.lunar-label.normal,.lunar-label.wp,.lunar-label.pati15,.lunar-label.pati-new{font-size:9.5px !important;text-align:center !important;max-width:none !important;white-space:nowrap}
+.lunar-label.wp,.lunar-label.pati15{color:var(--gold2) !important;font-weight:800 !important}
+.lunar-label.pati-new{color:var(--green) !important;font-weight:800 !important}
+.ev-chip{font-size:10.5px !important;padding:2px 3px !important}
+.multiday-bar{height:20px !important;font-size:10.5px !important;z-index:3}
+@media(min-width:768px){
+  .cal-grid-wrap,.view-flex.active .cal-grid-wrap{padding-left:10px !important;padding-right:10px !important}
+  .cal-cell{min-height:108px !important}
+  .day-n{font-size:20px !important}
+}
 </style>
 </head>
 <body>
@@ -1265,10 +1286,24 @@ function computeBarStyle(ev,rowStartDate,rowEndDate){
   return {left:leftPct.toFixed(2)+'%',width:widthPct.toFixed(2)+'%'};
 }
 
+function lunarMonthRange(y,m){
+  const days=new Date(y,m+1,0).getDate(), seen=[];
+  for(let d=1;d<=days;d++){
+    const ld=LUNAR_ALL[toDateStr(new Date(y,m,d))];
+    if(!ld) continue;
+    let s=ld.l.split(' (')[0].replace(/^(ขึ้น|แรม)\s+\d+\s*/,'').trim();
+    if(!s) continue;
+    if(s.indexOf('เดือน')!==0) s='เดือน'+s;
+    if(seen[seen.length-1]!==s) seen.push(s);
+  }
+  return seen.length?'จันทรคติ '+seen.join(' – '):'ปฏิทินจันทรคติ ปี พ.ศ. '+(y+543);
+}
+
+const BAR_TOP=49, BAR_H=22;
 function renderCalendar(){
   const now=new Date();
   document.getElementById('cal-month-title').textContent=thMonths[currentMonth]+' '+(currentYear+543);
-  document.getElementById('cal-month-sub').textContent='ปฏิทินจันทรคติ ปี พ.ศ. '+(currentYear+543);
+  document.getElementById('cal-month-sub').textContent=lunarMonthRange(currentYear,currentMonth);
   const first=new Date(currentYear,currentMonth,1).getDay();
   const days=new Date(currentYear,currentMonth+1,0).getDate();
   const grid=document.getElementById('cal-grid');
@@ -1285,8 +1320,23 @@ function renderCalendar(){
     weekRow.className='week-row';
     // หาวันแรกและสุดท้ายของ row นี้
     const rowFirstDay=day;
-    const rowFirstDate=new Date(currentYear,currentMonth,day);
-    const rowLastDate=new Date(currentYear,currentMonth,day+6);
+    const rowStart=new Date(currentYear,currentMonth,rowFirstDay);
+    const rowEnd=new Date(currentYear,currentMonth,rowFirstDay+6);
+    const rowStartStr=toDateStr(rowStart);
+    const rowEndStr=toDateStr(rowEnd);
+    // จัดแถบกิจกรรมหลายวันเป็นชั้น (lane) ไม่ให้ทับกัน
+    const rowBars=multidayEvs.filter(ev=>!(ev.end<rowStartStr||ev.start>rowEndStr)).map(ev=>{
+      const s=ev.start<rowStartStr?rowStart:new Date(ev.start+'T00:00:00');
+      const e=ev.end>rowEndStr?rowEnd:new Date(ev.end+'T00:00:00');
+      return {ev,c0:Math.round((s-rowStart)/864e5),c1:Math.round((e-rowStart)/864e5)};
+    }).sort((a,b)=>a.c0-b.c0||(b.c1-b.c0)-(a.c1-a.c0));
+    const laneEnd=[];
+    rowBars.forEach(b=>{
+      let l=0; while(laneEnd[l]!==undefined&&laneEnd[l]>=b.c0) l++;
+      b.lane=l; laneEnd[l]=b.c1;
+    });
+    const colLanes=[0,0,0,0,0,0,0];
+    rowBars.forEach(b=>{for(let k=b.c0;k<=b.c1;k++) colLanes[k]=Math.max(colLanes[k],b.lane+1);});
     for(let c=0;c<7;c++,day++){
       const cell=document.createElement('div');
       const isThis=day>=1&&day<=days;
@@ -1310,7 +1360,7 @@ function renderCalendar(){
       // lunar label — แสดงทุกวัน รูปแบบ 2 บรรทัดกะทัดรัด
       if(isThis){
         const lb=document.createElement('div');
-        lb.style.cssText='text-align:right;line-height:1.35;flex-shrink:0;max-width:54px';
+        lb.style.cssText='text-align:center;line-height:1.2';
         if(ld){
           const isCls=ld.pati15?'pati15':ld.patiNew?'pati-new':ld.wp?'wp':'normal';
           lb.className='lunar-label '+isCls;
@@ -1322,17 +1372,7 @@ function renderCalendar(){
             const mon=dM?dM[1]:'';
             // แปลงชื่อเดือนให้สั้น
             const monShort=mon.replace('อ้าย','อ้าย').replace('ยี่','ยี่');
-            const prefix=ld.wp?'● ':'';
-            const l1=document.createElement('div');
-            l1.textContent=prefix+half+' '+num;
-            lb.appendChild(l1);
-            if(mon){
-              const l2=document.createElement('div');
-              l2.style.opacity='0.75';
-              l2.style.fontSize='8px';
-              l2.textContent='เดือน'+monShort;
-              lb.appendChild(l2);
-            }
+            lb.textContent=half+' '+num;
           } else {
             lb.textContent=ld.l.slice(0,8);
           }
@@ -1343,6 +1383,8 @@ function renderCalendar(){
         top.appendChild(lb);
       }
       cell.appendChild(top);
+      // เว้นที่ให้แถบกิจกรรมหลายวัน
+      if(colLanes[c]>0){const sp=document.createElement('div');sp.style.height=(colLanes[c]*BAR_H)+'px';sp.style.flexShrink='0';cell.appendChild(sp);}
       // เพิ่ม Chip ปาฏิโมกข์อัตโนมัติ
       if(isThis&&ld?.pati15){
         const pc=document.createElement('div');
@@ -1357,7 +1399,7 @@ function renderCalendar(){
       }
       // events
       if(isThis&&dateStr){
-        const dayEvs=getEventsForDate(dateStr);
+        const dayEvs=getEventsForDate(dateStr).filter(ev=>!(ev.end&&ev.end>ev.start));
         dayEvs.slice(0,2).forEach(ev=>{
           const chip=document.createElement('div');
           chip.className='ev-chip chip-'+ev.cat;
@@ -1372,14 +1414,8 @@ function renderCalendar(){
       }
       weekRow.appendChild(cell);
     }
-    // เพิ่ม multiday bars ใน week row
-    const rowStart=new Date(currentYear,currentMonth,rowFirstDay);
-    const rowEnd=new Date(currentYear,currentMonth,rowFirstDay+6);
-    const rowStartStr=toDateStr(rowStart);
-    const rowEndStr=toDateStr(rowEnd);
-    multidayEvs.forEach(ev=>{
-      // ตรวจว่า event อยู่ใน row นี้ไหม
-      if(ev.end<rowStartStr||ev.start>rowEndStr)return;
+    // วาดแถบกิจกรรมหลายวัน
+    rowBars.forEach(({ev,lane})=>{
       const bar=document.createElement('div');
       const catCls={priv:'mb-priv',temple:'mb-temple',abroad:'mb-abroad'};
       bar.className='multiday-bar '+(catCls[ev.cat]||'mb-priv');
@@ -1390,11 +1426,11 @@ function renderCalendar(){
       const colSpan=Math.round((evEndDate-evStartDate)/864e5)+1;
       const leftPct=(colStart/7*100).toFixed(1);
       const widthPct=((colSpan/7*100)-0.5).toFixed(1);
-      bar.style.cssText=`top:26px;left:${leftPct}%;width:${widthPct}%;`;
+      bar.style.cssText=`top:${BAR_TOP+lane*BAR_H}px;left:${leftPct}%;width:${widthPct}%;`;
       const iconMap={priv:'ti-user-heart',temple:'ti-building-arch',abroad:'ti-world'};
       const isStart=ev.start>=rowStartStr;
       bar.innerHTML=`<i class="ti ${iconMap[ev.cat]||'ti-calendar'}"></i>${isStart?ev.title:'↳ '+ev.title}`;
-      bar.onclick=(e)=>{e.stopPropagation();openEditModal(ev);};
+      bar.onclick=(e)=>{e.stopPropagation();openDayModal(ev.start<rowStartStr?rowStartStr:ev.start);};
       bar.title=`${ev.title} (${formatThai(ev.start)} – ${formatThai(ev.end)})`;
       weekRow.appendChild(bar);
     });
