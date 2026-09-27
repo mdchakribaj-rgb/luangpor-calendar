@@ -536,6 +536,15 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 /* ── กิจกรรมที่ไม่ระบุประเภท ── */
 .chip-none{background:rgba(107,90,62,.13);color:#4a3a20}
 .mb-none{background:#8c7a52}
+
+/* ── ประเภทงานบุญ ── */
+.cat-sel{grid-template-columns:repeat(2,1fr) !important}
+.co.s-merit{background:rgba(192,106,23,.1);color:#8a4a0c;border-color:rgba(192,106,23,.4)}
+.chip-merit{background:rgba(192,106,23,.15);color:#8a4a0c}
+.mb-merit{background:#c06a17}
+.merit-section{background:#fdf6ec;border:1px solid #efd6b4;border-radius:10px;padding:12px;margin-bottom:14px}
+.merit-title{font-size:13px;font-weight:700;color:#8a4a0c;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.merit-title span{font-weight:400;color:var(--text3);font-size:11px}
 </style>
 </head>
 <body>
@@ -588,6 +597,7 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
         <div class="cat-pill" onclick="filterCat('priv',this)"><i class="ti ti-user-heart" style="color:#b8860b"></i>ส่วนองค์</div>
         <div class="cat-pill" onclick="filterCat('temple',this)"><i class="ti ti-building-arch" style="color:#3d6b35"></i>วัด</div>
         <div class="cat-pill" onclick="filterCat('abroad',this)"><i class="ti ti-world" style="color:#c0392b"></i>ต่างประเทศ</div>
+        <div class="cat-pill" onclick="filterCat('merit',this)"><i class="ti ti-flower" style="color:#c06a17"></i>งานบุญ</div>
       </div>
       <div class="cal-grid-wrap">
         <div class="cal-head"><span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span></div>
@@ -684,6 +694,7 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
           <div class="co" id="co-priv" onclick="selCat('priv')"><i class="ti ti-user-heart"></i>นิมนต์ส่วนองค์</div>
           <div class="co" id="co-temple" onclick="selCat('temple')"><i class="ti ti-building-arch"></i>นิมนต์วัด</div>
           <div class="co" id="co-abroad" onclick="selCat('abroad')"><i class="ti ti-world"></i>นิมนต์ต่างประเทศ</div>
+          <div class="co" id="co-merit" onclick="selCat('merit')"><i class="ti ti-flower"></i>งานบุญ</div>
         </div>
       </div>
       <div class="g2">
@@ -695,6 +706,28 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
       <div class="fg"><label class="fl">สถานที่</label><input type="text" class="fi" id="ev-location" placeholder="เช่น วัดป่าสัก จ.เชียงราย"></div>
       <div class="fg"><label class="fl">ผู้ติดตาม / ผู้ประสานงาน</label><input type="text" class="fi" id="ev-guests" placeholder="เช่น พระอานนท์, โยมสมชาย"></div>
       <div class="fg"><label class="fl">รายละเอียด</label><textarea class="fi" id="ev-desc" rows="2" style="resize:vertical" placeholder="ข้อมูลพิเศษหรือสิ่งที่ต้องเตรียม"></textarea></div>
+      <div class="merit-section" id="merit-section" style="display:none">
+        <div class="merit-title"><i class="ti ti-flower"></i> ข้อมูลงานบุญ <span>(แสดงในการ์ด LINE · ไม่บังคับทุกช่อง)</span></div>
+        <div class="fg">
+          <label class="fl">โปสเตอร์งาน</label>
+          <div class="bp-upload-area" id="poster-upload-area" onclick="document.getElementById('poster-file-input').click()">
+            <i class="ti ti-photo" style="font-size:28px;color:var(--text3);display:block;margin-bottom:6px"></i>
+            <div style="font-size:13px;color:var(--text2);font-weight:500">กดเพื่อเลือกโปสเตอร์</div>
+          </div>
+          <input type="file" id="poster-file-input" accept="image/*" style="display:none" onchange="handlePosterUpload(this)">
+          <div id="poster-preview-wrap" style="display:none;margin-top:8px">
+            <img id="poster-preview-img" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:260px;object-fit:contain;background:#fff;cursor:zoom-in" alt="โปสเตอร์" onclick="openLightbox(this.src,'โปสเตอร์งานบุญ')">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <span id="poster-file-name" style="font-size:11px;color:var(--text3)"></span>
+              <button type="button" onclick="removePoster()" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer">✕ ลบ</button>
+            </div>
+          </div>
+          <input type="hidden" id="poster-url"><input type="hidden" id="poster-thumb-url">
+        </div>
+        <div class="fg"><label class="fl">เบอร์โทรสอบถาม</label><input type="tel" class="fi" id="ev-phone" placeholder="เช่น 081-234-5678"></div>
+        <div class="fg"><label class="fl">ลิงก์แผนที่ (Google Maps)</label><input type="url" class="fi" id="ev-map" placeholder="วางลิงก์ หรือเว้นว่างเพื่อค้นจากชื่อสถานที่"></div>
+        <div class="fg"><label class="fl">ช่องทางร่วมทำบุญ</label><textarea class="fi" id="ev-donation" rows="2" style="resize:vertical" placeholder="เช่น ธ.กรุงไทย 123-4-56789-0 ชื่อบัญชี วัด..."></textarea></div>
+      </div>
       <div class="fly-section">
         <div class="fly-toggle-row" onclick="toggleFly()">
           <div class="fly-label"><i class="ti ti-plane"></i>มีข้อมูลไฟล์บิน</div>
@@ -1170,9 +1203,9 @@ let currentYear,currentMonth;
 let settings=JSON.parse(localStorage.getItem('lpSettings')||'{"token":"","notify7d":false,"notify3d":true,"notify1d":true,"notify0d":true}');
 
 const thMonths=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-const catColor={priv:'#b8860b',temple:'#3d6b35',abroad:'#c0392b'};
-const catName={priv:'นิมนต์ส่วนองค์',temple:'นิมนต์วัด',abroad:'นิมนต์ต่างประเทศ'};
-const catIcon={priv:'ti-user-heart',temple:'ti-building-arch',abroad:'ti-world'};
+const catColor={priv:'#b8860b',temple:'#3d6b35',abroad:'#c0392b',merit:'#c06a17'};
+const catName={priv:'นิมนต์ส่วนองค์',temple:'นิมนต์วัด',abroad:'นิมนต์ต่างประเทศ',merit:'งานบุญ'};
+const catIcon={priv:'ti-user-heart',temple:'ti-building-arch',abroad:'ti-world',merit:'ti-flower'};
 
 function toDateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function formatThai(str){
@@ -1448,7 +1481,7 @@ function renderCalendar(){
     // วาดแถบกิจกรรมหลายวัน
     rowBars.forEach(({ev,lane})=>{
       const bar=document.createElement('div');
-      const catCls={priv:'mb-priv',temple:'mb-temple',abroad:'mb-abroad'};
+      const catCls={priv:'mb-priv',temple:'mb-temple',abroad:'mb-abroad',merit:'mb-merit'};
       bar.className='multiday-bar '+(catCls[ev.cat]||'mb-none');
       // คำนวณตำแหน่ง
       const evStartDate=ev.start<rowStartStr?rowStart:new Date(ev.start+'T00:00:00');
@@ -1575,7 +1608,7 @@ function renderDashboard(){
   bars.forEach(b=>{const col=document.createElement('div');col.className='bar-col';col.innerHTML=`<div class="bar-label">${b.cnt||''}</div><div class="bar-col-bar" style="height:${Math.max((b.cnt/maxB)*70,4)}px;background:var(--gold2)"></div><div class="bar-day">${b.lbl}</div>`;bc.appendChild(col);});
   // cat breakdown
   const total=events.length||1;
-  document.getElementById('cat-breakdown').innerHTML=['priv','temple','abroad'].map(c=>{
+  document.getElementById('cat-breakdown').innerHTML=['priv','temple','abroad','merit'].map(c=>{
     const cnt=events.filter(e=>e.cat===c).length;
     return`<div class="cat-row"><div class="cat-row-label">${catName[c]}</div><div class="cat-row-bar-wrap"><div class="cat-row-bar" style="width:${(cnt/total*100).toFixed(0)}%;background:${catColor[c]}"></div></div><div class="cat-row-num">${cnt}</div></div>`;
   }).join('');
@@ -1617,6 +1650,7 @@ window.openAddModal=function(dateStr){
   ['ev-title','ev-end','ev-time-s','ev-time-e','ev-location','ev-guests','ev-desc','fly-no','fly-time','fly-from','fly-to','fly-seat','fly-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ev-start').value=dateStr||toDateStr(new Date());
   setCat('');setRemindVal('1440');closeFly();resetBPUI();setPublic(false);
+  ['ev-phone','ev-map','ev-donation'].forEach(id=>document.getElementById(id).value='');loadPoster('','');
   document.getElementById('btn-delete').style.display='none';
   document.getElementById('event-modal').classList.add('open');
 };
@@ -1650,6 +1684,10 @@ function openEditModal(ev){
   ev.flyNo?openFly():closeFly();
   loadBPPreview(ev.bpUrl||'');
   setPublic(ev.isPublic===true);
+  document.getElementById('ev-phone').value=ev.phone||'';
+  document.getElementById('ev-map').value=ev.mapUrl||'';
+  document.getElementById('ev-donation').value=ev.donation||'';
+  loadPoster(ev.posterUrl||'',ev.posterThumbUrl||'');
   const canDel=userRole==='admin'||ev.recordedByEmail===currentUser?.email;
   document.getElementById('btn-delete').style.display=canDel?'block':'none';
   document.getElementById('event-modal').classList.add('open');
@@ -1669,6 +1707,9 @@ window.saveEvent=async function(){
     desc:document.getElementById('ev-desc').value,
     remind:selectedRemind,
     isPublic:isPublicSel,
+    phone:selectedCat==='merit'?document.getElementById('ev-phone').value.trim():'',
+    mapUrl:selectedCat==='merit'?document.getElementById('ev-map').value.trim():'',
+    donation:selectedCat==='merit'?document.getElementById('ev-donation').value.trim():'',
     flyNo:flyOpen?document.getElementById('fly-no').value:'',
     flyTime:flyOpen?document.getElementById('fly-time').value:'',
     flyFrom:flyOpen?document.getElementById('fly-from').value:'',
@@ -1694,6 +1735,18 @@ window.saveEvent=async function(){
       }
     }
     ev.bpUrl = bpUrl;
+    // โปสเตอร์งานบุญ
+    let posterUrl=document.getElementById('poster-url').value||'', posterThumbUrl=document.getElementById('poster-thumb-url').value||'';
+    if(selectedCat==='merit' && posterFiles){
+      btn.innerHTML='⏳ กำลังอัปโหลดโปสเตอร์...';
+      try{ const r=await uploadPoster(id); posterUrl=r.full; posterThumbUrl=r.thumb; }
+      catch(upErr){
+        console.error('poster:',upErr);
+        if(!confirm('อัปโหลดโปสเตอร์ไม่สำเร็จ\n'+bpErrorText(upErr)+'\n\nกด ตกลง เพื่อบันทึกโดยไม่มีโปสเตอร์ใหม่\nกด ยกเลิก เพื่อกลับไปลองอีกครั้ง')) return;
+      }
+    }
+    ev.posterUrl = selectedCat==='merit' ? posterUrl : '';
+    ev.posterThumbUrl = selectedCat==='merit' ? posterThumbUrl : '';
     if(editingId){
       await updateDoc(doc(db,'events',editingId),ev);
       showToast('✅ แก้ไขกิจกรรมแล้ว');
@@ -1718,10 +1771,11 @@ window.deleteEvent=async function(){
 };
 function setCat(cat){
   selectedCat=cat||'';
-  ['priv','temple','abroad'].forEach(c=>{const el=document.getElementById('co-'+c);el.classList.remove('s-priv','s-temple','s-abroad');if(c===selectedCat)el.classList.add('s-'+c);});
+  ['priv','temple','abroad','merit'].forEach(c=>{const el=document.getElementById('co-'+c);el.classList.remove('s-priv','s-temple','s-abroad','s-merit');if(c===selectedCat)el.classList.add('s-'+c);});
+  const ms=document.getElementById('merit-section'); if(ms) ms.style.display=selectedCat==='merit'?'block':'none';
 }
 // กดซ้ำที่ประเภทเดิมเพื่อยกเลิก — ไม่บังคับเลือก
-window.selCat=cat=>setCat(selectedCat===cat?'':cat);
+window.selCat=cat=>{const nv=selectedCat===cat?'':cat;setCat(nv);if(nv==='merit'&&!isPublicSel)setPublic(true);};
 window.setRemind=(el,val)=>{selectedRemind=val;document.querySelectorAll('.rc').forEach(x=>x.classList.remove('on'));el.classList.add('on');};
 function setRemindVal(val){selectedRemind=val;document.querySelectorAll('.rc').forEach(x=>x.classList.toggle('on',x.getAttribute('onclick')?.includes("'"+val+"'")));}
 window.toggleFly=()=>flyOpen?closeFly():openFly();
@@ -1778,6 +1832,51 @@ function compressImage(file, maxSide=1600, quality=0.82){
     img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('เปิดไฟล์รูปนี้ไม่ได้ กรุณาใช้ไฟล์ JPG/PNG หรือแคปหน้าจอแทน'));};
     img.src=url;
   });
+}
+
+// ── โปสเตอร์งานบุญ: เก็บ 2 ขนาด (เต็ม ≤1600px สำหรับดูรูป, ย่อ ≤1024px สำหรับการ์ด LINE) ──
+let posterFiles=null;
+async function shrinkUnder(file,side,q,limit){
+  let r=await compressImage(file,side,q);
+  if(r.blob.size>limit) r=await compressImage(file,Math.round(side*0.8),0.7);
+  return r;
+}
+window.handlePosterUpload=async function(input){
+  const file=input.files[0]; if(!file) return;
+  document.getElementById('poster-file-name').textContent='⏳ กำลังเตรียมรูป...';
+  try{
+    const full=await shrinkUnder(file,1600,0.85,950*1024);
+    const thumb=await shrinkUnder(file,1024,0.82,600*1024);
+    posterFiles={full:full.blob,thumb:thumb.blob};
+    document.getElementById('poster-preview-img').src=full.dataUrl;
+    document.getElementById('poster-preview-wrap').style.display='block';
+    document.getElementById('poster-upload-area').style.display='none';
+    document.getElementById('poster-file-name').textContent='โปสเตอร์ใหม่ · '+Math.round(full.blob.size/1024)+' KB · จะอัปโหลดเมื่อกดบันทึก';
+  }catch(err){ posterFiles=null; input.value=''; alert('❌ '+err.message); }
+};
+window.removePoster=function(){ posterFiles=null; loadPoster('',''); };
+function loadPoster(url,thumb){
+  if(!url) posterFiles=null;
+  document.getElementById('poster-url').value=url||'';
+  document.getElementById('poster-thumb-url').value=thumb||'';
+  document.getElementById('poster-file-input').value='';
+  document.getElementById('poster-preview-img').src=url||'';
+  document.getElementById('poster-preview-wrap').style.display=url?'block':'none';
+  document.getElementById('poster-upload-area').style.display=url?'none':'block';
+  document.getElementById('poster-file-name').textContent=url?'โปสเตอร์ที่บันทึกไว้':'';
+}
+async function uploadPoster(eventId){
+  const ts=Date.now();
+  const up=async(blob,name)=>{
+    const s=await uploadBytes(ref(storage,`posters/${eventId}/${ts}_${name}.jpg`),blob,{contentType:'image/jpeg'});
+    return getDownloadURL(s.ref);
+  };
+  const full=await up(posterFiles.full,'full');
+  const thumb=await up(posterFiles.thumb,'thumb');
+  posterFiles=null;
+  document.getElementById('poster-url').value=full;
+  document.getElementById('poster-thumb-url').value=thumb;
+  return {full,thumb};
 }
 
 window.handleBPUpload = async function(input) {
@@ -1898,10 +1997,13 @@ window.openDayModal = function(dateStr) {
           ${ev.location ? `<span><i class="ti ti-map-pin"></i>${ev.location}</span>` : ''}
           ${ev.guests ? `<span><i class="ti ti-users"></i>${ev.guests}</span>` : ''}
           ${ev.flyNo ? `<span><i class="ti ti-plane"></i>${ev.flyNo}${ev.flyTime?' '+ev.flyTime:''}</span>` : ''}
+          ${ev.phone ? `<span><i class="ti ti-phone"></i>${ev.phone}</span>` : ''}
           <span style="color:var(--text3)"><i class="ti ti-user"></i>${ev.recordedBy||''}</span>
         </div>
         ${ev.bpUrl ? `<div class="day-ev-bp"><img src="${ev.bpUrl}" alt="Boarding Pass" loading="lazy" style="cursor:zoom-in" onclick="event.stopPropagation();openLightbox('${ev.bpUrl}','Boarding Pass — ${ev.title}')"></div>` : ''}
+        ${ev.posterUrl ? `<div class="day-ev-bp"><img src="${ev.posterThumbUrl||ev.posterUrl}" alt="โปสเตอร์" loading="lazy" style="cursor:zoom-in;max-height:220px" onclick="event.stopPropagation();openLightbox('${ev.posterUrl}','โปสเตอร์ — ${ev.title}')"></div>` : ''}
         ${ev.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${ev.desc}</div>` : ''}
+        ${ev.donation ? `<div style="font-size:12px;color:var(--text2);margin-top:4px">🙏 ${ev.donation}</div>` : ''}
       </div>
     </div>`).join('');
 
