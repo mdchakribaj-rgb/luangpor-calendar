@@ -532,6 +532,10 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 @media(min-width:768px){
   #view-calendar .cal-grid-wrap{padding-bottom:24px !important}
 }
+
+/* ── กิจกรรมที่ไม่ระบุประเภท ── */
+.chip-none{background:rgba(107,90,62,.13);color:#4a3a20}
+.mb-none{background:#8c7a52}
 </style>
 </head>
 <body>
@@ -675,9 +679,9 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
     <div class="modal-body">
       <input type="hidden" id="ev-id">
       <div class="fg"><label class="fl">ชื่อกิจกรรม *</label><input type="text" class="fi" id="ev-title" placeholder="เช่น นิมนต์วัดป่าสัก"></div>
-      <div class="fg"><label class="fl">ประเภท</label>
+      <div class="fg"><label class="fl">ประเภท <span style="font-weight:400;color:var(--text3)">(ไม่บังคับ · กดซ้ำเพื่อยกเลิก)</span></label>
         <div class="cat-sel">
-          <div class="co s-priv" id="co-priv" onclick="selCat('priv')"><i class="ti ti-user-heart"></i>นิมนต์ส่วนองค์</div>
+          <div class="co" id="co-priv" onclick="selCat('priv')"><i class="ti ti-user-heart"></i>นิมนต์ส่วนองค์</div>
           <div class="co" id="co-temple" onclick="selCat('temple')"><i class="ti ti-building-arch"></i>นิมนต์วัด</div>
           <div class="co" id="co-abroad" onclick="selCat('abroad')"><i class="ti ti-world"></i>นิมนต์ต่างประเทศ</div>
         </div>
@@ -1161,7 +1165,7 @@ function getNextPatimokkha(fromDateStr){
 let currentUser=null,userRole='viewer';
 let events=[];
 let activeFilter='all';
-let selectedCat='priv',selectedRemind='1440',flyOpen=false,editingId=null;
+let selectedCat='',selectedRemind='1440',flyOpen=false,editingId=null;
 let currentYear,currentMonth;
 let settings=JSON.parse(localStorage.getItem('lpSettings')||'{"token":"","notify7d":false,"notify3d":true,"notify1d":true,"notify0d":true}');
 
@@ -1429,8 +1433,8 @@ function renderCalendar(){
         const dayEvs=getEventsForDate(dateStr).filter(ev=>!(ev.end&&ev.end>ev.start));
         dayEvs.slice(0,2).forEach(ev=>{
           const chip=document.createElement('div');
-          chip.className='ev-chip chip-'+ev.cat;
-          chip.innerHTML=`<i class="ti ${catIcon[ev.cat]}"></i><span style="overflow:hidden;text-overflow:ellipsis">${ev.timeStart?ev.timeStart+' ':''}${ev.title}</span>`;
+          chip.className='ev-chip chip-'+(ev.cat||'none');
+          chip.innerHTML=`${catIcon[ev.cat]?`<i class="ti ${catIcon[ev.cat]}"></i>`:''}<span style="overflow:hidden;text-overflow:ellipsis">${ev.title}</span>`;
           chip.onclick=e=>{e.stopPropagation();openEditModal(ev);};
           cell.appendChild(chip);
           if(ev.flyNo){const ft=document.createElement('div');ft.className='fly-tag';ft.innerHTML=`<i class="ti ti-plane"></i>${ev.flyNo}`;cell.appendChild(ft);}
@@ -1445,7 +1449,7 @@ function renderCalendar(){
     rowBars.forEach(({ev,lane})=>{
       const bar=document.createElement('div');
       const catCls={priv:'mb-priv',temple:'mb-temple',abroad:'mb-abroad'};
-      bar.className='multiday-bar '+(catCls[ev.cat]||'mb-priv');
+      bar.className='multiday-bar '+(catCls[ev.cat]||'mb-none');
       // คำนวณตำแหน่ง
       const evStartDate=ev.start<rowStartStr?rowStart:new Date(ev.start+'T00:00:00');
       const evEndDate=ev.end>rowEndStr?rowEnd:new Date(ev.end+'T00:00:00');
@@ -1506,10 +1510,10 @@ function renderCalEventList(){
       const flyTag=ev.flyNo?`<span style="color:#1a4a8a"><i class="ti ti-plane" style="font-size:11px"></i> ${ev.flyNo}</span>`:'';
       return `
       <div class="event-list-item" onclick="openDayModal('${ev.start}')">
-        <div class="ev-bar" style="background:${catColor[ev.cat]}"></div>
+        <div class="ev-bar" style="background:${(catColor[ev.cat]||'#8c7a52')}"></div>
         <div class="ev-info">
           <div class="ev-name">${ev.title}${bpIcon}</div>
-          <div class="ev-meta">${catName[ev.cat]}${ev.location?' · '+ev.location:''} ${flyTag}</div>
+          <div class="ev-meta">${(catName[ev.cat]||'กิจกรรม')}${ev.location?' · '+ev.location:''} ${flyTag}</div>
         </div>
         <div class="ev-time">${dateRange}</div>
       </div>`;
@@ -1588,8 +1592,8 @@ function renderDashboard(){
   const ul=document.getElementById('upcoming-list');
   ul.innerHTML=!upcoming.length?'<div class="empty-state">ยังไม่มีกิจกรรม</div>':upcoming.map(ev=>`
     <div class="up-item" onclick="openEditModal_id('${ev.id}')">
-      <div class="up-bar" style="background:${catColor[ev.cat]}"></div>
-      <div class="up-info"><div class="up-name">${ev.title}</div><div class="up-meta">${catName[ev.cat]}${ev.location?' · '+ev.location:''}</div></div>
+      <div class="up-bar" style="background:${(catColor[ev.cat]||'#8c7a52')}"></div>
+      <div class="up-info"><div class="up-name">${ev.title}</div><div class="up-meta">${(catName[ev.cat]||'กิจกรรม')}${ev.location?' · '+ev.location:''}</div></div>
       <div class="up-date">${formatThai(ev.start)}</div>
     </div>`).join('');
 }
@@ -1612,7 +1616,7 @@ window.openAddModal=function(dateStr){
   document.getElementById('modal-title-text').textContent='เพิ่มกิจกรรม';
   ['ev-title','ev-end','ev-time-s','ev-time-e','ev-location','ev-guests','ev-desc','fly-no','fly-time','fly-from','fly-to','fly-seat','fly-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ev-start').value=dateStr||toDateStr(new Date());
-  selCat('priv');setRemindVal('1440');closeFly();resetBPUI();setPublic(false);
+  setCat('');setRemindVal('1440');closeFly();resetBPUI();setPublic(false);
   document.getElementById('btn-delete').style.display='none';
   document.getElementById('event-modal').classList.add('open');
 };
@@ -1642,7 +1646,7 @@ function openEditModal(ev){
   document.getElementById('fly-to').value=ev.flyTo||'';
   document.getElementById('fly-seat').value=ev.flySeat||'';
   document.getElementById('fly-note').value=ev.flyNote||'';
-  selCat(ev.cat||'priv');setRemindVal(ev.remind||'1440');
+  setCat(ev.cat||'');setRemindVal(ev.remind||'1440');
   ev.flyNo?openFly():closeFly();
   loadBPPreview(ev.bpUrl||'');
   setPublic(ev.isPublic===true);
@@ -1712,10 +1716,12 @@ window.deleteEvent=async function(){
   showToast('🗑️ ลบกิจกรรมแล้ว');
   closeModal();await loadEvents();renderCalendar();renderCalEventList();renderDashboard();
 };
-window.selCat=cat=>{
-  selectedCat=cat;
-  ['priv','temple','abroad'].forEach(c=>{const el=document.getElementById('co-'+c);el.classList.remove('s-priv','s-temple','s-abroad');if(c===cat)el.classList.add('s-'+cat);});
-};
+function setCat(cat){
+  selectedCat=cat||'';
+  ['priv','temple','abroad'].forEach(c=>{const el=document.getElementById('co-'+c);el.classList.remove('s-priv','s-temple','s-abroad');if(c===selectedCat)el.classList.add('s-'+c);});
+}
+// กดซ้ำที่ประเภทเดิมเพื่อยกเลิก — ไม่บังคับเลือก
+window.selCat=cat=>setCat(selectedCat===cat?'':cat);
 window.setRemind=(el,val)=>{selectedRemind=val;document.querySelectorAll('.rc').forEach(x=>x.classList.remove('on'));el.classList.add('on');};
 function setRemindVal(val){selectedRemind=val;document.querySelectorAll('.rc').forEach(x=>x.classList.toggle('on',x.getAttribute('onclick')?.includes("'"+val+"'")));}
 window.toggleFly=()=>flyOpen?closeFly():openFly();
@@ -1884,7 +1890,7 @@ window.openDayModal = function(dateStr) {
 
   listHtml += dayEvs.map(ev => `
     <div class="day-ev-item" onclick="editFromDay('${ev.id}')">
-      <div class="day-ev-bar" style="background:${catColor[ev.cat]}"></div>
+      <div class="day-ev-bar" style="background:${(catColor[ev.cat]||'#8c7a52')}"></div>
       <div class="day-ev-info">
         <div class="day-ev-name">${ev.title}${ev.isPublic?'<span class="pub-badge"><i class="ti ti-world"></i>สาธารณะ</span>':''}</div>
         <div class="day-ev-meta">
