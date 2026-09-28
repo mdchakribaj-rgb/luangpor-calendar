@@ -545,6 +545,13 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 .merit-section{background:#fdf6ec;border:1px solid #efd6b4;border-radius:10px;padding:12px;margin-bottom:14px}
 .merit-title{font-size:13px;font-weight:700;color:#8a4a0c;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .merit-title span{font-weight:400;color:var(--text3);font-size:11px}
+
+/* ── ข้อมูลวัด ── */
+.ti-group{font-size:13px;font-weight:800;color:var(--gold);margin:18px 0 10px;padding-top:12px;border-top:1px solid var(--border2)}
+.ti-note{font-size:12px;color:var(--text3);line-height:1.6}
+.ti-faq{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.ti-faq-del{align-self:flex-end;font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:'Sarabun',sans-serif}
+.ti-f:disabled{opacity:.75;background:var(--surface)}
 </style>
 </head>
 <body>
@@ -661,6 +668,42 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-bell"></i><div><div class="settings-row-label">ก่อน 3 วัน</div><div class="settings-row-sub">ส่ง 08:00 น.</div></div></div><div class="toggle" id="ns-notify3d" onclick="toggleNotify('notify3d',this)"></div></div>
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-bell"></i><div><div class="settings-row-label">ก่อน 1 วัน</div><div class="settings-row-sub">ส่ง 08:00 น.</div></div></div><div class="toggle" id="ns-notify1d" onclick="toggleNotify('notify1d',this)"></div></div>
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-bell"></i><div><div class="settings-row-label">เช้าวันปาฏิโมกข์</div><div class="settings-row-sub">ส่ง 05:00 น.</div></div></div><div class="toggle" id="ns-notify0d" onclick="toggleNotify('notify0d',this)"></div></div>
+        </div>
+        <div class="settings-section" id="temple-section">
+          <div class="settings-section-title">ข้อมูลวัด · ใช้ตอบคำถามใน LINE</div>
+          <div class="token-wrap">
+            <div class="settings-row" style="padding:0 0 14px;cursor:default;border:none">
+              <div class="settings-row-left"><i class="ti ti-robot"></i><div><div class="settings-row-label">เณรน้อย ตอบอัตโนมัติ</div><div class="settings-row-sub" id="ai-status-sub">ปิดอยู่ · ยังไม่ได้เชื่อมระบบ AI</div></div></div>
+              <div class="toggle" id="ti-aiEnabled" onclick="toggleTempleAI(this)"></div>
+            </div>
+            <div class="ti-note">เณรน้อยตอบได้เฉพาะข้อมูลในหน้านี้ ร่วมกับตารางนิมนต์และงานบุญที่เปิดเผยแพร่ ช่องที่เว้นว่างจะไม่ถูกนำไปตอบ</div>
+
+            <div class="ti-group">เกี่ยวกับหลวงพ่อและวัด</div>
+            <div class="fg"><label class="fl">ประวัติหลวงพ่อโดยย่อ</label><textarea class="fi ti-f" id="ti-bio" rows="4" placeholder="3–5 บรรทัด"></textarea></div>
+            <div class="fg"><label class="fl">ชื่อวัด</label><input class="fi ti-f" id="ti-templeName" placeholder="เช่น วัดป่า..."></div>
+            <div class="fg"><label class="fl">ที่ตั้ง</label><textarea class="fi ti-f" id="ti-address" rows="2" placeholder="ที่อยู่ของวัด"></textarea></div>
+            <div class="fg"><label class="fl">ลิงก์แผนที่ (Google Maps)</label><input class="fi ti-f" id="ti-mapUrl" type="url" placeholder="https://maps.app.goo.gl/..."></div>
+            <div class="fg"><label class="fl">เวลาที่เปิดให้เข้ากราบ</label><input class="fi ti-f" id="ti-visitHours" placeholder="เช่น ทุกวัน ๐๖.๐๐ – ๑๘.๐๐ น."></div>
+
+            <div class="ti-group">การนิมนต์และติดต่อ</div>
+            <div class="fg"><label class="fl">วิธีนิมนต์</label><textarea class="fi ti-f" id="ti-howToInvite" rows="3" placeholder="เช่น แจ้งล่วงหน้าอย่างน้อย ๑ เดือน ระบุวัน เวลา สถานที่ และชื่อผู้ติดต่อ"></textarea></div>
+            <div class="fg"><label class="fl">เบอร์ติดต่อเจ้าหน้าที่</label><input class="fi ti-f" id="ti-contactPhone" type="tel" placeholder="เช่น 081-234-5678"></div>
+
+            <div class="ti-group">ช่องทางร่วมทำบุญ</div>
+            <div class="g2">
+              <div class="fg"><label class="fl">ธนาคาร</label><input class="fi ti-f" id="ti-bankName" placeholder="เช่น กรุงไทย"></div>
+              <div class="fg"><label class="fl">เลขบัญชี</label><input class="fi ti-f" id="ti-bankAccount" inputmode="numeric" placeholder="123-4-56789-0"></div>
+            </div>
+            <div class="fg"><label class="fl">ชื่อบัญชี</label><input class="fi ti-f" id="ti-bankAccountName" placeholder="ชื่อบัญชีตามสมุดบัญชี"></div>
+            <div class="fg"><label class="fl">พร้อมเพย์ / ช่องทางอื่น</label><input class="fi ti-f" id="ti-otherDonation" placeholder="ไม่บังคับ"></div>
+
+            <div class="ti-group">คำถามที่พบบ่อย</div>
+            <div id="ti-faq-list"></div>
+            <button class="btn-secondary ti-admin" type="button" onclick="addFaqRow()"><i class="ti ti-plus"></i>เพิ่มคำถาม</button>
+
+            <button class="btn-gold ti-admin" type="button" id="ti-save-btn" onclick="saveTempleInfo()"><i class="ti ti-device-floppy"></i>บันทึกข้อมูลวัด</button>
+            <div class="ti-note" id="ti-updated" style="margin-top:10px"></div>
+          </div>
         </div>
         <div class="settings-section">
           <div class="settings-section-title">บัญชีผู้ใช้</div>
@@ -1783,7 +1826,71 @@ function openFly(){flyOpen=true;document.getElementById('fly-toggle-sw').classLi
 function closeFly(){flyOpen=false;document.getElementById('fly-toggle-sw').classList.remove('on');document.getElementById('fly-body').classList.remove('open');document.getElementById('fly-hint').textContent='กดเพื่อเพิ่ม';}
 const NOTIFY_DEFAULT={dailySummary:true,eventReminders:true,notify7d:false,notify3d:true,notify1d:true,notify0d:true};
 let notifySettings={...NOTIFY_DEFAULT};
+// ══ ข้อมูลวัด (settings/templeInfo) ══
+const TI_FIELDS=['bio','templeName','address','mapUrl','visitHours','howToInvite','contactPhone','bankName','bankAccount','bankAccountName','otherDonation'];
+let templeInfo={aiEnabled:false,faq:[]};
+function esc(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function renderFaq(){
+  const isAdmin=userRole==='admin';
+  const list=document.getElementById('ti-faq-list');
+  const faq=templeInfo.faq&&templeInfo.faq.length?templeInfo.faq:[];
+  list.innerHTML=faq.length?faq.map((f,i)=>`
+    <div class="ti-faq">
+      <input class="fi ti-f" data-faq-q="${i}" placeholder="คำถาม เช่น แต่งกายเข้าวัดอย่างไร" value="${esc(f.q)}" ${isAdmin?'':'disabled'}>
+      <textarea class="fi ti-f" data-faq-a="${i}" rows="2" placeholder="คำตอบ" ${isAdmin?'':'disabled'}>${esc(f.a)}</textarea>
+      ${isAdmin?`<button type="button" class="ti-faq-del" onclick="removeFaqRow(${i})"><i class="ti ti-trash"></i> ลบ</button>`:''}
+    </div>`).join(''):'<div class="ti-note">ยังไม่มีคำถาม</div>';
+}
+function readFaqFromForm(){
+  const qs=[...document.querySelectorAll('[data-faq-q]')];
+  return qs.map(q=>{const i=q.dataset.faqQ;return {q:q.value.trim(),a:(document.querySelector(`[data-faq-a="${i}"]`)||{}).value?.trim()||''};});
+}
+window.addFaqRow=()=>{templeInfo.faq=readFaqFromForm();templeInfo.faq.push({q:'',a:''});renderFaq();};
+window.removeFaqRow=i=>{templeInfo.faq=readFaqFromForm();templeInfo.faq.splice(i,1);renderFaq();};
+async function loadTempleInfo(){
+  try{
+    const s=await getDoc(doc(db,'settings','templeInfo'));
+    if(s.exists()) templeInfo={aiEnabled:false,faq:[],...s.data()};
+  }catch(e){console.warn('templeInfo:',e);}
+  const isAdmin=userRole==='admin';
+  TI_FIELDS.forEach(k=>{const el=document.getElementById('ti-'+k); if(el){el.value=templeInfo[k]||''; el.disabled=!isAdmin;}});
+  document.querySelectorAll('.ti-admin').forEach(b=>b.style.display=isAdmin?'':'none');
+  const tg=document.getElementById('ti-aiEnabled');
+  tg.classList.toggle('on',!!templeInfo.aiEnabled); tg.style.opacity=isAdmin?'1':'.5';
+  document.getElementById('ai-status-sub').textContent=templeInfo.aiEnabled?'เปิดอยู่ · ตอบคำถามทั่วไปในแชท LINE':'ปิดอยู่ · บอทตอบเฉพาะคำสั่งเมนู';
+  renderFaq();
+  if(templeInfo.updatedBy) document.getElementById('ti-updated').textContent='แก้ไขล่าสุดโดย '+templeInfo.updatedBy;
+}
+window.toggleTempleAI=async el=>{
+  if(userRole!=='admin'){showToast('เฉพาะ Admin ที่เปลี่ยนค่าได้','error');return;}
+  const nv=!templeInfo.aiEnabled; el.classList.toggle('on',nv);
+  try{
+    await setDoc(doc(db,'settings','templeInfo'),{aiEnabled:nv,updatedAt:serverTimestamp(),updatedBy:currentUser._displayName||currentUser.email},{merge:true});
+    templeInfo.aiEnabled=nv;
+    document.getElementById('ai-status-sub').textContent=nv?'เปิดอยู่ · ตอบคำถามทั่วไปในแชท LINE':'ปิดอยู่ · บอทตอบเฉพาะคำสั่งเมนู';
+    showToast(nv?'✅ เปิดเณรน้อยแล้ว':'ปิดเณรน้อยแล้ว');
+  }catch(e){el.classList.toggle('on',!nv);showToast('บันทึกไม่สำเร็จ: '+e.message,'error');}
+};
+window.saveTempleInfo=async()=>{
+  if(userRole!=='admin') return;
+  const btn=document.getElementById('ti-save-btn'); if(btn.disabled) return;
+  const data={};
+  TI_FIELDS.forEach(k=>data[k]=(document.getElementById('ti-'+k).value||'').trim());
+  if(data.mapUrl && !/^https:\/\//.test(data.mapUrl)){alert('ลิงก์แผนที่ต้องขึ้นต้นด้วย https://');return;}
+  data.faq=readFaqFromForm().filter(f=>f.q&&f.a);
+  data.updatedAt=serverTimestamp(); data.updatedBy=currentUser._displayName||currentUser.email;
+  btn.disabled=true; const h=btn.innerHTML; btn.innerHTML='⏳ กำลังบันทึก...';
+  try{
+    await setDoc(doc(db,'settings','templeInfo'),data,{merge:true});
+    templeInfo={...templeInfo,...data}; renderFaq();
+    document.getElementById('ti-updated').textContent='แก้ไขล่าสุดโดย '+data.updatedBy;
+    showToast('✅ บันทึกข้อมูลวัดแล้ว');
+  }catch(e){ alert('❌ บันทึกไม่สำเร็จ\n'+(e.code||e.message)); }
+  finally{ btn.disabled=false; btn.innerHTML=h; }
+};
+
 async function loadSettingsUI(){
+  loadTempleInfo();
   try{
     const s=await getDoc(doc(db,'settings','notify'));
     if(s.exists()) notifySettings={...NOTIFY_DEFAULT,...s.data()};
