@@ -660,6 +660,7 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
           <div class="settings-section-title">แจ้งเตือนเข้ากลุ่ม LINE ของทีม</div>
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-sun"></i><div><div class="settings-row-label">สรุปงานประจำวัน</div><div class="settings-row-sub">ส่งทุกเช้า 07:00 น. เฉพาะวันที่มีงาน</div></div></div><div class="toggle" id="ns-dailySummary" onclick="toggleNotify('dailySummary',this)"></div></div>
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-alarm"></i><div><div class="settings-row-label">แจ้งเตือนก่อนถึงกิจกรรม</div><div class="settings-row-sub">ตามเวลาที่ตั้งไว้ในแต่ละกิจกรรม</div></div></div><div class="toggle" id="ns-eventReminders" onclick="toggleNotify('eventReminders',this)"></div></div>
+          <div class="settings-row"><div class="settings-row-left"><i class="ti ti-sparkles"></i><div><div class="settings-row-label">ลงตารางจากแชทกลุ่มด้วย AI</div><div class="settings-row-sub">AI อ่านข้อความในกลุ่มทีม แล้วเสนอให้กดยืนยันลงปฏิทิน</div></div></div><div class="toggle" id="ns-teamAi" onclick="toggleNotify('teamAi',this)"></div></div>
           <div style="padding:10px 16px 14px;font-size:12px;color:var(--text3);line-height:1.7">ส่งอัตโนมัติผ่าน LINE Official Account · เปลี่ยนค่าได้เฉพาะ Admin</div>
         </div>
         <div class="settings-section">
@@ -1824,7 +1825,7 @@ function setRemindVal(val){selectedRemind=val;document.querySelectorAll('.rc').f
 window.toggleFly=()=>flyOpen?closeFly():openFly();
 function openFly(){flyOpen=true;document.getElementById('fly-toggle-sw').classList.add('on');document.getElementById('fly-body').classList.add('open');document.getElementById('fly-hint').textContent='เปิดอยู่';}
 function closeFly(){flyOpen=false;document.getElementById('fly-toggle-sw').classList.remove('on');document.getElementById('fly-body').classList.remove('open');document.getElementById('fly-hint').textContent='กดเพื่อเพิ่ม';}
-const NOTIFY_DEFAULT={dailySummary:true,eventReminders:true,notify7d:false,notify3d:true,notify1d:true,notify0d:true};
+const NOTIFY_DEFAULT={dailySummary:true,eventReminders:true,notify7d:false,notify3d:true,notify1d:true,notify0d:true,teamAi:true};
 let notifySettings={...NOTIFY_DEFAULT};
 // ══ ข้อมูลวัด (settings/templeInfo) ══
 const TI_FIELDS=['bio','templeName','address','mapUrl','visitHours','howToInvite','contactPhone','bankName','bankAccount','bankAccountName','otherDonation'];
