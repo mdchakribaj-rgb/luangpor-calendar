@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#c9973a">
+<title>หนังสือสวดมนต์ (แปล) — วัดป่าบ้านตาด</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e7dcc6;--surface:#faf7f0;--surface2:#f3ecdc;--border:#d4c9a8;--border2:#e6dcc6;
+  --gold:#b07f22;--gold2:#c9973a;--brown:#3d2e10;--text2:#6b5a3e;--text3:#9c8a68;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--brown);font-family:'Sarabun',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+body.night{--bg:#141210;--surface:#1f1b16;--surface2:#29241d;--border:#3a3228;--border2:#2e281f;--brown:#efe3c8;--text2:#cdbd9c;--text3:#998a6c}
+button{font-family:inherit;cursor:pointer}
+
+/* ── สารบัญ ── */
+#toc{max-width:640px;margin:0 auto;padding:calc(16px + var(--sat)) 14px calc(40px + var(--sab))}
+.book{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(61,46,16,.08)}
+.book img{width:84px;height:119px;border-radius:6px;object-fit:cover;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.book h1{font-size:20px;font-weight:800;line-height:1.3}
+.book p{font-size:13px;color:var(--text2);margin-top:4px;line-height:1.5}
+.resume{display:none;width:100%;margin-top:12px;padding:13px;border:none;border-radius:12px;background:#3d3222;color:#e8c56a;font-size:15px;font-weight:700}
+.tools{display:flex;gap:8px;margin-top:12px}
+.tools button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600}
+.sec{margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.sec-h{width:100%;display:flex;align-items:center;gap:10px;padding:14px;border:none;background:none;color:var(--brown);text-align:left}
+.sec-n{width:34px;height:34px;border-radius:50%;background:var(--gold2);color:#fff;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-t{flex:1;font-size:17px;font-weight:800}
+.sec-p{font-size:13px;color:var(--text3)}
+.chev{font-size:14px;color:var(--text3);transition:transform .2s}
+.sec.open .chev{transform:rotate(90deg)}
+.items{display:none;border-top:1px solid var(--border2)}
+.sec.open .items{display:block}
+.it{width:100%;display:flex;justify-content:space-between;gap:10px;padding:13px 16px 13px 58px;border:none;border-bottom:1px solid var(--border2);background:none;color:var(--brown);font-size:16px;text-align:left;line-height:1.4}
+.it:last-child{border-bottom:none}
+.it:active{background:var(--surface2)}
+.it span:last-child{color:var(--text3);font-size:14px;flex-shrink:0}
+.foot{text-align:center;font-size:12px;color:var(--text3);margin-top:22px;line-height:1.7}
+
+/* ── หน้าอ่าน ── */
+#reader{display:none}
+.bar{position:fixed;top:0;left:0;right:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--border);padding:calc(8px + var(--sat)) 10px 8px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.bar button{border:none;background:var(--surface2);color:var(--brown);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;flex-shrink:0}
+.bar-t{flex:1;min-width:0}
+.bar-t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-t small{font-size:12px;color:var(--text3)}
+#pages{padding:calc(62px + var(--sat)) 0 calc(90px + var(--sab));overflow-x:auto}
+#pages-in{margin:0 auto;width:100%;max-width:900px;transition:width .15s}
+.pg{display:block;width:100%;height:auto;aspect-ratio:1300/1838;background:#fff;margin:0 auto 6px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+body.night .pg{filter:invert(.92) hue-rotate(180deg) contrast(.9)}
+.ctl{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + var(--sab));z-index:10;display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:30px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.ctl button{border:none;background:var(--surface2);color:var(--brown);width:46px;height:40px;border-radius:20px;font-size:18px;font-weight:800}
+.ctl .z{width:auto;padding:0 10px;font-size:13px;background:none;min-width:52px}
+@media(min-width:900px){#pages-in{max-width:760px}}
+</style>
+</head>
+<body>
+
+<!-- สารบัญ -->
+<div id="toc">
+  <div class="book">
+    <img src="chant/cover-thumb.webp" alt="ปกหนังสือสวดมนต์">
+    <div>
+      <h1>หนังสือสวดมนต์ (แปล)</h1>
+      <p>วัดเกษรศีลคุณ (วัดป่าบ้านตาด)<br>อ.เมือง จ.อุดรธานี</p>
+    </div>
+  </div>
+  <button class="resume" id="resume"></button>
+  <div class="tools">
+    <button onclick="openPage(16)">📖 เริ่มอ่านจากหน้าแรก</button>
+    <button onclick="toggleNight()" id="night-btn">🌙 โหมดกลางคืน</button>
+  </div>
+  <div id="sections"></div>
+  <div class="foot">กดชื่อบทเพื่อเปิดหน้านั้น · ซูมด้วยปุ่ม + − หรือใช้สองนิ้ว<br>ถ่ายภาพจากหนังสือต้นฉบับของวัด</div>
+</div>
+
+<!-- หน้าอ่าน -->
+<div id="reader">
+  <div class="bar">
+    <button onclick="showToc()">☰ สารบัญ</button>
+    <div class="bar-t"><b id="cur-t"></b><small id="cur-p"></small></div>
+    <button onclick="toggleNight()" id="night-btn2">🌙</button>
+  </div>
+  <div id="pages"><div id="pages-in"></div></div>
+  <div class="ctl">
+    <button onclick="step(-1)" aria-label="หน้าก่อน">‹</button>
+    <button onclick="zoom(-1)" aria-label="ย่อ">−</button>
+    <button class="z" id="zlab" onclick="zoom(0)">100%</button>
+    <button onclick="zoom(1)" aria-label="ขยาย">+</button>
+    <button onclick="step(1)" aria-label="หน้าถัดไป">›</button>
+  </div>
+</div>
+
+<script>
+const TOTAL = 214, OFFSET = 15;               // หน้าหนังสือ = หน้าไฟล์ − 15
+const TOC = [
+ ['คำทำวัตรเช้า',1,[['คำทำวัตรเช้า',2],['คำกราบพระรัตนตรัย',2],['ปุพพะภาคะนะมะการะ',3],['พุทธาภิถุติ',3],['ธัมมาภิถุติ',5],['สังฆาภิถุติ',5],['ระตะนัตตะยัปปะณามะคาถา',7],['สังเวคะวัตถุปะริทีปะกะปาฐะ',8],['ตังขะณิกะปัจจะเวกขะณะวิธี',13],['กายะคะตาสะติภาวะนา',15],['อะภิณ์หะปัจจะเวกขะณะปาฐะ',18],['พ์รัห์มะวิหาระผะระณะ',19],['บทพิเศษ',20]]],
+ ['คำทำวัตรเย็น',21,[['คำทำวัตรเย็น',22],['คำกราบพระรัตนตรัย',22],['ปุพพะภาคะนะมะการะ',23],['พุทธานุสสะติ',23],['พุทธาภิคีติ',24],['ธัมมานุสสะติ',26],['ธัมมาภิคีติ',27],['สังฆานุสสะติ',30],['สังฆาภิคีติ',31],['อะตีตะปัจจะเวกขะณะปาฐะ',33],['กายะคะตาสะติภาวะนา',35],['อะภิณ์หะปัจจะเวกขะณะปาฐะ',37],['พ์รัห์มะวิหาระผะระณะ',39],['บทพิเศษ',40]]],
+ ['พระปริตร',41,[['ชุมนุมเทวดา',42],['ปุพพะภาคะนะมะการะ',44],['สะระณะคะมะนะปาฐะ',44],['สัจจะกิริยะคาถา',46],['มะหาการุณิโกนาโถติอาทิกาคาถา',47],['เขมาเขมะสะระณะคะมะนะปะริทีปิกาคาถา',48],['ปัพพะโตปะมะสุตตะคาถา',49],['อะริยะธะนะคาถา',50],['นะมะการะสิทธิคาถา',51],['สัมพุทเธ',53],['นะโมการะอัฏฐะกะคาถา',55],['มังคะละปะริตร',56],['ระตะนะปะริตร',59],['กะระณียะเมตตะปะริตร',65],['ขันธะปะริตร',68],['โมระปะริตร',70],['วัฏฏะกะปะริตร',72],['อาฏานาฏิยะปะริตร',73],['อังคุลิมาละปะริตร',82],['โพชฌังคะปะริตร',83],['อะภะยะปะริตร',85],['ถวายพรพระ',86],['พุทธะชะยะมังคะละคาถา',87],['ชะยะปะริตร',90],['เทวะตาอุยโยชะนะคาถา',92],['นักขัตตะยักขะภูตานัง',94]]],
+ ['พระสูตร',95,[['ธัมมะจักกัปปะวัตตะนะสุตตัง',96],['อะนัตตะลักขะณะสุตตัง',111],['อาทิตตะปะริยายะสุตตัง',122],['ธัมมะนิยามะสุตตัง',131],['วิปัสสะนาภูมิปาฐะ',135],['ปะฏิจจะสะมุปปาทะปาฐะ',137]]],
+ ['พระอภิธรรม มาติกา',139,[['พระสังคะณี',140],['พระวิภังค์',142],['พระธาตุกถา',143],['พระปุคคะละปัญญัตติ',144],['พระกถาวัตถุ',146],['พระยะมะกะ',147],['พระมหาปัฏฐาน',148],['ธัมมะสังคิณีมาติกาปาฐะ',150],['บังสุกุลตาย',154],['บังสุกุลเป็น',154]]],
+ ['บทแผ่เมตตา',155,[['อุททิสสะนาธิฏฐานะคาถา',156],['เทวะตาทิปัตติทานะคาถา',158],['สัพพะปัตติทานะคาถา (คาถากรวดน้ำ)',159]]],
+ ['บทสวดมนต์พิเศษ',161,[['บทสวดที่ประสูติ (มหาสมัยสูตร)',162]]],
+ ['คำอาราธนา',183,[['คำอาราธนาศีล ๕',184],['คำให้ไตรสรณคมน์ และศีล ๕',184],['สิกขาบท ๕',185],['ท้ายศีล',186],['คำอาราธนาศีล ๘',186],['คำอาราธนาอุโบสถศีล',187],['คำให้ไตรสรณคมน์ ศีล ๘ และอุโบสถศีล',187],['สิกขาบท ๘',187],['ท้ายศีล ๘',188],['ท้ายศีลอุโบสถ',189],['คำอาราธนาธรรม',190],['คำอาราธนาพระปริตร',190]]],
+ ['คำถวายทาน',191,[['คำถวายสังฆทาน',192],['คำถวายสังฆทาน (อีกแบบหนึ่ง)',192],['คำถวายผ้ากฐิน',193],['คำถวายผ้าป่า',193]]]
+];
+const ABOUT = [['ปกหนังสือ',1],['ปฏิปทาครูบาอาจารย์',2],['คำนำ',10],['สารบัญ',12],['รายนามผู้บริจาค',209]];   // หน้าไฟล์
+
+const th = n => String(n).replace(/[0-9]/g, d => '๐๑๒๓๔๕๖๗๘๙'[d]);
+const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+// หาชื่อบทจากหน้าไฟล์
+const FLAT = [];
+TOC.forEach(([sec,sp,items],i) => { FLAT.push({f:sp+OFFSET, t:sec, s:i}); items.forEach(([t,p]) => FLAT.push({f:p+OFFSET, t, s:i})); });
+FLAT.sort((a,b) => a.f - b.f);
+function titleOf(f){
+  if(f < 16) return f >= 12 ? 'สารบัญ' : f >= 10 ? 'คำนำ' : 'ปฏิปทาครูบาอาจารย์';
+  if(f >= 209) return 'รายนามผู้บริจาค';
+  const here = FLAT.filter(x => x.f === f && x.t !== TOC[x.s][0]).map(x => x.t);
+  if(here.length) return [...new Set(here)].join(' · ');
+  let t = ''; FLAT.forEach(x => { if(x.f <= f) t = x.t; }); return t;
+}
+const pageLabel = f => (f >= 16 && f <= 209) ? 'หน้า ' + th(f - OFFSET) + ' / ' + th(194) : 'หน้าประกอบ';
+
+// ── สร้างสารบัญ ──
+function buildToc(){
+  let h = '';
+  TOC.forEach(([sec,sp,items],i) => {
+    h += `<div class="sec" id="sec${i}"><button class="sec-h" onclick="this.parentNode.classList.toggle('open')">
+      <span class="sec-n">${th(i+1)}</span><span class="sec-t">${sec}</span><span class="sec-p">${th(sp)}</span><span class="chev">▶</span></button>
+      <div class="items">${items.map(([t,p]) => `<button class="it" onclick="openPage(${p+OFFSET})"><span>${t}</span><span>${th(p)}</span></button>`).join('')}</div></div>`;
+  });
+  h += `<div class="sec"><button class="sec-h" onclick="this.parentNode.classList.toggle('open')"><span class="sec-n" style="background:#8c7a52">i</span><span class="sec-t">เกี่ยวกับหนังสือ</span><span class="chev">▶</span></button>
+    <div class="items">${ABOUT.map(([t,f]) => `<button class="it" onclick="openPage(${f})"><span>${t}</span><span></span></button>`).join('')}</div></div>`;
+  document.getElementById('sections').innerHTML = h;
+}
+
+// ── หน้าอ่าน ──
+let built = false, cur = 16, zoomLv = 0;
+const ZOOMS = [100, 140, 180, 230];
+function buildPages(){
+  if(built) return; built = true;
+  const box = document.getElementById('pages-in');
+  let h = '';
+  for(let f = 1; f <= TOTAL; f++) h += `<img class="pg" id="pg${f}" data-f="${f}" loading="lazy" decoding="async" width="1300" height="1838" alt="หน้า ${f}" src="chant/p${String(f).padStart(3,'0')}.webp">`;
+  box.innerHTML = h;
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting){ cur = +e.target.dataset.f; showCur(); } });
+  }, {rootMargin: '-45% 0px -50% 0px'});
+  box.querySelectorAll('.pg').forEach(im => io.observe(im));
+}
+function showCur(){
+  document.getElementById('cur-t').textContent = titleOf(cur);
+  document.getElementById('cur-p').textContent = pageLabel(cur);
+  store.set('chant_last', cur);
+  const f = cur; if(location.hash !== '#pdf=' + f) history.replaceState(null, '', '#pdf=' + f);
+}
+function openPage(f){
+  document.getElementById('toc').style.display = 'none';
+  document.getElementById('reader').style.display = 'block';
+  buildPages();
+  cur = f; showCur();
+  requestAnimationFrame(() => { const el = document.getElementById('pg' + f); el && el.scrollIntoView({block: 'start'}); window.scrollBy(0, -66); });
+}
+function showToc(){
+  document.getElementById('reader').style.display = 'none';
+  document.getElementById('toc').style.display = 'block';
+  history.replaceState(null, '', location.pathname);
+  updateResume(); window.scrollTo(0, 0);
+}
+function step(d){ openPage(Math.min(TOTAL, Math.max(1, cur + d))); }
+function zoom(d){
+  const keep = cur;
+  zoomLv = d === 0 ? 0 : Math.min(ZOOMS.length - 1, Math.max(0, zoomLv + d));
+  const z = ZOOMS[zoomLv];
+  const inn = document.getElementById('pages-in');
+  inn.style.width = z + '%'; inn.style.maxWidth = z === 100 ? '' : 'none';
+  document.getElementById('zlab').textContent = th(z) + '%';
+  store.set('chant_zoom', zoomLv);
+  requestAnimationFrame(() => { const el = document.getElementById('pg' + keep); el && el.scrollIntoView({block: 'start'}); window.scrollBy(0, -66); });
+}
+function toggleNight(){
+  const on = document.body.classList.toggle('night');
+  store.set('chant_night', on ? '1' : '');
+  ['night-btn','night-btn2'].forEach(id => { const b = document.getElementById(id); b.textContent = id === 'night-btn' ? (on ? '☀️ โหมดกลางวัน' : '🌙 โหมดกลางคืน') : (on ? '☀️' : '🌙'); });
+}
+function updateResume(){
+  const last = +store.get('chant_last');
+  const b = document.getElementById('resume');
+  if(last > 1){ b.style.display = 'block'; b.textContent = '▶ อ่านต่อ: ' + titleOf(last) + ' · ' + pageLabel(last); b.onclick = () => openPage(last); }
+}
+
+// ── เริ่มต้น ──
+buildToc();
+if(store.get('chant_night')) toggleNight();
+const zl = +store.get('chant_zoom'); if(zl > 0){ zoomLv = zl; }
+updateResume();
+(function route(){
+  const h = location.hash;
+  let m;
+  if((m = h.match(/^#s=(\d+)/))){ const i = +m[1] - 1; const el = document.getElementById('sec' + i); if(el){ el.classList.add('open'); setTimeout(() => el.scrollIntoView({block: 'start'}), 50); } }
+  else if((m = h.match(/^#p=(\d+)/))) openPage(Math.min(TOTAL, +m[1] + OFFSET));
+  else if((m = h.match(/^#pdf=(\d+)/))) openPage(Math.min(TOTAL, +m[1]));
+  if(zoomLv > 0 && document.getElementById('reader').style.display === 'block'){ const z = zoomLv; zoomLv = 0; zoomLv = z - 1; zoom(1); }
+  else if(zoomLv > 0){ document.getElementById('zlab').textContent = th(ZOOMS[zoomLv]) + '%'; const inn = document.getElementById('pages-in'); inn.style.width = ZOOMS[zoomLv] + '%'; inn.style.maxWidth = 'none'; }
+})();
+</script>
+</body>
+</html>
