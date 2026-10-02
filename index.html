@@ -617,6 +617,7 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
         <div class="cal-head"><span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span></div>
         <div id="cal-grid" class="cal-grid"></div>
         <div class="event-list-section">
+          <div id="undated-merit"></div>
           <div class="event-list-title"><i class="ti ti-clock-hour-4"></i>กิจกรรมที่กำลังจะมาถึง</div>
           <div id="cal-event-list"><div class="empty-state">ยังไม่มีกิจกรรม</div></div>
         </div>
@@ -755,7 +756,7 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
         </div>
       </div>
       <div class="g2">
-        <div class="fg"><label class="fl">วันที่เริ่ม *</label><input type="date" class="fi" id="ev-start"></div>
+        <div class="fg"><label class="fl" id="ev-start-label">วันที่เริ่ม *</label><input type="date" class="fi" id="ev-start"></div>
         <div class="fg"><label class="fl">วันที่สิ้นสุด</label><input type="date" class="fi" id="ev-end"></div>
         <div class="fg"><label class="fl">เวลาเริ่ม</label><input type="time" class="fi" id="ev-time-s"></div>
         <div class="fg"><label class="fl">เวลาสิ้นสุด</label><input type="time" class="fi" id="ev-time-e"></div>
@@ -1574,7 +1575,19 @@ function renderCalEventList(){
   const list=document.getElementById('cal-event-list');
 
   // รวมกิจกรรมปกติ
-  const evItems=events.filter(ev=>(ev.end||ev.start)>=todayStr).map(ev=>({
+  // งานบุญไม่ระบุวัน
+  const und=events.filter(ev=>ev.cat==='merit'&&!ev.start);
+  const ub=document.getElementById('undated-merit');
+  if(ub) ub.innerHTML=und.length?`<div class="event-list-title"><i class="ti ti-flower"></i>งานบุญไม่ระบุวัน</div>`+und.map(ev=>`
+      <div class="event-list-item" onclick="openUndated('${ev.id}')">
+        <div class="ev-bar" style="background:#c06a17"></div>
+        <div class="ev-info">
+          <div class="ev-name">${ev.title}${ev.posterUrl?' <i class="ti ti-photo" style="font-size:12px;color:#c06a17"></i>':''}</div>
+          <div class="ev-meta">ร่วมบุญได้ตลอด${ev.location?' · '+ev.location:''} · ${ev.isPublic?'🌐 เผยแพร่':'🔒 ไม่เผยแพร่'}${ev.announceStatus==='sent'?' · 📢 ประกาศแล้ว':''}</div>
+        </div>
+      </div>`).join('')+'<div style="height:14px"></div>':'';
+
+  const evItems=events.filter(ev=>ev.start&&(ev.end||ev.start)>=todayStr).map(ev=>({
     type:'event', date:ev.start, data:ev
   }));
 
@@ -1643,6 +1656,7 @@ function renderCalEventList(){
   list.innerHTML=html;
 }
 
+window.openUndated=id=>{const ev=events.find(e=>e.id===id); if(ev) openEditModal(ev);};
 window.toggleShowAll=function(){
   showAllUpcoming=!showAllUpcoming;
   renderCalEventList();
@@ -1760,9 +1774,9 @@ window.closeModal=()=>document.getElementById('event-modal').classList.remove('o
 window.saveEvent=async function(){
   const title=document.getElementById('ev-title').value.trim();
   const start=document.getElementById('ev-start').value;
-  if(!title||!start){showToast('กรุณากรอกชื่อและวันที่','error');return;}
+  if(!title||(!start&&selectedCat!=='merit')){showToast(selectedCat==='merit'?'กรุณากรอกชื่องาน':'กรุณากรอกชื่อและวันที่','error');return;}
   const ev={
-    title,start,end:document.getElementById('ev-end').value||start,
+    title,start,end:start?(document.getElementById('ev-end').value||start):'',
     timeStart:document.getElementById('ev-time-s').value,
     timeEnd:document.getElementById('ev-time-e').value,
     cat:selectedCat,
@@ -1837,6 +1851,7 @@ function setCat(cat){
   selectedCat=cat||'';
   ['priv','temple','abroad','merit'].forEach(c=>{const el=document.getElementById('co-'+c);el.classList.remove('s-priv','s-temple','s-abroad','s-merit');if(c===selectedCat)el.classList.add('s-'+c);});
   const ms=document.getElementById('merit-section'); if(ms) ms.style.display=selectedCat==='merit'?'block':'none';
+  const sl=document.getElementById('ev-start-label'); if(sl) sl.textContent=selectedCat==='merit'?'วันที่เริ่ม (งานบุญไม่บังคับ)':'วันที่เริ่ม *';
   if(typeof updateAnnounceUI==='function') updateAnnounceUI();
 }
 // กดซ้ำที่ประเภทเดิมเพื่อยกเลิก — ไม่บังคับเลือก
