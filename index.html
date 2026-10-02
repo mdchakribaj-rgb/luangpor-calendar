@@ -552,6 +552,13 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 .ti-faq{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
 .ti-faq-del{align-self:flex-end;font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:'Sarabun',sans-serif}
 .ti-f:disabled{opacity:.75;background:var(--surface)}
+
+/* ── ประกาศงานบุญ ── */
+.announce-box{display:flex;align-items:center;gap:10px;margin-top:6px;padding:12px;background:#fff;border:1px dashed #d9a35e;border-radius:10px}
+.announce-t{font-size:14px;font-weight:700;color:#8a4a0c}
+.announce-s{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5}
+.announce-btn{padding:9px 14px;border:none;border-radius:9px;background:#c06a17;color:#fff;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0}
+.announce-btn:disabled{background:#d8cbb3;color:#7a6a4a;cursor:default}
 </style>
 </head>
 <body>
@@ -664,6 +671,12 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
           <div style="padding:10px 16px 14px;font-size:12px;color:var(--text3);line-height:1.7">ส่งอัตโนมัติผ่าน LINE Official Account · เปลี่ยนค่าได้เฉพาะ Admin</div>
         </div>
         <div class="settings-section">
+          <div class="settings-section-title">ข่าวงานบุญทาง LINE</div>
+          <div class="settings-row" style="cursor:default"><div class="settings-row-left"><i class="ti ti-users"></i><div><div class="settings-row-label">ผู้กดรับข่าว</div><div class="settings-row-sub" id="bc-subs">—</div></div></div></div>
+          <div class="settings-row" style="cursor:default"><div class="settings-row-left"><i class="ti ti-message-circle"></i><div><div class="settings-row-label">โควตาข้อความเดือนนี้</div><div class="settings-row-sub" id="bc-quota">—</div></div></div></div>
+          <div style="padding:8px 16px 14px;font-size:12px;color:var(--text3);line-height:1.7">ประกาศได้จากหน้าแก้ไขงานบุญ · ระบบไม่ส่งช่วง ๒๑.๐๐–๐๗.๐๐ น.</div>
+        </div>
+        <div class="settings-section">
           <div class="settings-section-title">แจ้งเตือนวันปาฏิโมกข์</div>
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-bell"></i><div><div class="settings-row-label">ก่อน 7 วัน</div><div class="settings-row-sub">ส่ง 08:00 น.</div></div></div><div class="toggle" id="ns-notify7d" onclick="toggleNotify('notify7d',this)"></div></div>
           <div class="settings-row"><div class="settings-row-left"><i class="ti ti-bell"></i><div><div class="settings-row-label">ก่อน 3 วัน</div><div class="settings-row-sub">ส่ง 08:00 น.</div></div></div><div class="toggle" id="ns-notify3d" onclick="toggleNotify('notify3d',this)"></div></div>
@@ -771,6 +784,13 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
         <div class="fg"><label class="fl">เบอร์โทรสอบถาม</label><input type="tel" class="fi" id="ev-phone" placeholder="เช่น 081-234-5678"></div>
         <div class="fg"><label class="fl">ลิงก์แผนที่ (Google Maps)</label><input type="url" class="fi" id="ev-map" placeholder="วางลิงก์ หรือเว้นว่างเพื่อค้นจากชื่อสถานที่"></div>
         <div class="fg"><label class="fl">ช่องทางร่วมทำบุญ</label><textarea class="fi" id="ev-donation" rows="2" style="resize:vertical" placeholder="เช่น ธ.กรุงไทย 123-4-56789-0 ชื่อบัญชี วัด..."></textarea></div>
+        <div class="announce-box" id="announce-box" style="display:none">
+          <div style="flex:1;min-width:0">
+            <div class="announce-t">📢 ประกาศถึงผู้รับข่าวงานบุญ</div>
+            <div class="announce-s" id="announce-sub"></div>
+          </div>
+          <button type="button" class="announce-btn" id="announce-btn" onclick="announceMerit()">ประกาศ</button>
+        </div>
       </div>
       <div class="fly-section">
         <div class="fly-toggle-row" onclick="toggleFly()">
@@ -1817,6 +1837,7 @@ function setCat(cat){
   selectedCat=cat||'';
   ['priv','temple','abroad','merit'].forEach(c=>{const el=document.getElementById('co-'+c);el.classList.remove('s-priv','s-temple','s-abroad','s-merit');if(c===selectedCat)el.classList.add('s-'+c);});
   const ms=document.getElementById('merit-section'); if(ms) ms.style.display=selectedCat==='merit'?'block':'none';
+  if(typeof updateAnnounceUI==='function') updateAnnounceUI();
 }
 // กดซ้ำที่ประเภทเดิมเพื่อยกเลิก — ไม่บังคับเลือก
 window.selCat=cat=>{const nv=selectedCat===cat?'':cat;setCat(nv);if(nv==='merit'&&!isPublicSel)setPublic(true);};
@@ -1890,8 +1911,56 @@ window.saveTempleInfo=async()=>{
   finally{ btn.disabled=false; btn.innerHTML=h; }
 };
 
+// ══ ประกาศงานบุญ ══
+let bcStats=null;
+const thN=n=>String(n).replace(/[0-9]/g,d=>'๐๑๒๓๔๕๖๗๘๙'[d]);
+async function loadBroadcastStats(){
+  try{ const s=await getDoc(doc(db,'settings','broadcastStats')); bcStats=s.exists()?s.data():null; }catch(e){ bcStats=null; }
+  const subs=document.getElementById('bc-subs'), q=document.getElementById('bc-quota');
+  if(!subs) return;
+  if(!bcStats){ subs.textContent='ยังไม่มีข้อมูล (รอระบบ LINE อัปเดต)'; q.textContent='—'; return; }
+  subs.textContent=thN(bcStats.subscribers||0)+' คน';
+  q.textContent=bcStats.quotaType==='limited'?('ใช้แล้ว '+thN(bcStats.used||0)+' จาก '+thN(bcStats.quota||0)+' ข้อความ'):'ไม่จำกัด';
+}
+function updateAnnounceUI(){
+  const box=document.getElementById('announce-box'); if(!box) return;
+  const ev=editingId?events.find(e=>e.id===editingId):null;
+  const show=userRole==='admin'&&ev&&selectedCat==='merit';
+  box.style.display=show?'flex':'none';
+  if(!show) return;
+  const btn=document.getElementById('announce-btn'), sub=document.getElementById('announce-sub');
+  if(ev.announceStatus==='sent'){ btn.disabled=true; btn.textContent='ประกาศแล้ว'; sub.textContent='ส่งถึงผู้รับข่าวแล้ว'+(ev.announceCount?' '+thN(ev.announceCount)+' คน':''); return; }
+  if(ev.announceStatus==='pending'){ btn.disabled=true; btn.textContent='รอส่ง'; sub.textContent='อยู่ในคิว ระบบจะส่งภายใน ๕ นาที (หรือ ๐๗.๐๐ น. ถ้าอยู่ในช่วงห้ามส่ง)'; return; }
+  btn.disabled=false; btn.textContent='ประกาศ';
+  sub.textContent=bcStats?('ผู้รับข่าว '+thN(bcStats.subscribers||0)+' คน'):'ส่งการ์ดงานบุญพร้อมโปสเตอร์ทาง LINE';
+}
+window.announceMerit=async()=>{
+  if(userRole!=='admin'||!editingId) return;
+  const ev=events.find(e=>e.id===editingId);
+  if(!ev||ev.cat!=='merit'){ alert('กรุณาบันทึกงานเป็นประเภทงานบุญก่อนประกาศ'); return; }
+  if(ev.isPublic!==true){ alert('งานนี้ยังไม่เผยแพร่สาธารณะ\nเปิดสวิตช์เผยแพร่ แล้วกดบันทึกก่อนประกาศ'); return; }
+  if(ev.announceStatus==='sent'||ev.announceStatus==='pending') return;
+  await loadBroadcastStats();
+  const n=bcStats?bcStats.subscribers||0:0;
+  if(bcStats&&n===0){ alert('ยังไม่มีผู้กดรับข่าวงานบุญ\nประกาศได้เมื่อมีผู้รับข่าวอย่างน้อย ๑ คน'); return; }
+  const left=bcStats&&bcStats.quotaType==='limited'?(bcStats.quota||0)-(bcStats.used||0):null;
+  if(left!==null&&left<n){ alert('โควตาข้อความเดือนนี้ไม่พอ\nเหลือ '+thN(left)+' ข้อความ แต่ต้องใช้ '+thN(n)+' ข้อความ'); return; }
+  const h=new Date().getHours(), quiet=h>=21||h<7;
+  const msg='ประกาศงานบุญ "'+ev.title+'"\n\nผู้รับ: '+(bcStats?thN(n)+' คน (ใช้โควตา '+thN(n)+' ข้อความ)':'ผู้กดรับข่าวทั้งหมด')
+    +(left!==null?'\nโควตาคงเหลือหลังส่ง: '+thN(left-n)+' ข้อความ':'')
+    +(quiet?'\n\nขณะนี้อยู่ในช่วงห้ามส่ง ระบบจะส่งเวลา ๐๗.๐๐ น.':'\n\nระบบจะส่งภายใน ๕ นาที')+'\n\nประกาศได้ครั้งเดียวต่องาน ยืนยันไหม?';
+  if(!confirm(msg)) return;
+  try{
+    await addDoc(collection(db,'broadcasts'),{type:'merit',eventId:ev.id,title:ev.title,status:'pending',requestedBy:currentUser._displayName||currentUser.email,requestedAt:serverTimestamp()});
+    await updateDoc(doc(db,'events',ev.id),{announceStatus:'pending'});
+    ev.announceStatus='pending'; updateAnnounceUI();
+    showToast('📢 เข้าคิวประกาศแล้ว');
+  }catch(e){ alert('❌ ประกาศไม่สำเร็จ\n'+(e.code||e.message)); }
+};
+
 async function loadSettingsUI(){
   loadTempleInfo();
+  loadBroadcastStats();
   try{
     const s=await getDoc(doc(db,'settings','notify'));
     if(s.exists()) notifySettings={...NOTIFY_DEFAULT,...s.data()};
