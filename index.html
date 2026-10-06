@@ -842,8 +842,12 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
           </div>
           <label class="gw-chk" style="margin:0 0 10px"><input type="checkbox" id="ft-open"> เปิดรับผู้ที่ต้องการมาตั้งโรงทาน</label>
           <div class="g2">
-            <div class="fg"><label class="fl">ผู้ประสานงานโรงทาน</label><input class="fi" id="ft-contact" placeholder="ชื่อ"></div>
-            <div class="fg"><label class="fl">เบอร์โทร</label><input class="fi" id="ft-phone" type="tel" placeholder="08x-xxx-xxxx"></div>
+            <div class="fg"><label class="fl">ผู้ประสานงาน คนที่ ๑</label><input class="fi" id="ft-contact" placeholder="ชื่อ"></div>
+            <div class="fg"><label class="fl">เบอร์โทร คนที่ ๑</label><input class="fi" id="ft-phone" type="tel" placeholder="08x-xxx-xxxx"></div>
+          </div>
+          <div class="g2">
+            <div class="fg"><label class="fl">ผู้ประสานงาน คนที่ ๒ (ไม่บังคับ)</label><input class="fi" id="ft-contact2" placeholder="ชื่อ"></div>
+            <div class="fg"><label class="fl">เบอร์โทร คนที่ ๒</label><input class="fi" id="ft-phone2" type="tel" placeholder="08x-xxx-xxxx"></div>
           </div>
           <div class="fg"><label class="fl">LINE ID หรือลิงก์ LINE (ไม่บังคับ)</label><input class="fi" id="ft-line" placeholder="เช่น @watpa หรือ https://line.me/..."></div>
           <div class="fg" style="margin-bottom:0"><label class="fl">เงื่อนไขการตั้งโรงทาน</label><textarea class="fi" id="ft-note" rows="2" style="resize:vertical" placeholder="เช่น อาหารมังสวิรัติ งดเหล้าบุหรี่ นำเต็นท์มาเอง มีไฟฟ้าให้"></textarea></div>
@@ -1792,7 +1796,7 @@ window.openAddModal=function(dateStr){
   ['ev-title','ev-end','ev-time-s','ev-time-e','ev-location','ev-guests','ev-desc','fly-no','fly-time','fly-from','fly-to','fly-seat','fly-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ev-start').value=dateStr||toDateStr(new Date());
   setCat('');setRemindVal('1440');closeFly();resetBPUI();setPublic(false);
-  ['ev-phone','ev-map','ev-donation','ft-has','ft-close','ft-contact','ft-phone','ft-line','ft-note'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft-open').checked=false;loadPoster('','');
+  ['ev-phone','ev-map','ev-donation','ft-has','ft-close','ft-contact','ft-phone','ft-contact2','ft-phone2','ft-line','ft-note'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft-open').checked=false;loadPoster('','');
   document.getElementById('btn-delete').style.display='none';
   document.getElementById('event-modal').classList.add('open');
 };
@@ -1829,7 +1833,7 @@ function openEditModal(ev){
   document.getElementById('ev-phone').value=ev.phone||'';
   document.getElementById('ev-map').value=ev.mapUrl||'';
   document.getElementById('ev-donation').value=ev.donation||'';
-  [['ft-has','ftHas'],['ft-close','ftClose'],['ft-contact','ftContact'],['ft-phone','ftPhone'],['ft-line','ftLine'],['ft-note','ftNote']].forEach(([id,k])=>document.getElementById(id).value=ev[k]||'');
+  [['ft-has','ftHas'],['ft-close','ftClose'],['ft-contact','ftContact'],['ft-phone','ftPhone'],['ft-contact2','ftContact2'],['ft-phone2','ftPhone2'],['ft-line','ftLine'],['ft-note','ftNote']].forEach(([id,k])=>document.getElementById(id).value=ev[k]||'');
   document.getElementById('ft-open').checked=ev.ftOpen===true;
   loadPoster(ev.posterUrl||'',ev.posterThumbUrl||'');
   const canDel=userRole==='admin'||ev.recordedByEmail===currentUser?.email;
@@ -1859,6 +1863,8 @@ window.saveEvent=async function(){
     ftClose:selectedCat==='merit'?document.getElementById('ft-close').value:'',
     ftContact:selectedCat==='merit'?document.getElementById('ft-contact').value.trim():'',
     ftPhone:selectedCat==='merit'?document.getElementById('ft-phone').value.trim():'',
+    ftContact2:selectedCat==='merit'?document.getElementById('ft-contact2').value.trim():'',
+    ftPhone2:selectedCat==='merit'?document.getElementById('ft-phone2').value.trim():'',
     ftLine:selectedCat==='merit'?document.getElementById('ft-line').value.trim():'',
     ftNote:selectedCat==='merit'?document.getElementById('ft-note').value.trim():'',
     flyNo:flyOpen?document.getElementById('fly-no').value:'',
