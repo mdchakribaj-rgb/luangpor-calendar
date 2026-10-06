@@ -559,6 +559,55 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 .announce-s{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5}
 .announce-btn{padding:9px 14px;border:none;border-radius:9px;background:#c06a17;color:#fff;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0}
 .announce-btn:disabled{background:#d8cbb3;color:#7a6a4a;cursor:default}
+
+/* ══ แจกของงานบุญ ══ */
+.gw-open-btn{width:100%;margin-top:8px;padding:12px;border:1.5px solid #c06a17;border-radius:10px;background:#fff7ec;color:#8a4a0c;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.gw-overlay{display:none;position:fixed;inset:0;z-index:600;background:var(--bg);flex-direction:column;padding-top:var(--sat,0px)}
+.gw-overlay.open{display:flex}
+.gw-head{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+.gw-title{flex:1;font-size:17px;font-weight:800;color:var(--brown);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gw-x{border:none;background:var(--surface2);border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}
+.gw-tabs{display:flex;gap:6px;padding:10px 14px 0;background:var(--surface);border-bottom:1px solid var(--border)}
+.gw-tabs button{flex:1;padding:10px;border:none;background:none;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;color:var(--text3);border-bottom:3px solid transparent;cursor:pointer}
+.gw-tabs button.on{color:#8a4a0c;border-bottom-color:#c06a17}
+.gw-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px calc(30px + var(--sab,0px));max-width:640px;width:100%;margin:0 auto}
+.gw-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+.gw-h{font-size:16px;font-weight:800;color:var(--brown);margin-bottom:10px}
+.gw-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.gw-chip{background:#eef6ec;border:1px solid #c8dfc4;color:#2a5024;border-radius:20px;padding:5px 11px;font-size:13px}
+.gw-chip.low{background:#fdf5e0;border-color:#e8d9a0;color:#8a6410}.gw-chip.out{background:#fdecec;border-color:#efb8b8;color:#9b2c2c}
+.gw-btn{width:100%;padding:13px;border:none;border-radius:10px;background:#c06a17;color:#fff;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
+.gw-btn2{background:var(--surface2);color:var(--brown);border:1px solid var(--border)}
+.gw-btn:disabled{opacity:.6}
+.gw-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.gw-row .fi{flex:1;min-width:0}
+#gw-reader{width:100%;border-radius:10px;overflow:hidden;margin-bottom:4px}
+.gw-msg{margin-top:10px;padding:12px;border-radius:10px;font-size:14px;line-height:1.6}
+.gw-msg.ok{background:#eef6ec;border:1px solid #c8dfc4;color:#2a5024}.gw-msg.err{background:#fdecec;border:1px solid #efb8b8;color:#9b2c2c}
+.gw-pick{padding:10px 0;border-top:1px solid var(--border2)}
+.gw-pick-n{font-size:15px;font-weight:700;color:var(--brown);margin-bottom:6px}
+.gw-pick-c{display:flex;gap:8px}.gw-pick-c select{flex:1}
+.gw-left{font-size:12px;font-weight:400;color:#2a5024}.gw-left.out{color:#9b2c2c}
+.gw-consent{font-size:12px;color:var(--text3);background:var(--surface2);border-radius:8px;padding:8px 10px;margin-top:10px;line-height:1.6}
+.gw-note{font-size:13px;color:var(--text3);line-height:1.6}
+.gw-tb{width:100%;border-collapse:collapse;font-size:13px}
+.gw-tb th,.gw-tb td{padding:8px 6px;border-bottom:1px solid var(--border2);text-align:right;white-space:nowrap}
+.gw-tb th:first-child,.gw-tb td:first-child{text-align:left;white-space:normal}
+.gw-tb th{color:var(--text3);font-weight:700}.gw-tb td.out{color:#9b2c2c;font-weight:700}.gw-tb tr.tot td{font-weight:800}
+.gw-cl{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--border2);font-size:14px;line-height:1.5}
+.gw-src{font-size:11px;background:var(--surface2);border-radius:6px;padding:1px 6px;color:var(--text3)}
+.gw-st{font-size:12px;font-weight:700;border-radius:8px;padding:2px 8px;height:fit-content;white-space:nowrap}
+.gw-st.given{background:#eef6ec;color:#2a5024}.gw-st.reserved{background:#fdf5e0;color:#8a6410}.gw-st.cancelled{background:#eee;color:#888}
+.gw-it{border:1px solid var(--border2);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--surface2)}
+.gw-chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--text2);margin-top:8px}
+.gw-var .fi[type=number]{max-width:90px}
+.gw-var small{font-size:11px;color:var(--text3);white-space:nowrap}
+.gw-del{border:none;background:#fdecec;color:#9b2c2c;border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;cursor:pointer}
+.gw-add{border:none;background:none;color:#8a4a0c;font-family:'Sarabun',sans-serif;font-weight:700;margin-top:6px;cursor:pointer}
+
+/* ── โรงทาน ── */
+.ft-box{background:#fff;border:1px solid #efd6b4;border-radius:10px;padding:12px;margin:4px 0 10px}
+.ft-h{font-size:14px;font-weight:800;color:#8a4a0c;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -785,6 +834,21 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
         <div class="fg"><label class="fl">เบอร์โทรสอบถาม</label><input type="tel" class="fi" id="ev-phone" placeholder="เช่น 081-234-5678"></div>
         <div class="fg"><label class="fl">ลิงก์แผนที่ (Google Maps)</label><input type="url" class="fi" id="ev-map" placeholder="วางลิงก์ หรือเว้นว่างเพื่อค้นจากชื่อสถานที่"></div>
         <div class="fg"><label class="fl">ช่องทางร่วมทำบุญ</label><textarea class="fi" id="ev-donation" rows="2" style="resize:vertical" placeholder="เช่น ธ.กรุงไทย 123-4-56789-0 ชื่อบัญชี วัด..."></textarea></div>
+        <div class="ft-box">
+          <div class="ft-h">🍲 โรงทาน</div>
+          <div class="g2">
+            <div class="fg"><label class="fl">งานนี้มีโรงทาน</label><select class="fi" id="ft-has"><option value="">ไม่ระบุ</option><option value="yes">มีโรงทาน</option><option value="no">ไม่มีโรงทาน</option></select></div>
+            <div class="fg"><label class="fl">รับเจ้าภาพโรงทานถึงวันที่</label><input type="date" class="fi" id="ft-close"></div>
+          </div>
+          <label class="gw-chk" style="margin:0 0 10px"><input type="checkbox" id="ft-open"> เปิดรับผู้ที่ต้องการมาตั้งโรงทาน</label>
+          <div class="g2">
+            <div class="fg"><label class="fl">ผู้ประสานงานโรงทาน</label><input class="fi" id="ft-contact" placeholder="ชื่อ"></div>
+            <div class="fg"><label class="fl">เบอร์โทร</label><input class="fi" id="ft-phone" type="tel" placeholder="08x-xxx-xxxx"></div>
+          </div>
+          <div class="fg"><label class="fl">LINE ID หรือลิงก์ LINE (ไม่บังคับ)</label><input class="fi" id="ft-line" placeholder="เช่น @watpa หรือ https://line.me/..."></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">เงื่อนไขการตั้งโรงทาน</label><textarea class="fi" id="ft-note" rows="2" style="resize:vertical" placeholder="เช่น อาหารมังสวิรัติ งดเหล้าบุหรี่ นำเต็นท์มาเอง มีไฟฟ้าให้"></textarea></div>
+        </div>
+        <button type="button" class="gw-open-btn" id="gw-open-btn" style="display:none" onclick="openGiveaway(editingId)">🎁 จัดการแจกของในงานนี้</button>
         <div class="announce-box" id="announce-box" style="display:none">
           <div style="flex:1;min-width:0">
             <div class="announce-t">📢 ประกาศถึงผู้รับข่าวงานบุญ</div>
@@ -888,7 +952,7 @@ html.modal-lock .view,html.modal-lock .cal-grid-wrap{overflow:hidden !important}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, where, runTransaction, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -1728,7 +1792,7 @@ window.openAddModal=function(dateStr){
   ['ev-title','ev-end','ev-time-s','ev-time-e','ev-location','ev-guests','ev-desc','fly-no','fly-time','fly-from','fly-to','fly-seat','fly-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ev-start').value=dateStr||toDateStr(new Date());
   setCat('');setRemindVal('1440');closeFly();resetBPUI();setPublic(false);
-  ['ev-phone','ev-map','ev-donation'].forEach(id=>document.getElementById(id).value='');loadPoster('','');
+  ['ev-phone','ev-map','ev-donation','ft-has','ft-close','ft-contact','ft-phone','ft-line','ft-note'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft-open').checked=false;loadPoster('','');
   document.getElementById('btn-delete').style.display='none';
   document.getElementById('event-modal').classList.add('open');
 };
@@ -1765,6 +1829,8 @@ function openEditModal(ev){
   document.getElementById('ev-phone').value=ev.phone||'';
   document.getElementById('ev-map').value=ev.mapUrl||'';
   document.getElementById('ev-donation').value=ev.donation||'';
+  [['ft-has','ftHas'],['ft-close','ftClose'],['ft-contact','ftContact'],['ft-phone','ftPhone'],['ft-line','ftLine'],['ft-note','ftNote']].forEach(([id,k])=>document.getElementById(id).value=ev[k]||'');
+  document.getElementById('ft-open').checked=ev.ftOpen===true;
   loadPoster(ev.posterUrl||'',ev.posterThumbUrl||'');
   const canDel=userRole==='admin'||ev.recordedByEmail===currentUser?.email;
   document.getElementById('btn-delete').style.display=canDel?'block':'none';
@@ -1788,6 +1854,13 @@ window.saveEvent=async function(){
     phone:selectedCat==='merit'?document.getElementById('ev-phone').value.trim():'',
     mapUrl:selectedCat==='merit'?document.getElementById('ev-map').value.trim():'',
     donation:selectedCat==='merit'?document.getElementById('ev-donation').value.trim():'',
+    ftHas:selectedCat==='merit'?document.getElementById('ft-has').value:'',
+    ftOpen:selectedCat==='merit'&&document.getElementById('ft-open').checked,
+    ftClose:selectedCat==='merit'?document.getElementById('ft-close').value:'',
+    ftContact:selectedCat==='merit'?document.getElementById('ft-contact').value.trim():'',
+    ftPhone:selectedCat==='merit'?document.getElementById('ft-phone').value.trim():'',
+    ftLine:selectedCat==='merit'?document.getElementById('ft-line').value.trim():'',
+    ftNote:selectedCat==='merit'?document.getElementById('ft-note').value.trim():'',
     flyNo:flyOpen?document.getElementById('fly-no').value:'',
     flyTime:flyOpen?document.getElementById('fly-time').value:'',
     flyFrom:flyOpen?document.getElementById('fly-from').value:'',
@@ -1926,6 +1999,252 @@ window.saveTempleInfo=async()=>{
   finally{ btn.disabled=false; btn.innerHTML=h; }
 };
 
+// ══ แจกของงานบุญ ══
+const GW=window.GW={eid:null,cfg:null,unsub:null,tab:'site',edit:null,claims:[],scanner:null,sig:''};   // window: ช่องกรอกในแท็บตั้งค่าเรียกใช้โดยตรง
+const gwRef=eid=>doc(db,'giveaways',eid);
+const gwCol=eid=>collection(db,'giveaways',eid,'claims');
+const gwNum=n=>String(n).replace(/[0-9]/g,d=>'๐๑๒๓๔๕๖๗๘๙'[d]);
+const gwEsc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const gwUid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function gwKeys(cfg){
+  const out=[];
+  (cfg&&cfg.items||[]).forEach(it=>{
+    if(it.variants&&it.variants.length) it.variants.forEach(v=>out.push({key:it.id+'_'+v.id,itemId:it.id,label:it.name+' ('+v.label+')',stock:+v.stock||0}));
+    else out.push({key:it.id,itemId:it.id,label:it.name,stock:+it.stock||0});
+  });
+  return out;
+}
+const gwLeft=(cfg,k)=>{const x=gwKeys(cfg).find(z=>z.key===k);return x?x.stock-((cfg.taken||{})[k]||0):0;};
+function gwCode(){const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;}
+const gwTime=t=>{try{const d=t&&t.toDate?t.toDate():t&&t.seconds?new Date(t.seconds*1000):t?new Date(t):null;if(d&&isNaN(d))return '';return d?d.toLocaleString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';}catch(e){return '';}};
+
+window.openGiveaway=eid=>{
+  const ev=events.find(e=>e.id===eid); if(!ev) return;
+  GW.eid=eid; GW.title=ev.title; GW.sig=''; GW.edit=null;
+  document.getElementById('gw-title').textContent='🎁 แจกของ · '+ev.title;
+  document.getElementById('gw-overlay').classList.add('open');
+  document.querySelectorAll('.gw-admin').forEach(b=>b.style.display=userRole==='admin'?'':'none');
+  document.getElementById('gw-csv-btn').style.display=userRole==='admin'?'':'none';
+  if(GW.unsub) GW.unsub();
+  GW.unsub=onSnapshot(gwRef(eid),s=>{
+    GW.cfg=s.exists()?s.data():{maxPerPerson:1,maxPerItem:1,items:[],taken:{},given:{}};
+    gwRender();
+  },e=>alert('โหลดข้อมูลการแจกไม่ได้\n'+e.message));
+  gwTab('site');
+};
+window.closeGiveaway=()=>{
+  document.getElementById('gw-overlay').classList.remove('open');
+  if(GW.unsub){GW.unsub();GW.unsub=null;}
+  gwStopScan();
+};
+window.gwTab=t=>{
+  GW.tab=t;
+  ['site','sum','cfg'].forEach(x=>{document.getElementById('gw-tab-'+x).classList.toggle('on',x===t);document.getElementById('gw-pane-'+x).style.display=x===t?'block':'none';});
+  if(t!=='site') gwStopScan();
+  if(t==='sum') gwLoadClaims();
+  if(t==='cfg') gwBuildCfg(true);
+  gwRender();
+};
+
+function gwRender(){
+  const cfg=GW.cfg; if(!cfg) return;
+  const keys=gwKeys(cfg);
+  // ยอดคงเหลือ
+  document.getElementById('gw-stock').innerHTML=keys.length?keys.map(k=>{const l=gwLeft(cfg,k.key);return `<span class="gw-chip ${l<=0?'out':l<=10?'low':''}">${gwEsc(k.label)} <b>${gwNum(Math.max(0,l))}</b></span>`;}).join(''):'<div class="gw-note">ยังไม่ได้ตั้งรายการของ — ไปที่แท็บตั้งค่า</div>';
+  // ตัวเลือกของ (สร้างใหม่เมื่อรายการเปลี่ยน ไม่ล้างค่าที่เลือกอยู่)
+  const sig=JSON.stringify([cfg.items,cfg.maxPerItem]);
+  if(sig!==GW.sig){ GW.sig=sig; gwBuildPicker(); } else gwUpdatePickerLeft();
+  if(GW.tab==='sum') gwRenderSum();
+  if(GW.tab==='cfg' && !GW.edit) gwBuildCfg(true);
+}
+
+// ── ตัวเลือกของสำหรับลงทะเบียนหน้างาน ──
+function gwBuildPicker(){
+  const cfg=GW.cfg, maxI=Math.max(1,+cfg.maxPerItem||1);
+  const box=document.getElementById('gw-picker');
+  if(!(cfg.items||[]).length){ box.innerHTML=''; return; }
+  box.innerHTML=`<div class="gw-note" style="margin-bottom:6px">เลือกของ (รวมไม่เกิน ${gwNum(cfg.maxPerPerson||1)} ชิ้น · ชนิดละไม่เกิน ${gwNum(maxI)} ชิ้น)</div>`+
+  cfg.items.map(it=>{
+    const qty=`<select class="fi gw-q" data-item="${it.id}">${Array.from({length:maxI+1},(_,i)=>`<option value="${i}">${i?gwNum(i)+' ชิ้น':'ไม่รับ'}</option>`).join('')}</select>`;
+    const vs=it.variants&&it.variants.length?`<select class="fi gw-v" data-item="${it.id}">${it.variants.map(v=>`<option value="${v.id}">${gwEsc(v.label)}</option>`).join('')}</select>`:'';
+    return `<div class="gw-pick"><div class="gw-pick-n">${gwEsc(it.name)} <span class="gw-left" data-item="${it.id}"></span></div><div class="gw-pick-c">${vs}${qty}</div></div>`;
+  }).join('');
+  box.querySelectorAll('.gw-v').forEach(s=>s.onchange=gwUpdatePickerLeft);
+  gwUpdatePickerLeft();
+}
+function gwUpdatePickerLeft(){
+  const cfg=GW.cfg; if(!cfg) return;
+  (cfg.items||[]).forEach(it=>{
+    const el=document.querySelector(`.gw-left[data-item="${it.id}"]`); if(!el) return;
+    let key=it.id;
+    if(it.variants&&it.variants.length){ const s=document.querySelector(`.gw-v[data-item="${it.id}"]`); key=it.id+'_'+(s?s.value:it.variants[0].id);
+      document.querySelectorAll(`.gw-v[data-item="${it.id}"] option`).forEach(o=>{const v=it.variants.find(x=>x.id===o.value);o.textContent=v.label+' (เหลือ '+Math.max(0,gwLeft(cfg,it.id+'_'+v.id))+')';}); }
+    const l=gwLeft(cfg,key); el.textContent='เหลือ '+gwNum(Math.max(0,l)); el.className='gw-left'+(l<=0?' out':'');
+  });
+}
+function gwSelections(){
+  const cfg=GW.cfg, out=[];
+  (cfg.items||[]).forEach(it=>{
+    const q=+(document.querySelector(`.gw-q[data-item="${it.id}"]`)||{}).value||0; if(!q) return;
+    if(it.variants&&it.variants.length){ const vid=document.querySelector(`.gw-v[data-item="${it.id}"]`).value; const v=it.variants.find(x=>x.id===vid);
+      out.push({key:it.id+'_'+vid,itemId:it.id,label:it.name+' ('+v.label+')',qty:q}); }
+    else out.push({key:it.id,itemId:it.id,label:it.name,qty:q});
+  });
+  return out;
+}
+const gwMsg=(id,html,ok)=>{document.getElementById(id).innerHTML=html?`<div class="gw-msg ${ok?'ok':'err'}">${html}</div>`:'';};
+
+window.gwWalkin=async()=>{
+  const cfg=GW.cfg, btn=document.getElementById('gw-walk-btn');
+  const name=document.getElementById('gw-name').value.trim();
+  const phone=document.getElementById('gw-phone').value.replace(/\D/g,'');
+  const sel=gwSelections(), total=sel.reduce((a,b)=>a+b.qty,0);
+  if(!name) return gwMsg('gw-walk-msg','กรุณากรอกชื่อ');
+  if(!/^0\d{8,9}$/.test(phone)) return gwMsg('gw-walk-msg','เบอร์โทรไม่ถูกต้อง (๙–๑๐ หลัก ขึ้นต้นด้วย ๐)');
+  if(!total) return gwMsg('gw-walk-msg','กรุณาเลือกของอย่างน้อย ๑ ชิ้น');
+  if(total>(+cfg.maxPerPerson||1)) return gwMsg('gw-walk-msg','เลือกเกินสิทธิ์ รวมได้ไม่เกิน '+gwNum(cfg.maxPerPerson||1)+' ชิ้น');
+  btn.disabled=true; btn.textContent='⏳ กำลังบันทึก...';
+  try{
+    const dup=await getDocs(query(gwCol(GW.eid),where('phone','==',phone)));
+    const prev=[]; dup.forEach(d=>{const x=d.data(); if(x.status!=='cancelled') prev.push(x);});
+    if(prev.length){ const x=prev[0]; gwMsg('gw-walk-msg','❌ เบอร์นี้รับไปแล้ว<br>'+gwEsc(x.name)+' · '+x.items.map(i=>gwEsc(i.label)+' ×'+i.qty).join(', ')+'<br>'+gwTime(x.givenAt||x.createdAt)); return; }
+    const code=gwCode();
+    await runTransaction(db,async tx=>{
+      const s=await tx.get(gwRef(GW.eid)); const g=s.data()||{};
+      const taken={...(g.taken||{})}, given={...(g.given||{})};
+      sel.forEach(x=>{const left=gwLeft(g,x.key); if(left<x.qty) throw new Error(x.label+' เหลือ '+Math.max(0,left)+' ชิ้น'); taken[x.key]=(taken[x.key]||0)+x.qty; given[x.key]=(given[x.key]||0)+x.qty;});
+      tx.update(gwRef(GW.eid),{taken,given});
+      tx.set(doc(gwCol(GW.eid)),{code,source:'walkin',name,phone,items:sel.map(({key,label,qty})=>({key,label,qty})),status:'given',createdAt:serverTimestamp(),givenAt:serverTimestamp(),givenBy:currentUser._displayName||currentUser.email});
+    });
+    gwMsg('gw-walk-msg','✅ แจกแล้ว · '+gwEsc(name)+'<br>'+sel.map(i=>gwEsc(i.label)+' ×'+gwNum(i.qty)).join(', '),true);
+    document.getElementById('gw-name').value=''; document.getElementById('gw-phone').value='';
+    document.querySelectorAll('.gw-q').forEach(s=>s.value='0');
+  }catch(e){ gwMsg('gw-walk-msg','❌ '+gwEsc(e.message||e.code)); }
+  finally{ btn.disabled=false; btn.textContent='บันทึกและแจก'; }
+};
+
+// ── สแกนบัตร / ค้นหารหัส ──
+async function gwLoadLib(){
+  if(window.Html5Qrcode) return;
+  await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';s.onload=res;s.onerror=()=>rej(new Error('โหลดตัวสแกนไม่ได้ ตรวจอินเทอร์เน็ต'));document.head.appendChild(s);});
+}
+window.gwToggleScan=async()=>{
+  if(GW.scanner){ gwStopScan(); return; }
+  const btn=document.getElementById('gw-scan-btn');
+  try{
+    btn.textContent='⏳ กำลังเปิดกล้อง...';
+    await gwLoadLib();
+    GW.scanner=new Html5Qrcode('gw-reader');
+    await GW.scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},txt=>{gwStopScan();gwHandleScan(txt);},()=>{});
+    btn.textContent='ปิดกล้อง';
+  }catch(e){ GW.scanner=null; btn.textContent='เปิดกล้องสแกน'; alert('เปิดกล้องไม่ได้\n'+(e.message||e)+'\n\nตรวจว่าอนุญาตให้ใช้กล้อง หรือลองเปิดแอพใน Safari / Chrome'); }
+};
+function gwStopScan(){
+  if(GW.scanner){ const s=GW.scanner; GW.scanner=null; s.stop().then(()=>s.clear()).catch(()=>{}); }
+  const b=document.getElementById('gw-scan-btn'); if(b) b.textContent='เปิดกล้องสแกน';
+}
+function gwHandleScan(txt){
+  let code=String(txt||'').trim();
+  const m=code.match(/^LPG:([^:]+):([A-Z0-9]{6})$/i);
+  if(m){ if(m[1]!==GW.eid){ gwMsg('gw-result','❌ บัตรนี้เป็นของงานอื่น'); return; } code=m[2]; }
+  document.getElementById('gw-code').value=code.toUpperCase().slice(0,6);
+  gwLookup();
+}
+window.gwLookup=async()=>{
+  const code=document.getElementById('gw-code').value.trim().toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(code)) return gwMsg('gw-result','กรุณากรอกรหัส ๖ ตัว');
+  gwMsg('gw-result','⏳ กำลังค้นหา...',true);
+  try{
+    const r=await getDocs(query(gwCol(GW.eid),where('code','==',code)));
+    if(r.empty) return gwMsg('gw-result','❌ ไม่พบบัตรรหัส '+code+' ในงานนี้');
+    const d=r.docs[0], x=d.data();
+    const items=x.items.map(i=>gwEsc(i.label)+' ×'+gwNum(i.qty)).join('<br>');
+    if(x.status==='given') return gwMsg('gw-result',`<b>❌ รับของไปแล้ว</b><br>${gwEsc(x.name)}<br>${items}<br><small>${gwTime(x.givenAt)} โดย ${gwEsc(x.givenBy||'')}</small>`);
+    if(x.status==='cancelled') return gwMsg('gw-result','❌ บัตรนี้ถูกยกเลิกแล้ว');
+    document.getElementById('gw-result').innerHTML=`<div class="gw-msg ok"><b>✅ รับของได้</b><br>${gwEsc(x.name)} ${x.source==='line'?'(LINE)':''}<br>${items}<button class="gw-btn" style="margin-top:10px" onclick="gwGive('${d.id}')">ยืนยันแจกของ</button></div>`;
+  }catch(e){ gwMsg('gw-result','❌ '+gwEsc(e.message)); }
+};
+window.gwGive=async cid=>{
+  try{
+    await runTransaction(db,async tx=>{
+      const cr=doc(db,'giveaways',GW.eid,'claims',cid);
+      const cs=await tx.get(cr), gs=await tx.get(gwRef(GW.eid));
+      const x=cs.data(); if(!x||x.status!=='reserved') throw new Error('บัตรนี้ไม่อยู่ในสถานะรอรับ');
+      const given={...((gs.data()||{}).given||{})};
+      x.items.forEach(i=>given[i.key]=(given[i.key]||0)+i.qty);
+      tx.update(gwRef(GW.eid),{given});
+      tx.update(cr,{status:'given',givenAt:serverTimestamp(),givenBy:currentUser._displayName||currentUser.email});
+    });
+    gwMsg('gw-result','✅ แจกของเรียบร้อย',true); document.getElementById('gw-code').value='';
+  }catch(e){ gwMsg('gw-result','❌ '+gwEsc(e.message)); }
+};
+
+// ── สรุปยอด ──
+function gwRenderSum(){
+  const cfg=GW.cfg, keys=gwKeys(cfg); let T={s:0,r:0,g:0,l:0};
+  const rows=keys.map(k=>{const tk=(cfg.taken||{})[k.key]||0, gv=(cfg.given||{})[k.key]||0, r=tk-gv, l=k.stock-tk; T.s+=k.stock;T.r+=r;T.g+=gv;T.l+=l;
+    return `<tr><td>${gwEsc(k.label)}</td><td>${gwNum(k.stock)}</td><td>${gwNum(r)}</td><td>${gwNum(gv)}</td><td class="${l<=0?'out':''}">${gwNum(Math.max(0,l))}</td></tr>`;}).join('');
+  document.getElementById('gw-sum-table').innerHTML=keys.length?`<div style="overflow-x:auto"><table class="gw-tb"><tr><th>ของ</th><th>ทั้งหมด</th><th>จองไว้</th><th>แจกแล้ว</th><th>เหลือ</th></tr>${rows}<tr class="tot"><td>รวม</td><td>${gwNum(T.s)}</td><td>${gwNum(T.r)}</td><td>${gwNum(T.g)}</td><td>${gwNum(Math.max(0,T.l))}</td></tr></table></div>`:'<div class="gw-note">ยังไม่ได้ตั้งรายการของ</div>';
+}
+async function gwLoadClaims(){
+  document.getElementById('gw-claims').innerHTML='<div class="gw-note">⏳ กำลังโหลด...</div>';
+  try{ const r=await getDocs(gwCol(GW.eid)); GW.claims=[]; r.forEach(d=>GW.claims.push({id:d.id,...d.data()}));
+    GW.claims.sort((a,b)=>((b.createdAt&&b.createdAt.seconds)||0)-((a.createdAt&&a.createdAt.seconds)||0)); gwRenderClaims(); }
+  catch(e){ document.getElementById('gw-claims').innerHTML='<div class="gw-msg err">โหลดรายชื่อไม่ได้: '+gwEsc(e.message)+'</div>'; }
+}
+const gwMask=p=>p?String(p).replace(/^(\d{3})\d+(\d{4})$/,'$1-xxx-$2'):'';
+window.gwRenderClaims=()=>{
+  const q=document.getElementById('gw-search').value.trim().toLowerCase();
+  const list=GW.claims.filter(x=>!q||[x.name,x.phone,x.code].join(' ').toLowerCase().includes(q));
+  const st={given:'แจกแล้ว',reserved:'รอรับ',cancelled:'ยกเลิก'};
+  document.getElementById('gw-count').textContent='· '+gwNum(GW.claims.filter(x=>x.status!=='cancelled').length)+' คน';
+  document.getElementById('gw-claims').innerHTML=list.slice(0,100).map(x=>`<div class="gw-cl"><div><b>${gwEsc(x.name)}</b> <span class="gw-src">${x.source==='line'?'LINE':'หน้างาน'}</span><br><small>${x.items.map(i=>gwEsc(i.label)+' ×'+i.qty).join(', ')}</small><br><small style="color:var(--text3)">${x.code} · ${gwMask(x.phone)} · ${gwTime(x.givenAt||x.createdAt)}</small></div><span class="gw-st ${x.status}">${st[x.status]||x.status}</span></div>`).join('')||'<div class="gw-note">ยังไม่มีรายชื่อ</div>';
+};
+window.gwCsv=()=>{
+  if(userRole!=='admin') return;
+  const esc=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const rows=[['รหัส','ชื่อ','เบอร์โทร','ช่องทาง','ของที่รับ','สถานะ','เวลาลงทะเบียน','เวลารับ','ผู้แจก']].concat(GW.claims.map(x=>[x.code,x.name,x.phone||'',x.source==='line'?'LINE':'หน้างาน',x.items.map(i=>i.label+' x'+i.qty).join(' / '),x.status,gwTime(x.createdAt),gwTime(x.givenAt),x.givenBy||'']));
+  const blob=new Blob(['\ufeff'+rows.map(r=>r.map(esc).join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='แจกของ_'+GW.title.replace(/[\\/:*?"<>|]/g,'')+'.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+
+// ── ตั้งค่า ──
+function gwBuildCfg(fromCfg){
+  const cfg=GW.cfg||{}; const isA=userRole==='admin';
+  if(fromCfg||!GW.edit){ GW.edit=JSON.parse(JSON.stringify(cfg.items||[])); document.getElementById('gw-maxp').value=cfg.maxPerPerson||1; document.getElementById('gw-maxi').value=cfg.maxPerItem||1; }
+  document.querySelectorAll('.gw-cf').forEach(i=>i.disabled=!isA);
+  const tk=cfg.taken||{}, dis=isA?'':'disabled';
+  document.getElementById('gw-items').innerHTML=GW.edit.map((it,i)=>{
+    const hasV=it.variants&&it.variants.length;
+    return `<div class="gw-it">
+      <div class="gw-row"><input class="fi" ${dis} value="${gwEsc(it.name)}" placeholder="ชื่อของ เช่น เสื้อ" oninput="GW.edit[${i}].name=this.value">${isA?`<button class="gw-del" onclick="gwDelItem(${i})">ลบ</button>`:''}</div>
+      <label class="gw-chk"><input type="checkbox" ${dis} ${hasV?'checked':''} onchange="gwToggleVar(${i},this.checked)"> มีไซส์ / ตัวเลือก</label>
+      ${hasV?it.variants.map((v,j)=>`<div class="gw-row gw-var"><input class="fi" ${dis} value="${gwEsc(v.label)}" placeholder="ไซส์ เช่น L" oninput="GW.edit[${i}].variants[${j}].label=this.value"><input class="fi" ${dis} type="number" min="0" value="${v.stock||0}" oninput="GW.edit[${i}].variants[${j}].stock=+this.value"><small>ใช้ไป ${tk[it.id+'_'+v.id]||0}</small>${isA?`<button class="gw-del" onclick="gwDelVar(${i},${j})">✕</button>`:''}</div>`).join('')+(isA?`<button class="gw-add" onclick="gwAddVar(${i})">＋ เพิ่มไซส์</button>`:'')
+        :`<div class="gw-row gw-var"><span style="flex:1">จำนวน</span><input class="fi" ${dis} type="number" min="0" value="${it.stock||0}" oninput="GW.edit[${i}].stock=+this.value"><small>ใช้ไป ${tk[it.id]||0}</small></div>`}
+    </div>`;}).join('')||'<div class="gw-note">ยังไม่มีรายการของ</div>';
+  document.getElementById('gw-cfg-note').textContent=isA?'':'เฉพาะ Admin ที่แก้ไขการตั้งค่าได้';
+}
+window.gwAddItem=()=>{GW.edit.push({id:gwUid('i'),name:'',stock:0,variants:[]});gwBuildCfg(false);};
+window.gwDelItem=i=>{const it=GW.edit[i],tk=(GW.cfg.taken||{});if(Object.keys(tk).some(k=>(k===it.id||k.indexOf(it.id+'_')===0)&&tk[k]>0)){alert('ของชนิดนี้มีผู้รับแล้ว ลบไม่ได้ ตั้งจำนวนให้เท่ากับที่ใช้ไปแทน');return;}GW.edit.splice(i,1);gwBuildCfg(false);};
+window.gwToggleVar=(i,on)=>{GW.edit[i].variants=on?[{id:gwUid('v'),label:'S',stock:0},{id:gwUid('v'),label:'M',stock:0},{id:gwUid('v'),label:'L',stock:0}]:[];gwBuildCfg(false);};
+window.gwAddVar=i=>{GW.edit[i].variants.push({id:gwUid('v'),label:'',stock:0});gwBuildCfg(false);};
+window.gwDelVar=(i,j)=>{const k=GW.edit[i].id+'_'+GW.edit[i].variants[j].id;if(((GW.cfg.taken||{})[k]||0)>0){alert('ไซส์นี้มีผู้รับแล้ว ลบไม่ได้');return;}GW.edit[i].variants.splice(j,1);gwBuildCfg(false);};
+window.gwSaveCfg=async()=>{
+  if(userRole!=='admin') return;
+  const maxP=+document.getElementById('gw-maxp').value||0, maxI=+document.getElementById('gw-maxi').value||0;
+  if(maxP<1||maxI<1) return alert('สิทธิ์ต่อคนต้องอย่างน้อย ๑ ชิ้น');
+  const items=GW.edit.map(it=>({id:it.id,name:String(it.name||'').trim(),stock:Math.max(0,Math.floor(+it.stock||0)),variants:(it.variants||[]).map(v=>({id:v.id,label:String(v.label||'').trim(),stock:Math.max(0,Math.floor(+v.stock||0))}))}));
+  if(items.some(it=>!it.name)) return alert('กรุณาตั้งชื่อของให้ครบ');
+  if(items.some(it=>it.variants.some(v=>!v.label))) return alert('กรุณาตั้งชื่อไซส์ให้ครบ');
+  const tk=GW.cfg.taken||{}, bad=gwKeys({items}).find(k=>k.stock<(tk[k.key]||0));
+  if(bad) return alert(bad.label+' ตั้งจำนวนน้อยกว่าที่ใช้ไปแล้ว ('+tk[bad.key]+')');
+  const btn=document.getElementById('gw-save-btn'); btn.disabled=true;
+  try{ await setDoc(gwRef(GW.eid),{eventId:GW.eid,title:GW.title,maxPerPerson:maxP,maxPerItem:maxI,items,updatedAt:serverTimestamp(),updatedBy:currentUser._displayName||currentUser.email},{merge:true});
+    GW.edit=null; GW.sig=''; showToast('✅ บันทึกการตั้งค่าแล้ว'); }
+  catch(e){ alert('❌ บันทึกไม่สำเร็จ\n'+(e.code||e.message)); }
+  finally{ btn.disabled=false; }
+};
+
 // ══ ประกาศงานบุญ ══
 let bcStats=null;
 const thN=n=>String(n).replace(/[0-9]/g,d=>'๐๑๒๓๔๕๖๗๘๙'[d]);
@@ -1940,6 +2259,7 @@ async function loadBroadcastStats(){
 function updateAnnounceUI(){
   const box=document.getElementById('announce-box'); if(!box) return;
   const ev=editingId?events.find(e=>e.id===editingId):null;
+  const gb=document.getElementById('gw-open-btn'); if(gb) gb.style.display=ev&&selectedCat==='merit'?'block':'none';
   const show=userRole==='admin'&&ev&&selectedCat==='merit';
   box.style.display=show?'flex':'none';
   if(!show) return;
@@ -2324,5 +2644,67 @@ window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
 });
 </script>
+
+<!-- ══ แจกของงานบุญ ══ -->
+<div class="gw-overlay" id="gw-overlay">
+  <div class="gw-head">
+    <div class="gw-title" id="gw-title">🎁 แจกของ</div>
+    <button class="gw-x" onclick="closeGiveaway()">✕</button>
+  </div>
+  <div class="gw-tabs">
+    <button id="gw-tab-site" onclick="gwTab('site')">หน้างาน</button>
+    <button id="gw-tab-sum" onclick="gwTab('sum')">สรุปยอด</button>
+    <button id="gw-tab-cfg" onclick="gwTab('cfg')">ตั้งค่า</button>
+  </div>
+  <div class="gw-body">
+    <!-- หน้างาน -->
+    <div id="gw-pane-site">
+      <div class="gw-chips" id="gw-stock"></div>
+      <div class="gw-card">
+        <div class="gw-h">📷 สแกนบัตรรับของ</div>
+        <div id="gw-reader"></div>
+        <button class="gw-btn gw-btn2" id="gw-scan-btn" onclick="gwToggleScan()">เปิดกล้องสแกน</button>
+        <div class="gw-row"><input class="fi" id="gw-code" placeholder="หรือพิมพ์รหัสบนบัตร 6 ตัว" maxlength="6" style="text-transform:uppercase"><button class="gw-btn gw-btn2" style="width:auto;margin:0" onclick="gwLookup()">ค้นหา</button></div>
+        <div id="gw-result"></div>
+      </div>
+      <div class="gw-card">
+        <div class="gw-h">📝 ลงทะเบียนหน้างาน</div>
+        <div class="fg"><label class="fl">ชื่อ</label><input class="fi" id="gw-name" placeholder="ชื่อ–นามสกุล"></div>
+        <div class="fg"><label class="fl">เบอร์โทร</label><input class="fi" id="gw-phone" type="tel" inputmode="numeric" placeholder="ใช้ตรวจรับซ้ำ"></div>
+        <div id="gw-picker"></div>
+        <div class="gw-consent">แจ้งผู้รับ: ทางวัดเก็บชื่อและเบอร์โทรเพื่อใช้ตรวจสอบการรับของในงานนี้เท่านั้น</div>
+        <button class="gw-btn" id="gw-walk-btn" onclick="gwWalkin()">บันทึกและแจก</button>
+        <div id="gw-walk-msg"></div>
+      </div>
+    </div>
+    <!-- สรุปยอด -->
+    <div id="gw-pane-sum" style="display:none">
+      <div class="gw-card"><div class="gw-h">ยอดคงเหลือ</div><div id="gw-sum-table"></div></div>
+      <div class="gw-card">
+        <div class="gw-h">รายชื่อผู้รับ <span id="gw-count" style="font-weight:400;color:var(--text3)"></span></div>
+        <input class="fi" id="gw-search" placeholder="ค้นหาชื่อ เบอร์โทร หรือรหัส" oninput="gwRenderClaims()">
+        <div id="gw-claims"></div>
+        <button class="gw-btn gw-btn2" id="gw-csv-btn" onclick="gwCsv()">⬇ ดาวน์โหลดรายชื่อ (CSV)</button>
+      </div>
+    </div>
+    <!-- ตั้งค่า -->
+    <div id="gw-pane-cfg" style="display:none">
+      <div class="gw-card">
+        <div class="gw-h">สิทธิ์ต่อคน</div>
+        <div class="g2">
+          <div class="fg"><label class="fl">รับได้รวมไม่เกิน (ชิ้น)</label><input class="fi gw-cf" id="gw-maxp" type="number" min="1"></div>
+          <div class="fg"><label class="fl">แต่ละชนิดไม่เกิน (ชิ้น)</label><input class="fi gw-cf" id="gw-maxi" type="number" min="1"></div>
+        </div>
+      </div>
+      <div class="gw-card">
+        <div class="gw-h">รายการของ</div>
+        <div id="gw-items"></div>
+        <button class="gw-btn gw-btn2 gw-admin" onclick="gwAddItem()">＋ เพิ่มของ</button>
+      </div>
+      <button class="gw-btn gw-admin" id="gw-save-btn" onclick="gwSaveCfg()">บันทึกการตั้งค่า</button>
+      <div class="gw-note" id="gw-cfg-note"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
